@@ -14,4 +14,4 @@ add a settings menu. esc to open
 shaders
 different effects with shaders. for example a flash effect when you save, text near cursor gets a radial/horizontal gradient color.
 add background image
-make cursor blink
+make cursor blink. make it with a shader
