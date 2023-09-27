@@ -13,7 +13,7 @@ namespace Notepad___Raylib {
       
       static void Main(string[] args) {
          Cursor cursor = new Cursor();
-         List<Line> lines = new List<Line>();
+         List<Line> lines;
 
          Raylib.InitWindow(800, 600, "Notepad--");
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
