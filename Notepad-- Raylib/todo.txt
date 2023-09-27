@@ -1,0 +1,17 @@
+make the text modifiable
+save file
+initial publish. notepad-- <file name> to open files from cli
+add scrollbars
+text selection
+text selection rendering
+implement zoom
+add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level
+add shortcuts
+find in file. ctrl + f
+highlight the line the cursor is on
+cursor navigation with mouse
+add a settings menu. esc to open
+shaders
+different effects with shaders. for example a flash effect when you save, text near cursor gets a radial/horizontal gradient color.
+add background image
+make cursor blink
