@@ -1,3 +1,4 @@
+set initial capacity to line in the constructor.
 make the text modifiable
 save file
 initial publish. notepad-- <file name> to open files from cli
