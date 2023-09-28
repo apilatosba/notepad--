@@ -2,7 +2,6 @@
 
 namespace Notepad___Raylib {
    internal class Line {
-      // TODO maybe List<char> instead of string? cause it is easier to edit
       string value;
       /// <summary>
       /// Zero-based.
@@ -20,6 +19,15 @@ namespace Notepad___Raylib {
       public Line(string value, uint lineNumber) {
          this.value = value;
          this.lineNumber = lineNumber;
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="line">a copy</param>
+      public Line(Line line) {
+         this.value = line.value;
+         this.lineNumber = line.lineNumber;
       }
 
       public void InsertTextAt(int index, string c) {

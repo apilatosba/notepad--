@@ -35,11 +35,18 @@ namespace Notepad___Raylib {
 
       static void Main(string[] args) {
          lastInputTimer.Start();
+
          Cursor cursor = new Cursor();
          List<Line> lines;
 
          Raylib.InitWindow(800, 600, "Notepad--");
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
+         Camera2D camera = new Camera2D() {
+            zoom = 1.0f,
+            target = new Vector2(0, 0),
+            rotation = 0.0f,
+            offset = new Vector2(0, 0),
+         };
 
          Font font = Raylib.LoadFont("Fonts/Inconsolata-Medium.ttf");
          Line.height = Line.MeasureTextHeight(font, "A", fontSize);
@@ -47,31 +54,73 @@ namespace Notepad___Raylib {
          lines = ReadLinesFromFile("test.txt");
 
          while (!Raylib.WindowShouldClose()) {
+            // Input handling
+            {
+               if (ShouldAcceptInput(out string pressedKeys, out KeyboardKey specialKey)) {
+                  if (pressedKeys != null) {
+                     PrintPressedKeys(pressedKeys);
+
+                     InsertTextAtCursor(lines, cursor, pressedKeys);
+                  }
+
+                  if (specialKey != KeyboardKey.KEY_NULL) {
+                     Console.WriteLine(specialKey);
+
+                     switch (specialKey) {
+                        case KeyboardKey.KEY_BACKSPACE:
+                           if (cursor.IsCursorAtBeginningOfFile()) break;
+
+                           if (cursor.IsCursorAtBeginningOfLine()) {
+                              Line currentLine = lines[cursor.position.y];
+                              Line lineAbove = lines[cursor.position.y - 1];
+
+                              cursor.position.x = lineAbove.Value.Length;
+
+                              lineAbove.InsertTextAt(lineAbove.Value.Length, currentLine.Value);
+                              lines.RemoveAt(cursor.position.y);
+
+                              cursor.position.y--;
+
+                              break;
+                           }
+
+                           RemoveTextAtCursor(lines, cursor, 1);
+                           break;
+                        case KeyboardKey.KEY_ENTER:
+                           break;
+                        case KeyboardKey.KEY_TAB:
+                           break;
+                        case KeyboardKey.KEY_DELETE:
+                           break;
+                        case KeyboardKey.KEY_RIGHT:
+                           break;
+                        case KeyboardKey.KEY_LEFT:
+                           break;
+                        case KeyboardKey.KEY_UP:
+                           break;
+                        case KeyboardKey.KEY_DOWN:
+                           break;
+                     }
+                  }
+
+                  cursor.HandleArrowKeysNavigation(lines);
+               }
+            } // End of input handling
+
             Raylib.BeginDrawing();
+            Raylib.BeginMode2D(camera);
 
             Raylib.ClearBackground(BACKGROUND_COLOR);
 
-            if (ShouldAcceptInput(out string pressedKeys, out KeyboardKey specialKey)) {
-               if (pressedKeys != null) {
-                  PrintPressedKeys(pressedKeys);
-                  InsertTextAtCursor(lines, cursor, pressedKeys);
-               }
-
-               if(specialKey != KeyboardKey.KEY_NULL) {
-                  Console.WriteLine(specialKey);
-               }
-               
-               cursor.HandleArrowKeysNavigation(lines);
-            }
-
             RenderLines(lines, font);
-
             cursor.Render(lines, fontSize, leftPadding, font);
 
+            Raylib.EndMode2D();
             Raylib.EndDrawing();
          }
 
          Raylib.UnloadFont(font);
+         Raylib.CloseWindow();
       }
 
       /// <summary>
@@ -144,7 +193,7 @@ namespace Notepad___Raylib {
          if ((pressedChars = GetPressedCharsAsString()) != null || IsSpecialKeyPressed(out specialKey)) {
             keyHoldTimer.Start();
 
-            if(inputRushCounter > 0 && keyHoldTimer.ElapsedMilliseconds < waitTimeBeforeRapidInputRush) return false;
+            if (inputRushCounter > 0 && keyHoldTimer.ElapsedMilliseconds < waitTimeBeforeRapidInputRush) return false;
 
             inputRushCounter++;
 

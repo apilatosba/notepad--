@@ -13,12 +13,9 @@ namespace Notepad___Raylib {
       Color color = new Color(150, 150, 150, 255);
 
       public void Render(in List<Line> lines, int fontSize, int leftPadding, Font font) {
-         Line line = lines[position.y];
-         
-         string textBeforeCursor = line.Value.Substring(0, position.x);
+         int distance = GetWorldSpacePosition(lines, fontSize, leftPadding, font).x;
 
-         int distance = (int)Raylib.MeasureTextEx(font, textBeforeCursor, fontSize, 0).X;
-         Raylib.DrawRectangle(leftPadding + distance, position.y * Line.height, 1, Line.height, color);
+         Raylib.DrawRectangle(distance, position.y * Line.height, 1, Line.height, color);
       }
 
       public void HandleArrowKeysNavigation(in List<Line> lines) {
@@ -58,6 +55,27 @@ namespace Notepad___Raylib {
             position.x = Math.Min(position.x, lines[position.y].Value.Length);
 
          }
+      }
+
+      /// <summary>
+      /// In pixels. Top left corner of the cursor.
+      /// </summary>
+      /// <param name="lines"></param>
+      /// <param name="fontSize"></param>
+      /// <param name="leftPadding"></param>
+      /// <param name="font"></param>
+      /// <returns></returns>
+      public Int2 GetWorldSpacePosition(in List<Line> lines, int fontSize, int leftPadding, Font font) {
+         Int2 pos = new Int2();
+
+         Line line = lines[position.y];
+
+         string textBeforeCursor = line.Value.Substring(0, position.x);
+
+         pos.x = (int)Raylib.MeasureTextEx(font, textBeforeCursor, fontSize, 0).X + leftPadding;
+         pos.y = position.y * Line.height;
+
+         return pos;
       }
 
       public bool IsCursorAtEndOfLine(in List<Line> lines) {

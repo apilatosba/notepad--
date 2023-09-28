@@ -2,6 +2,7 @@ make the text modifiable
 save file
 initial publish. notepad-- <file name> to open files from cli
 add scrollbars
+get rid of leftPadding. we have camera now
 font does look so bad. it looks glitchy
 text selection
 text selection rendering
