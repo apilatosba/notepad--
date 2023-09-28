@@ -60,11 +60,12 @@ namespace Notepad___Raylib {
                if(specialKey != KeyboardKey.KEY_NULL) {
                   Console.WriteLine(specialKey);
                }
+               
+               cursor.HandleArrowKeysNavigation(lines);
             }
 
             RenderLines(lines, font);
 
-            //cursor.HandleArrowKeysNavigation(lines);
             cursor.Render(lines, fontSize, leftPadding, font);
 
             Raylib.EndDrawing();
