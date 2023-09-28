@@ -1,6 +1,7 @@
 ﻿using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 
@@ -10,8 +11,30 @@ namespace Notepad___Raylib {
       static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 255);
       static int fontSize = 20;
       static int leftPadding = 12;
+      /// <summary>
+      /// In milliseconds.
+      /// </summary>
+      static long timeSinceLastInput = 0;
+      /// <summary>
+      /// How many milliseconds to wait before accepting new input.
+      /// </summary>
+      static int inputDelay = 30;
+      /// <summary>
+      /// In milliseconds. This means that writing/deleting/(moving cursor) will wait after moving one character even if you are holding down the key.
+      /// </summary>
+      readonly static long waitTimeBeforeRapidInputRush = 700;
+      static Stopwatch lastInputTimer = new Stopwatch();
+      /// <summary>
+      /// Measures how long the user has been holding down key.
+      /// </summary>
+      static Stopwatch keyHoldTimer = new Stopwatch();
+      /// <summary>
+      /// Holds the number of times the cursor has moved while the user is holding down the arrow key.
+      /// </summary>
+      static int inputRushCounter = 0;
 
       static void Main(string[] args) {
+         lastInputTimer.Start();
          Cursor cursor = new Cursor();
          List<Line> lines;
 
@@ -28,19 +51,20 @@ namespace Notepad___Raylib {
 
             Raylib.ClearBackground(BACKGROUND_COLOR);
 
-            var pressedKeys = GetPressedCharsAsString();
-            if (pressedKeys != null) {
-               PrintPressedKeys(pressedKeys);
-               InsertTextAtCursor(lines, cursor, pressedKeys);
-            }
+            if (ShouldAcceptInput(out string pressedKeys, out KeyboardKey specialKey)) {
+               if (pressedKeys != null) {
+                  PrintPressedKeys(pressedKeys);
+                  InsertTextAtCursor(lines, cursor, pressedKeys);
+               }
 
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE)) {
-               RemoveTextAtCursor(lines, cursor, 1);
+               if(specialKey != KeyboardKey.KEY_NULL) {
+                  Console.WriteLine(specialKey);
+               }
             }
 
             RenderLines(lines, font);
 
-            cursor.HandleArrowKeysNavigation(lines);
+            //cursor.HandleArrowKeysNavigation(lines);
             cursor.Render(lines, fontSize, leftPadding, font);
 
             Raylib.EndDrawing();
@@ -106,6 +130,60 @@ namespace Notepad___Raylib {
          Line line = lines[cursor.position.y];
          line.RemoveTextAt(cursor.position.x, count, direction);
          cursor.position.x += direction == Direction.Left ? -count : count;
+      }
+
+      static bool ShouldAcceptInput(out string pressedChars, out KeyboardKey specialKey) {
+         pressedChars = null;
+         specialKey = KeyboardKey.KEY_NULL;
+
+         timeSinceLastInput = lastInputTimer.ElapsedMilliseconds;
+
+         if (timeSinceLastInput < inputDelay) return false;
+
+         if ((pressedChars = GetPressedCharsAsString()) != null || IsSpecialKeyPressed(out specialKey)) {
+            keyHoldTimer.Start();
+
+            if(inputRushCounter > 0 && keyHoldTimer.ElapsedMilliseconds < waitTimeBeforeRapidInputRush) return false;
+
+            inputRushCounter++;
+
+            lastInputTimer.Restart();
+            return true;
+         }
+
+         keyHoldTimer.Stop();
+         keyHoldTimer.Reset();
+         inputRushCounter = 0;
+         return true;
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="specialKey">dummy when method returns false</param>
+      /// <returns></returns>
+      static bool IsSpecialKeyPressed(out KeyboardKey specialKey) {
+         specialKey = KeyboardKey.KEY_NULL;
+
+         KeyboardKey[] specialKeys = new KeyboardKey[] {
+            KeyboardKey.KEY_BACKSPACE,
+            KeyboardKey.KEY_ENTER,
+            KeyboardKey.KEY_TAB,
+            KeyboardKey.KEY_DELETE,
+            KeyboardKey.KEY_RIGHT,
+            KeyboardKey.KEY_LEFT,
+            KeyboardKey.KEY_UP,
+            KeyboardKey.KEY_DOWN
+         };
+
+         foreach (KeyboardKey key in specialKeys) {
+            if (Raylib.IsKeyDown(key)) {
+               specialKey = key;
+               return true;
+            }
+         }
+
+         return false;
       }
    }
 }
