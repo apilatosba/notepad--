@@ -32,30 +32,19 @@ namespace Notepad___Raylib {
       /// Holds the number of times the cursor has moved while the user is holding down the arrow key.
       /// </summary>
       int cursorRushCounter = 0;
-      
+
 
       public Cursor() {
          stopwatch.Start();
       }
 
-      // TODO: Render shouldn't modify the cursor position.
-      public void Render(in List<Line> lines, int fontSize, int leftPadding) {
+      public void Render(in List<Line> lines, int fontSize, int leftPadding, Font font) {
          Line line = lines[position.y];
-         string textBeforeCursor;
-         try {
-            textBeforeCursor = line.Value.Substring(0, position.x);
-         }
-         catch (System.ArgumentOutOfRangeException) {
-            if (lines.Count <= position.y + 1) {
-               position.y++;
-               position.x = 0;
-               textBeforeCursor = "";
-            } else { // I have reached the end of the file.
-               textBeforeCursor = line.Value;
-            }
-         }
-         int distance = Raylib.MeasureText(textBeforeCursor, fontSize);
-         Raylib.DrawRectangle(leftPadding + distance, (int)position.y * Line.height, 1, Line.height, color);
+         
+         string textBeforeCursor = line.Value.Substring(0, position.x);
+
+         int distance = (int)Raylib.MeasureTextEx(font, textBeforeCursor, fontSize, 0).X;
+         Raylib.DrawRectangle(leftPadding + distance, position.y * Line.height, 1, Line.height, color);
       }
 
       public void HandleArrowKeysNavigation(in List<Line> lines) {
@@ -99,7 +88,7 @@ namespace Notepad___Raylib {
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_UP)) {
             keyHoldTimer.Start();
 
-            if(IsCursorAtFirstLine()) return;
+            if (IsCursorAtFirstLine()) return;
 
             if (cursorRushCounter > 0 && keyHoldTimer.ElapsedMilliseconds < waitTimeBeforeRapidCursorRush) return;
 

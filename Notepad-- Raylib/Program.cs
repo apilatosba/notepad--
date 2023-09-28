@@ -1,8 +1,8 @@
 ﻿using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Numerics;
 
 namespace Notepad___Raylib {
    internal class Program {
@@ -10,13 +10,16 @@ namespace Notepad___Raylib {
       static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 255);
       static int fontSize = 20;
       static int leftPadding = 12;
-      
+
       static void Main(string[] args) {
          Cursor cursor = new Cursor();
          List<Line> lines;
 
          Raylib.InitWindow(800, 600, "Notepad--");
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
+
+         Font font = Raylib.LoadFont("Fonts/Inconsolata-Medium.ttf");
+         Line.height = Line.MeasureTextHeight(font, "A", fontSize);
 
          lines = ReadLinesFromFile("test.txt");
 
@@ -25,35 +28,54 @@ namespace Notepad___Raylib {
 
             Raylib.ClearBackground(BACKGROUND_COLOR);
 
-            var pressedKeys = GetPressedChars();
+            var pressedKeys = GetPressedCharsAsString();
+            if (pressedKeys != null) {
+               PrintPressedKeys(pressedKeys);
+               InsertTextAtCursor(lines, cursor, pressedKeys);
+            }
 
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE)) {
+               RemoveTextAtCursor(lines, cursor, 1);
+            }
 
-            RenderLines(lines);
-            
+            RenderLines(lines, font);
+
             cursor.HandleArrowKeysNavigation(lines);
-            cursor.Render(lines, fontSize, leftPadding);
+            cursor.Render(lines, fontSize, leftPadding, font);
 
             Raylib.EndDrawing();
          }
+
+         Raylib.UnloadFont(font);
       }
 
       /// <summary>
       /// Doesn't detect special keys: enter, backspace, arrow keys, tab, delete.
       /// </summary>
-      /// <returns></returns>
+      /// <returns>null if nothing is pressed</returns>
       static List<char> GetPressedChars() {
          List<char> pressedKeys = new List<char>();
          char key;
          while ((key = (char)Raylib.GetCharPressed()) != 0) {
             pressedKeys.Add(key);
          }
-         return pressedKeys;
+         return pressedKeys.Count == 0 ? null : pressedKeys;
+      }
+
+      static string GetPressedCharsAsString() {
+         string pressedKeys = new string(GetPressedChars()?.ToArray());
+         return string.IsNullOrEmpty(pressedKeys) ? null : pressedKeys;
       }
 
       static void PrintPressedKeys(List<char> pressedKeys) {
          string keys = new string(pressedKeys.ToArray());
          if (!string.IsNullOrEmpty(keys))
             Console.WriteLine(keys);
+      }
+
+      static void PrintPressedKeys(string pressedKeys) {
+         if (!string.IsNullOrEmpty(pressedKeys))
+            Console.WriteLine(pressedKeys);
       }
 
       static List<Line> ReadLinesFromFile(string path) {
@@ -66,10 +88,24 @@ namespace Notepad___Raylib {
          return lines;
       }
 
-      static void RenderLines(List<Line> lines) {
+      static void RenderLines(List<Line> lines, Font font) {
          for (int i = 0; i < lines.Count; i++) {
-            Raylib.DrawText(lines[i].Value, leftPadding, i * Line.height, fontSize, TEXT_COLOR);
+            //Raylib.DrawText(lines[i].Value, leftPadding, i * Line.height, fontSize, TEXT_COLOR);
+            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(leftPadding, i * Line.height), fontSize, 0, TEXT_COLOR);
          }
+      }
+
+      static void InsertTextAtCursor(List<Line> lines, Cursor cursor, string text) {
+         Line line = lines[cursor.position.y];
+         line.InsertTextAt(cursor.position.x, text);
+
+         cursor.position.x += text.Length;
+      }
+
+      static void RemoveTextAtCursor(List<Line> lines, Cursor cursor, int count, Direction direction = Direction.Left) {
+         Line line = lines[cursor.position.y];
+         line.RemoveTextAt(cursor.position.x, count, direction);
+         cursor.position.x += direction == Direction.Left ? -count : count;
       }
    }
 }

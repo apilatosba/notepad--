@@ -1,8 +1,8 @@
-set initial capacity to line in the constructor.
 make the text modifiable
 save file
 initial publish. notepad-- <file name> to open files from cli
 add scrollbars
+font does look so bad. it looks glitchy
 text selection
 text selection rendering
 implement zoom
@@ -16,3 +16,4 @@ shaders
 different effects with shaders. for example a flash effect when you save, text near cursor gets a radial/horizontal gradient color.
 add background image
 make cursor blink. make it with a shader
+add raylib to license-3rd-party.txt
