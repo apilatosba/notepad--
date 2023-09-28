@@ -38,6 +38,7 @@ namespace Notepad___Raylib {
 
          Cursor cursor = new Cursor();
          List<Line> lines;
+         ScrollBar horizontalScrollBar = new ScrollBar();
 
          Raylib.InitWindow(800, 600, "Notepad--");
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
@@ -56,7 +57,7 @@ namespace Notepad___Raylib {
          while (!Raylib.WindowShouldClose()) {
             // Input handling
             {
-               if (ShouldAcceptInput(out string pressedKeys, out KeyboardKey specialKey)) {
+               if (ShouldAcceptKeyboardInput(out string pressedKeys, out KeyboardKey specialKey)) {
                   if (pressedKeys != null) {
                      PrintPressedKeys(pressedKeys);
 
@@ -116,6 +117,9 @@ namespace Notepad___Raylib {
             cursor.Render(lines, fontSize, leftPadding, font);
 
             Raylib.EndMode2D();
+
+            horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth(), camera, FindDistanceToRightMostChar(lines, font));
+
             Raylib.EndDrawing();
          }
 
@@ -143,8 +147,7 @@ namespace Notepad___Raylib {
 
       static void PrintPressedKeys(List<char> pressedKeys) {
          string keys = new string(pressedKeys.ToArray());
-         if (!string.IsNullOrEmpty(keys))
-            Console.WriteLine(keys);
+         PrintPressedKeys(keys);
       }
 
       static void PrintPressedKeys(string pressedKeys) {
@@ -164,7 +167,6 @@ namespace Notepad___Raylib {
 
       static void RenderLines(List<Line> lines, Font font) {
          for (int i = 0; i < lines.Count; i++) {
-            //Raylib.DrawText(lines[i].Value, leftPadding, i * Line.height, fontSize, TEXT_COLOR);
             Raylib.DrawTextEx(font, lines[i].Value, new Vector2(leftPadding, i * Line.height), fontSize, 0, TEXT_COLOR);
          }
       }
@@ -182,7 +184,7 @@ namespace Notepad___Raylib {
          cursor.position.x += direction == Direction.Left ? -count : count;
       }
 
-      static bool ShouldAcceptInput(out string pressedChars, out KeyboardKey specialKey) {
+      static bool ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey) {
          pressedChars = null;
          specialKey = KeyboardKey.KEY_NULL;
 
@@ -235,30 +237,26 @@ namespace Notepad___Raylib {
 
          return false;
       }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="lines"></param>
+      /// <param name="font"></param>
+      /// <returns>in pixels</returns>
+      static int FindDistanceToRightMostChar(in List<Line> lines, Font font) {
+         Line longestLine = FindLongestLine(lines);
+         return (int)Raylib.MeasureTextEx(font, longestLine.Value, fontSize, 0).X + leftPadding;
+      }
+
+      static Line FindLongestLine(in List<Line> lines) {
+         Line longestLine = lines[0];
+         for (int i = 1; i < lines.Count; i++) {
+            if (lines[i].Value.Length > longestLine.Value.Length) {
+               longestLine = lines[i];
+            }
+         }
+         return longestLine;
+      }
    }
 }
-/*
-make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like
-Aldus PageMaker including versions of Lorem Ipsum.
-
-Why do we use it?
-It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
-The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look
-like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum'
-will uncover many web sites still in their infancy.
-Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-
-
-Where does it come from?
-Contrary to popular belief, Lorem Ipsum is not simply random text.
-It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard
-McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of
-the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through
-the cites of the word in classical literature, discovered the undoubtable source.
-Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum"
-(The Extremes of Good and Evil) by Cicero, written in 45 BC.
-This book is a treatise on the theory of ethics, very popular during the Renaissance.
-The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..",
-comes from a line in section 1.10.32.
-*/
