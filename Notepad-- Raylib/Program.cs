@@ -71,96 +71,105 @@ namespace Notepad___Raylib {
                   if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
                   if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
-                  if(modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) &&
-                        Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
-                     WriteLinesToFile("test.txt", lines);
+                  // Handling key presses that have modifiers
+                  {
+                     if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) &&
+                           Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
+                        WriteLinesToFile("test.txt", lines);
+                     }
                   }
 
-                  if (pressedKeys != null) {
-                     PrintPressedKeys(pressedKeys);
+                  // Handling key presses that don't have modifiers ie. normal key presses
+                  {
+                     if (pressedKeys != null) {
+                        PrintPressedKeys(pressedKeys);
 
-                     InsertTextAtCursor(lines, cursor, pressedKeys);
+                        InsertTextAtCursor(lines, cursor, pressedKeys);
+                     }
                   }
 
-                  if (specialKey != KeyboardKey.KEY_NULL) {
-                     
-                     switch (specialKey) {
-                        case KeyboardKey.KEY_BACKSPACE:
-                           if (cursor.IsCursorAtBeginningOfFile()) break;
+                  // Handling special keys, both with and without modifiers
+                  {
+                     if (specialKey != KeyboardKey.KEY_NULL) {
 
-                           if (cursor.IsCursorAtBeginningOfLine()) {
-                              Line currentLine = lines[cursor.position.y];
-                              Line lineAbove = lines[cursor.position.y - 1];
+                        switch (specialKey) {
+                           case KeyboardKey.KEY_BACKSPACE:
+                              if (cursor.IsCursorAtBeginningOfFile()) break;
 
-                              cursor.position.x = lineAbove.Value.Length;
+                              if (cursor.IsCursorAtBeginningOfLine()) {
+                                 Line currentLine = lines[cursor.position.y];
+                                 Line lineAbove = lines[cursor.position.y - 1];
 
-                              lineAbove.InsertTextAt(lineAbove.Value.Length, currentLine.Value);
-                              lines.RemoveAt(cursor.position.y);
+                                 cursor.position.x = lineAbove.Value.Length;
 
-                              cursor.position.y--;
+                                 lineAbove.InsertTextAt(lineAbove.Value.Length, currentLine.Value);
+                                 lines.RemoveAt(cursor.position.y);
 
-                              for(int i = cursor.position.y + 1; i < lines.Count; i++) {
-                                 lines[i].LineNumber--;
-                              }
-                           } else {
-                              RemoveTextAtCursor(lines, cursor, 1);
-                           }
+                                 cursor.position.y--;
 
-                           break;
-                        case KeyboardKey.KEY_ENTER: {
-                              Line currentLine = lines[cursor.position.y];
-                              string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
-
-                              Line newLine = new Line(textAfterCursor, currentLine.LineNumber + 1);
-
-                              if(cursor.IsCursorAtEndOfFile(lines)) {
-                                 lines.Add(newLine);
+                                 for (int i = cursor.position.y + 1; i < lines.Count; i++) {
+                                    lines[i].LineNumber--;
+                                 }
                               } else {
-                                 lines.Insert((int)currentLine.LineNumber + 1, newLine);
+                                 RemoveTextAtCursor(lines, cursor, 1);
                               }
 
-                              currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
+                              break;
+                           case KeyboardKey.KEY_ENTER: {
+                                 Line currentLine = lines[cursor.position.y];
+                                 string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
 
-                              cursor.position.x = 0;
-                              cursor.position.y++;
+                                 Line newLine = new Line(textAfterCursor, currentLine.LineNumber + 1);
 
-                              for(int i = cursor.position.y + 1; i < lines.Count; i++) {
-                                 lines[i].LineNumber++;
+                                 if (cursor.IsCursorAtEndOfFile(lines)) {
+                                    lines.Add(newLine);
+                                 } else {
+                                    lines.Insert((int)currentLine.LineNumber + 1, newLine);
+                                 }
+
+                                 currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
+
+                                 cursor.position.x = 0;
+                                 cursor.position.y++;
+
+                                 for (int i = cursor.position.y + 1; i < lines.Count; i++) {
+                                    lines[i].LineNumber++;
+                                 }
                               }
-                           }
-                           break;
-                        case KeyboardKey.KEY_TAB:
-                           InsertTextAtCursor(lines, cursor, new string(' ', tabSize));
-                           break;
-                        case KeyboardKey.KEY_DELETE:
-                           if (cursor.IsCursorAtEndOfLine(lines)) {
-                              Line currentLine = lines[cursor.position.y];
-                              Line lineBelow = lines[cursor.position.y + 1];
+                              break;
+                           case KeyboardKey.KEY_TAB:
+                              InsertTextAtCursor(lines, cursor, new string(' ', tabSize));
+                              break;
+                           case KeyboardKey.KEY_DELETE:
+                              if (cursor.IsCursorAtEndOfLine(lines)) {
+                                 Line currentLine = lines[cursor.position.y];
+                                 Line lineBelow = lines[cursor.position.y + 1];
 
-                              currentLine.InsertTextAt(currentLine.Value.Length, lineBelow.Value);
+                                 currentLine.InsertTextAt(currentLine.Value.Length, lineBelow.Value);
 
-                              lines.RemoveAt(cursor.position.y + 1);
+                                 lines.RemoveAt(cursor.position.y + 1);
 
-                              for(int i = cursor.position.y + 1; i < lines.Count; i++) {
-                                 lines[i].LineNumber--;
+                                 for (int i = cursor.position.y + 1; i < lines.Count; i++) {
+                                    lines[i].LineNumber--;
+                                 }
+                              } else {
+                                 RemoveTextAtCursor(lines, cursor, 1, Direction.Right);
                               }
-                           } else {
-                              RemoveTextAtCursor(lines, cursor, 1, Direction.Right);
-                           }
 
-                           break;
-                        case KeyboardKey.KEY_RIGHT:
-                           //camera.target.X += 10;
-                           break;
-                        case KeyboardKey.KEY_LEFT:
-                           //camera.target.X -= 10;
-                           break;
-                        case KeyboardKey.KEY_UP:
-                           //camera.target.Y -= 10;
-                           break;
-                        case KeyboardKey.KEY_DOWN:
-                           //camera.target.Y += 10;
-                           break;
+                              break;
+                           case KeyboardKey.KEY_RIGHT:
+                              //camera.target.X += 10;
+                              break;
+                           case KeyboardKey.KEY_LEFT:
+                              //camera.target.X -= 10;
+                              break;
+                           case KeyboardKey.KEY_UP:
+                              //camera.target.Y -= 10;
+                              break;
+                           case KeyboardKey.KEY_DOWN:
+                              //camera.target.Y += 10;
+                              break;
+                        }
                      }
                   }
 
