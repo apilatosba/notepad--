@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
+using System.Threading;
 
 namespace Notepad___Raylib {
    internal class Program {
@@ -32,12 +33,14 @@ namespace Notepad___Raylib {
       /// Holds the number of times the cursor has moved while the user is holding down the arrow key.
       /// </summary>
       static int inputRushCounter = 0;
+      public static List<Line> lines;
+      public static Font font;
+      static int tabSize = 4;
 
       static void Main(string[] args) {
          lastInputTimer.Start();
 
          Cursor cursor = new Cursor();
-         List<Line> lines;
          ScrollBar horizontalScrollBar = new ScrollBar();
 
          Raylib.InitWindow(800, 600, "Notepad--");
@@ -49,7 +52,7 @@ namespace Notepad___Raylib {
             offset = new Vector2(0, 0),
          };
 
-         Font font = Raylib.LoadFont("Fonts/Inconsolata-Medium.ttf");
+         font = Raylib.LoadFont("Fonts/Inconsolata-Medium.ttf");
          Line.height = Line.MeasureTextHeight(font, "A", fontSize);
 
          lines = ReadLinesFromFile("test.txt");
@@ -82,35 +85,80 @@ namespace Notepad___Raylib {
 
                               cursor.position.y--;
 
-                              break;
+                              for(int i = cursor.position.y + 1; i < lines.Count; i++) {
+                                 lines[i].LineNumber--;
+                              }
+                           } else {
+                              RemoveTextAtCursor(lines, cursor, 1);
                            }
 
-                           RemoveTextAtCursor(lines, cursor, 1);
                            break;
-                        case KeyboardKey.KEY_ENTER:
+                        case KeyboardKey.KEY_ENTER: {
+                              Line currentLine = lines[cursor.position.y];
+                              string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
+
+                              Line newLine = new Line(textAfterCursor, currentLine.LineNumber + 1);
+
+                              if(cursor.IsCursorAtEndOfFile(lines)) {
+                                 lines.Add(newLine);
+                              } else {
+                                 lines.Insert((int)currentLine.LineNumber + 1, newLine);
+                              }
+
+                              currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
+
+                              cursor.position.x = 0;
+                              cursor.position.y++;
+
+                              for(int i = cursor.position.y + 1; i < lines.Count; i++) {
+                                 lines[i].LineNumber++;
+                              }
+                           }
                            break;
                         case KeyboardKey.KEY_TAB:
+                           InsertTextAtCursor(lines, cursor, new string(' ', tabSize));
                            break;
                         case KeyboardKey.KEY_DELETE:
+                           if (cursor.IsCursorAtEndOfLine(lines)) {
+                              Line currentLine = lines[cursor.position.y];
+                              Line lineBelow = lines[cursor.position.y + 1];
+
+                              currentLine.InsertTextAt(currentLine.Value.Length, lineBelow.Value);
+
+                              lines.RemoveAt(cursor.position.y + 1);
+
+                              for(int i = cursor.position.y + 1; i < lines.Count; i++) {
+                                 lines[i].LineNumber--;
+                              }
+                           } else {
+                              RemoveTextAtCursor(lines, cursor, 1, Direction.Right);
+                           }
+
                            break;
                         case KeyboardKey.KEY_RIGHT:
+                           //camera.target.X += 10;
                            break;
                         case KeyboardKey.KEY_LEFT:
+                           //camera.target.X -= 10;
                            break;
                         case KeyboardKey.KEY_UP:
+                           //camera.target.Y -= 10;
                            break;
                         case KeyboardKey.KEY_DOWN:
+                           //camera.target.Y += 10;
                            break;
                      }
                   }
 
                   cursor.HandleArrowKeysNavigation(lines);
                }
+
+               horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(lines, font), Raylib.GetScreenWidth());
             } // End of input handling
 
             Raylib.BeginDrawing();
             Raylib.BeginMode2D(camera);
-
+            
             Raylib.ClearBackground(BACKGROUND_COLOR);
 
             RenderLines(lines, font);
@@ -118,7 +166,7 @@ namespace Notepad___Raylib {
 
             Raylib.EndMode2D();
 
-            horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth(), camera, FindDistanceToRightMostChar(lines, font));
+            horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
 
             Raylib.EndDrawing();
          }
@@ -181,7 +229,7 @@ namespace Notepad___Raylib {
       static void RemoveTextAtCursor(List<Line> lines, Cursor cursor, int count, Direction direction = Direction.Left) {
          Line line = lines[cursor.position.y];
          line.RemoveTextAt(cursor.position.x, count, direction);
-         cursor.position.x += direction == Direction.Left ? -count : count;
+         cursor.position.x += direction == Direction.Left ? -count : 0;
       }
 
       static bool ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey) {
@@ -244,7 +292,7 @@ namespace Notepad___Raylib {
       /// <param name="lines"></param>
       /// <param name="font"></param>
       /// <returns>in pixels</returns>
-      static int FindDistanceToRightMostChar(in List<Line> lines, Font font) {
+      public static int FindDistanceToRightMostChar(in List<Line> lines, Font font) {
          Line longestLine = FindLongestLine(lines);
          return (int)Raylib.MeasureTextEx(font, longestLine.Value, fontSize, 0).X + leftPadding;
       }

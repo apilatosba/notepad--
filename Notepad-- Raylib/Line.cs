@@ -10,7 +10,10 @@ namespace Notepad___Raylib {
       public static int height = 20;
 
       public string Value => value;
-      public uint LineNumber => lineNumber;
+      public uint LineNumber {
+         get { return lineNumber; }
+         set { lineNumber = value; }
+      }
 
       public Line() {
          value = "";
