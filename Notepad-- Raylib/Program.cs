@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using System.Threading;
 
 namespace Notepad___Raylib {
    internal class Program {
@@ -52,7 +51,7 @@ namespace Notepad___Raylib {
             offset = new Vector2(0, 0),
          };
 
-         font = Raylib.LoadFont("Fonts/Inconsolata-Medium.ttf");
+         font = Raylib.LoadFontEx("Fonts/Inconsolata-Medium.ttf", fontSize, 0); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
          Line.height = Line.MeasureTextHeight(font, "A", fontSize);
 
          lines = ReadLinesFromFile("test.txt");
@@ -158,16 +157,16 @@ namespace Notepad___Raylib {
 
                               break;
                            case KeyboardKey.KEY_RIGHT:
-                              camera.target.X += 10;
+                              //camera.target.X += 10;
                               break;
                            case KeyboardKey.KEY_LEFT:
-                              camera.target.X -= 10;
+                              //camera.target.X -= 10;
                               break;
                            case KeyboardKey.KEY_UP:
-                              camera.target.Y -= 10;
+                              //camera.target.Y -= 10;
                               break;
                            case KeyboardKey.KEY_DOWN:
-                              camera.target.Y += 10;
+                              //camera.target.Y += 10;
                               break;
                         }
                      }
