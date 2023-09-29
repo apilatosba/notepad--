@@ -1,4 +1,5 @@
 save file
+if user exit without saving, save and exit.
 initial publish. notepad-- <file name> to open files from cli
 add scrollbars
 get rid of leftPadding. we have camera now
