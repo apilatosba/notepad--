@@ -71,6 +71,11 @@ namespace Notepad___Raylib {
                   if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
                   if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
+                  if(modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) &&
+                        Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
+                     WriteLinesToFile("test.txt", lines);
+                  }
+
                   if (pressedKeys != null) {
                      PrintPressedKeys(pressedKeys);
 
@@ -230,6 +235,7 @@ namespace Notepad___Raylib {
          }
 
          File.WriteAllLines(path, linesToFile);
+         Console.WriteLine($"Saved to {path}");
       }
 
       static void RenderLines(List<Line> lines, Font font) {
