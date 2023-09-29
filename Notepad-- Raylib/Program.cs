@@ -61,6 +61,16 @@ namespace Notepad___Raylib {
             // Input handling
             {
                if (ShouldAcceptKeyboardInput(out string pressedKeys, out KeyboardKey specialKey)) {
+                  List<KeyboardKey> modifiers = new List<KeyboardKey>();
+                  if(Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) modifiers.Add(KeyboardKey.KEY_LEFT_CONTROL);
+                  if(Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) modifiers.Add(KeyboardKey.KEY_LEFT_SHIFT);
+                  if(Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_ALT)) modifiers.Add(KeyboardKey.KEY_LEFT_ALT);
+                  if(Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SUPER)) modifiers.Add(KeyboardKey.KEY_LEFT_SUPER);
+                  if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) modifiers.Add(KeyboardKey.KEY_RIGHT_CONTROL);
+                  if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SHIFT)) modifiers.Add(KeyboardKey.KEY_RIGHT_SHIFT);
+                  if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
+                  if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
+
                   if (pressedKeys != null) {
                      PrintPressedKeys(pressedKeys);
 
@@ -68,8 +78,7 @@ namespace Notepad___Raylib {
                   }
 
                   if (specialKey != KeyboardKey.KEY_NULL) {
-                     Console.WriteLine(specialKey);
-
+                     
                      switch (specialKey) {
                         case KeyboardKey.KEY_BACKSPACE:
                            if (cursor.IsCursorAtBeginningOfFile()) break;
@@ -211,6 +220,16 @@ namespace Notepad___Raylib {
             lines.Add(new Line(linesFromFile[i], (uint)i));
          }
          return lines;
+      }
+
+      static void WriteLinesToFile(string path, List<Line> lines) {
+         string[] linesToFile = new string[lines.Count];
+
+         for (int i = 0; i < lines.Count; i++) {
+            linesToFile[i] = lines[i].Value;
+         }
+
+         File.WriteAllLines(path, linesToFile);
       }
 
       static void RenderLines(List<Line> lines, Font font) {
