@@ -1,7 +1,6 @@
-save file
-if user exit without saving, save and exit.
-initial publish. notepad-- <file name> to open files from cli
+undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state
 add scrollbars
+initial publish. notepad-- <file name> to open files from cli
 get rid of leftPadding. we have camera now
 font does look so bad. it looks glitchy
 text selection
