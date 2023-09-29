@@ -62,14 +62,14 @@ namespace Notepad___Raylib {
             {
                if (ShouldAcceptKeyboardInput(out string pressedKeys, out KeyboardKey specialKey)) {
                   List<KeyboardKey> modifiers = new List<KeyboardKey>();
-                  if(Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) modifiers.Add(KeyboardKey.KEY_LEFT_CONTROL);
-                  if(Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) modifiers.Add(KeyboardKey.KEY_LEFT_SHIFT);
-                  if(Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_ALT)) modifiers.Add(KeyboardKey.KEY_LEFT_ALT);
-                  if(Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SUPER)) modifiers.Add(KeyboardKey.KEY_LEFT_SUPER);
-                  if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) modifiers.Add(KeyboardKey.KEY_RIGHT_CONTROL);
-                  if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SHIFT)) modifiers.Add(KeyboardKey.KEY_RIGHT_SHIFT);
-                  if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
-                  if(Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
+                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) modifiers.Add(KeyboardKey.KEY_LEFT_CONTROL);
+                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) modifiers.Add(KeyboardKey.KEY_LEFT_SHIFT);
+                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_ALT)) modifiers.Add(KeyboardKey.KEY_LEFT_ALT);
+                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SUPER)) modifiers.Add(KeyboardKey.KEY_LEFT_SUPER);
+                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) modifiers.Add(KeyboardKey.KEY_RIGHT_CONTROL);
+                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SHIFT)) modifiers.Add(KeyboardKey.KEY_RIGHT_SHIFT);
+                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
+                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
                   // Handling key presses that have modifiers
                   {
@@ -158,16 +158,16 @@ namespace Notepad___Raylib {
 
                               break;
                            case KeyboardKey.KEY_RIGHT:
-                              //camera.target.X += 10;
+                              camera.target.X += 10;
                               break;
                            case KeyboardKey.KEY_LEFT:
-                              //camera.target.X -= 10;
+                              camera.target.X -= 10;
                               break;
                            case KeyboardKey.KEY_UP:
-                              //camera.target.Y -= 10;
+                              camera.target.Y -= 10;
                               break;
                            case KeyboardKey.KEY_DOWN:
-                              //camera.target.Y += 10;
+                              camera.target.Y += 10;
                               break;
                         }
                      }
@@ -180,16 +180,21 @@ namespace Notepad___Raylib {
             } // End of input handling
 
             Raylib.BeginDrawing();
+
+            // World space rendering
             Raylib.BeginMode2D(camera);
-            
-            Raylib.ClearBackground(BACKGROUND_COLOR);
+            {
+               Raylib.ClearBackground(BACKGROUND_COLOR);
 
-            RenderLines(lines, font);
-            cursor.Render(lines, fontSize, leftPadding, font);
-
+               RenderLines(lines, font);
+               cursor.Render(lines, fontSize, leftPadding, font);
+            }
             Raylib.EndMode2D();
 
-            horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
+            // Screen space rendering ie. UI
+            {
+               horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
+            }
 
             Raylib.EndDrawing();
          }
