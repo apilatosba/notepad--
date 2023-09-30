@@ -1,7 +1,7 @@
 ﻿using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Numerics;
 
 namespace Notepad___Raylib {
    internal class Cursor {
@@ -18,9 +18,8 @@ namespace Notepad___Raylib {
          Raylib.DrawRectangle(distance, position.y * Line.height, 1, Line.height, color);
       }
 
-      public void HandleArrowKeysNavigation(in List<Line> lines) {
+      public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT)) {
-
             if (IsCursorAtEndOfFile(lines)) return;
 
             if (IsCursorAtEndOfLine(lines)) {
@@ -30,8 +29,9 @@ namespace Notepad___Raylib {
                position.x++;
             }
 
-         } else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT)) {
+            MakeSureCursorIsInBoundsOfCamera(lines, ref camera, fontSize, leftPadding, font);
 
+         } else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT)) {
             if (IsCursorAtBeginningOfFile()) return;
 
             if (IsCursorAtBeginningOfLine()) {
@@ -39,21 +39,68 @@ namespace Notepad___Raylib {
             } else {
                position.x--;
             }
+            
+            MakeSureCursorIsInBoundsOfCamera(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_UP)) {
-
             if (IsCursorAtFirstLine()) return;
 
             position.y--;
             position.x = Math.Min(position.x, lines[position.y].Value.Length);
 
-         } else if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN)) {
+            MakeSureCursorIsInBoundsOfCamera(lines, ref camera, fontSize, leftPadding, font);
 
+         } else if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN)) {
             if (IsCursorAtLastLine(lines)) return;
 
             position.y++;
             position.x = Math.Min(position.x, lines[position.y].Value.Length);
 
+            MakeSureCursorIsInBoundsOfCamera(lines, ref camera, fontSize, leftPadding, font);
+
+         }
+      }
+
+      void MakeSureCursorIsInBoundsOfCamera(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
+         Int2 cursorWorldSpacePosition = GetWorldSpacePosition(lines, fontSize, leftPadding, font);
+
+         MakeSureCursorIsInBoundsOfCameraVertical(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
+         MakeSureCursorIsInBoundsOfCameraHorizontal(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
+      }
+
+      void MakeSureCursorIsInBoundsOfCameraHorizontal(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
+         int leftEdgeWorldSpacePositionX = (int)Raylib.GetScreenToWorld2D(Vector2.Zero, camera).X;
+         int rightEdgeWorldSpacePositionX = (int)Raylib.GetScreenToWorld2D(new Vector2(Raylib.GetScreenWidth(), 0), camera).X;
+
+         int a = cursorWorldSpacePosition.x - rightEdgeWorldSpacePositionX; // Explanation: ./CursorScreenExplanation.png
+         int b = cursorWorldSpacePosition.x - leftEdgeWorldSpacePositionX; // Explanation: ./CursorScreenExplanation.png
+
+         if (Math.Abs(a) + Math.Abs(b) <= Raylib.GetScreenWidth()) return;
+
+         // Offset is applied so we can see the cursor otherwise it would be at the edge of the screen and not visible.
+         int offset = (int)Raylib.MeasureTextEx(font, "A", fontSize, 0).X - 1;
+
+         if (Math.Abs(a) < Math.Abs(b)) {
+            camera.target.X += a + offset;
+         } else if (Math.Abs(b) < Math.Abs(a)) {
+            camera.target.X += b - offset;
+         }
+      }
+
+      void MakeSureCursorIsInBoundsOfCameraVertical(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
+         int topEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(Vector2.Zero, camera).Y;
+         int bottomEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(new Vector2(0, Raylib.GetScreenHeight()), camera).Y;
+         bottomEdgeWorldSpacePositionY -= Line.height;
+
+         int a = cursorWorldSpacePosition.y - topEdgeWorldSpacePositionY; // Explanation: ./CursorScreenExplanation.png
+         int b = cursorWorldSpacePosition.y - bottomEdgeWorldSpacePositionY; // Explanation: ./CursorScreenExplanation.png
+
+         if (Math.Abs(a) + Math.Abs(b) <= Raylib.GetScreenHeight()) return;
+
+         if (Math.Abs(a) < Math.Abs(b)) {
+            camera.target.Y += a;
+         } else if (Math.Abs(b) < Math.Abs(a)) {
+            camera.target.Y += b;
          }
       }
 

@@ -40,7 +40,7 @@ namespace Notepad___Raylib {
          lastInputTimer.Start();
 
          Cursor cursor = new Cursor();
-         ScrollBar horizontalScrollBar = new ScrollBar();
+         //ScrollBar horizontalScrollBar = new ScrollBar();
 
          Raylib.InitWindow(800, 600, "Notepad--");
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
@@ -172,10 +172,10 @@ namespace Notepad___Raylib {
                      }
                   }
 
-                  cursor.HandleArrowKeysNavigation(lines);
+                  cursor.HandleArrowKeysNavigation(lines, ref camera, fontSize, leftPadding, font);
                }
 
-               horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(lines, font), Raylib.GetScreenWidth());
+               //horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(lines, font), Raylib.GetScreenWidth());
             } // End of input handling
 
             Raylib.BeginDrawing();
@@ -192,7 +192,7 @@ namespace Notepad___Raylib {
 
             // Screen space rendering ie. UI
             {
-               horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
+               //horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
             }
 
             Raylib.EndDrawing();
