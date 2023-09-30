@@ -1,9 +1,11 @@
-﻿using Raylib_CsLo;
+﻿//#define VISUAL_STUDIO
+using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
+using System.Reflection;
 
 namespace Notepad___Raylib {
    internal class Program {
@@ -35,8 +37,52 @@ namespace Notepad___Raylib {
       public static List<Line> lines;
       public static Font font;
       static int tabSize = 4;
+      static string filePath;
+#if VISUAL_STUDIO
+      static readonly string customFontsDirectory = "Fonts";
+#else
+      static readonly string customFontsDirectory = Path.Combine(GetExecutableDirectory(), "Fonts");
+#endif
 
       static void Main(string[] args) {
+         // Command line arguments
+         {
+            if (args.Length == 0) {
+               Console.WriteLine("ERROR: No file specified\n");
+               PrintHelp();
+               return;
+            }
+
+            for (int i = 0; i < args.Length; i++) {
+               switch (args[i]) {
+                  case "-h":
+                  case "--help":
+                     PrintHelp();
+                     return;
+                  default:
+                     if (File.Exists(args[i])) {
+                        if (lines == null) {
+                           lines = ReadLinesFromFile(args[i]);
+                           filePath = args[i];
+                        } else {
+                           Console.WriteLine("ERROR: Specify only one file\n");
+                           PrintHelp();
+                           return;
+                        }
+                     } else {
+                        if (args[i].StartsWith("-")) {
+                           Console.WriteLine($"Invalid flag: \"{args[i]}\"\n");
+                        } else {
+                           Console.WriteLine($"File {args[i]} does not exist.");
+                        }
+
+                        return;
+                     }
+                     break;
+               }
+            }
+         }
+
          lastInputTimer.Start();
 
          Cursor cursor = new Cursor();
@@ -51,10 +97,8 @@ namespace Notepad___Raylib {
             offset = new Vector2(0, 0),
          };
 
-         font = Raylib.LoadFontEx("Fonts/Inconsolata-Medium.ttf", fontSize, 0); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+         font = Raylib.LoadFontEx($"{customFontsDirectory}/Inconsolata-Medium.ttf", fontSize, 0); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
          Line.height = Line.MeasureTextHeight(font, "A", fontSize);
-
-         lines = ReadLinesFromFile("test.txt");
 
          while (!Raylib.WindowShouldClose()) {
             // Input handling
@@ -74,7 +118,8 @@ namespace Notepad___Raylib {
                   {
                      if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) &&
                            Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
-                        WriteLinesToFile("test.txt", lines);
+                        
+                        WriteLinesToFile(filePath, lines);
                      }
                   }
 
@@ -237,6 +282,9 @@ namespace Notepad___Raylib {
          for (int i = 0; i < linesFromFile.Length; i++) {
             lines.Add(new Line(linesFromFile[i], (uint)i));
          }
+
+         if (lines.Count == 0) lines.Add(new Line("", 0));
+
          return lines;
       }
 
@@ -343,6 +391,18 @@ namespace Notepad___Raylib {
             }
          }
          return longestLine;
+      }
+
+      static void PrintHelp() {
+         Console.WriteLine("Usage: notepad-- [-h] file");
+         Console.WriteLine("-h, --help: Print help and exit.");
+      }
+
+      static string GetExecutableDirectory() {
+         Assembly entryAssembly = Assembly.GetEntryAssembly();
+         string executableDirectory = Path.GetDirectoryName(entryAssembly.Location);
+
+         return executableDirectory;
       }
    }
 }
