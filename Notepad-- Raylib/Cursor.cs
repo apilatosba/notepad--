@@ -12,12 +12,14 @@ namespace Notepad___Raylib {
       public Int2 position;
       Color color = new Color(150, 150, 150, 255);
 
-      public void Render(in List<Line> lines, int fontSize, int leftPadding, Font font) {
+      // TODO render cursor considering spacingBetweenLines
+      public void Render(in List<Line> lines, int fontSize, int leftPadding, Font font, int spacingBetweenLines) {
          int distance = GetWorldSpacePosition(lines, fontSize, leftPadding, font).x;
 
          Raylib.DrawRectangle(distance, position.y * Line.Height, 1, Line.Height, color);
       }
 
+      // TODO add modifiers
       public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT)) {
             if (IsCursorAtEndOfFile(lines)) return;
@@ -29,7 +31,7 @@ namespace Notepad___Raylib {
                position.x++;
             }
 
-            MakeSureCursorIsInBoundsOfCamera(lines, ref camera, fontSize, leftPadding, font);
+            MakeSureCursorIsVisible(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT)) {
             if (IsCursorAtBeginningOfFile()) return;
@@ -40,7 +42,7 @@ namespace Notepad___Raylib {
                position.x--;
             }
             
-            MakeSureCursorIsInBoundsOfCamera(lines, ref camera, fontSize, leftPadding, font);
+            MakeSureCursorIsVisible(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_UP)) {
             if (IsCursorAtFirstLine()) return;
@@ -48,7 +50,7 @@ namespace Notepad___Raylib {
             position.y--;
             position.x = Math.Min(position.x, lines[position.y].Value.Length);
 
-            MakeSureCursorIsInBoundsOfCamera(lines, ref camera, fontSize, leftPadding, font);
+            MakeSureCursorIsVisible(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN)) {
             if (IsCursorAtLastLine(lines)) return;
@@ -56,19 +58,19 @@ namespace Notepad___Raylib {
             position.y++;
             position.x = Math.Min(position.x, lines[position.y].Value.Length);
 
-            MakeSureCursorIsInBoundsOfCamera(lines, ref camera, fontSize, leftPadding, font);
+            MakeSureCursorIsVisible(lines, ref camera, fontSize, leftPadding, font);
 
          }
       }
 
-      void MakeSureCursorIsInBoundsOfCamera(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
+      void MakeSureCursorIsVisible(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
          Int2 cursorWorldSpacePosition = GetWorldSpacePosition(lines, fontSize, leftPadding, font);
 
-         MakeSureCursorIsInBoundsOfCameraVertical(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
-         MakeSureCursorIsInBoundsOfCameraHorizontal(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
+         MakeSureCursorIsVisibleVertical(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
+         MakeSureCursorIsVisibleHorizontal(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
       }
 
-      void MakeSureCursorIsInBoundsOfCameraHorizontal(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
+      void MakeSureCursorIsVisibleHorizontal(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
          int leftEdgeWorldSpacePositionX = (int)Raylib.GetScreenToWorld2D(Vector2.Zero, camera).X;
          int rightEdgeWorldSpacePositionX = (int)Raylib.GetScreenToWorld2D(new Vector2(Raylib.GetScreenWidth(), 0), camera).X;
 
@@ -87,7 +89,7 @@ namespace Notepad___Raylib {
          }
       }
 
-      void MakeSureCursorIsInBoundsOfCameraVertical(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
+      void MakeSureCursorIsVisibleVertical(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
          int topEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(Vector2.Zero, camera).Y;
          int bottomEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(new Vector2(0, Raylib.GetScreenHeight()), camera).Y;
          bottomEdgeWorldSpacePositionY -= Line.Height;

@@ -38,6 +38,7 @@ namespace Notepad___Raylib {
       public static Font font;
       static int tabSize = 4;
       static string filePath;
+      static int spacingBetweenLines = 2;
 #if VISUAL_STUDIO
       static readonly string customFontsDirectory = "Fonts";
 #else
@@ -213,9 +214,15 @@ namespace Notepad___Raylib {
                               //camera.target.X -= 10;
                               break;
                            case KeyboardKey.KEY_UP:
+                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
+                                 spacingBetweenLines++;
+                              }
                               //camera.target.Y -= 10;
                               break;
                            case KeyboardKey.KEY_DOWN:
+                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
+                                 spacingBetweenLines--;
+                              }
                               //camera.target.Y += 10;
                               break;
                         }
@@ -306,7 +313,7 @@ namespace Notepad___Raylib {
 
       static void RenderLines(List<Line> lines, Font font) {
          for (int i = 0; i < lines.Count; i++) {
-            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(leftPadding, i * Line.Height), fontSize, 0, TEXT_COLOR);
+            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(leftPadding, i * (Line.Height + spacingBetweenLines)), fontSize, 0, TEXT_COLOR);
          }
       }
 
