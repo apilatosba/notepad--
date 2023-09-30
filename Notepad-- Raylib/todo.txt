@@ -1,3 +1,4 @@
+resizable window
 scrolling with mouse wheel
 cursor positioning with mouse
 the font should be setable from settings and i should look for fonts in shared fonts folder (C:\Windows\Fonts, /usr/share/fonts) and my custom fonts folder
