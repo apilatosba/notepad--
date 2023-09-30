@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -45,6 +45,11 @@ namespace Notepad___Raylib {
 #endif
 
       static void Main(string[] args) {
+#if VISUAL_STUDIO
+#else
+         Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);
+#endif
+
          // Command line arguments
          {
             if (args.Length == 0) {
@@ -126,8 +131,9 @@ namespace Notepad___Raylib {
                   // Handling key presses that don't have modifiers ie. normal key presses
                   {
                      if (pressedKeys != null) {
+#if VISUAL_STUDIO
                         PrintPressedKeys(pressedKeys);
-
+#endif
                         InsertTextAtCursor(lines, cursor, pressedKeys);
                      }
                   }
