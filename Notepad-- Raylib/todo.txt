@@ -1,14 +1,10 @@
-notepad-- <file name> to open files from cli
-initial publish
 scrolling with mouse wheel
 cursor positioning with mouse
 the font should be setable from settings and i should look for fonts in shared fonts folder (C:\Windows\Fonts, /usr/share/fonts) and my custom fonts folder
-raylib debug info should be disabled in release mode
 fix the bug: characters other than english are not rendered but saved correctly
 undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state
 add scrollbars
 get rid of leftPadding. we have camera now
-font does look so bad. it looks glitchy
 text selection
 text selection rendering
 implement zoom
@@ -16,10 +12,8 @@ add a status bar at bottom shows the line and column number of cursor and shows 
 add shortcuts
 find in file. ctrl + f
 highlight the line the cursor is on
-cursor navigation with mouse
 add a settings menu. esc to open
 shaders
 different effects with shaders. for example a flash effect when you save, text near cursor gets a radial/horizontal gradient color.
 add background image
 make cursor blink. make it with a shader
-add raylib to license-3rd-party.txt
