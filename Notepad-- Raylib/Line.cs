@@ -7,7 +7,11 @@ namespace Notepad___Raylib {
       /// Zero-based.
       /// </summary>
       uint lineNumber;
-      public static int height = 20;
+      public static int Height {
+         get {
+            return GetLineHeight(Program.font, Program.fontSize);
+         }
+      }
 
       public string Value => value;
       public uint LineNumber {
@@ -50,6 +54,10 @@ namespace Notepad___Raylib {
 
       public static int MeasureTextHeight(Font font, string text, int fontSize) {
          return (int)Raylib.MeasureTextEx(font, text, fontSize, 0).Y;
+      }
+
+      public static int GetLineHeight(Font font, int fontSize) {
+         return MeasureTextHeight(font, "A", fontSize);
       }
    }
 }

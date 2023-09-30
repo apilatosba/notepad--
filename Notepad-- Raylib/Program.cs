@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace Notepad___Raylib {
    internal class Program {
       static readonly Color TEXT_COLOR = new Color(200, 200, 200, 255);
       static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 255);
-      static int fontSize = 20;
+      public static int fontSize = 20;
       static int leftPadding = 12;
       /// <summary>
       /// In milliseconds.
@@ -103,7 +103,6 @@ namespace Notepad___Raylib {
          };
 
          font = Raylib.LoadFontEx($"{customFontsDirectory}/Inconsolata-Medium.ttf", fontSize, 0); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
-         Line.height = Line.MeasureTextHeight(font, "A", fontSize);
 
          while (!Raylib.WindowShouldClose()) {
             // Input handling
@@ -307,7 +306,7 @@ namespace Notepad___Raylib {
 
       static void RenderLines(List<Line> lines, Font font) {
          for (int i = 0; i < lines.Count; i++) {
-            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(leftPadding, i * Line.height), fontSize, 0, TEXT_COLOR);
+            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(leftPadding, i * Line.Height), fontSize, 0, TEXT_COLOR);
          }
       }
 

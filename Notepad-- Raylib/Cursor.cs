@@ -15,7 +15,7 @@ namespace Notepad___Raylib {
       public void Render(in List<Line> lines, int fontSize, int leftPadding, Font font) {
          int distance = GetWorldSpacePosition(lines, fontSize, leftPadding, font).x;
 
-         Raylib.DrawRectangle(distance, position.y * Line.height, 1, Line.height, color);
+         Raylib.DrawRectangle(distance, position.y * Line.Height, 1, Line.Height, color);
       }
 
       public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
@@ -90,7 +90,7 @@ namespace Notepad___Raylib {
       void MakeSureCursorIsInBoundsOfCameraVertical(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
          int topEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(Vector2.Zero, camera).Y;
          int bottomEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(new Vector2(0, Raylib.GetScreenHeight()), camera).Y;
-         bottomEdgeWorldSpacePositionY -= Line.height;
+         bottomEdgeWorldSpacePositionY -= Line.Height;
 
          int a = cursorWorldSpacePosition.y - topEdgeWorldSpacePositionY; // Explanation: ./CursorScreenExplanation.png
          int b = cursorWorldSpacePosition.y - bottomEdgeWorldSpacePositionY; // Explanation: ./CursorScreenExplanation.png
@@ -120,7 +120,7 @@ namespace Notepad___Raylib {
          string textBeforeCursor = line.Value.Substring(0, position.x);
 
          pos.x = (int)Raylib.MeasureTextEx(font, textBeforeCursor, fontSize, 0).X + leftPadding;
-         pos.y = position.y * Line.height;
+         pos.y = position.y * Line.Height;
 
          return pos;
       }
