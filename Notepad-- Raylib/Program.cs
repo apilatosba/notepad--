@@ -10,7 +10,7 @@ using System.Reflection;
 namespace Notepad___Raylib {
    internal class Program {
       static readonly Color TEXT_COLOR = new Color(200, 200, 200, 255);
-      static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 255);
+      static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 50);
       public static int fontSize = 20;
       static int leftPadding = 12;
       /// <summary>
@@ -50,6 +50,9 @@ namespace Notepad___Raylib {
 #else
          Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);
 #endif
+
+         Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
+         Raylib.SetWindowOpacity(0.1f);
 
          // Command line arguments
          {
@@ -123,7 +126,7 @@ namespace Notepad___Raylib {
                   {
                      if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) &&
                            Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
-                        
+
                         WriteLinesToFile(filePath, lines);
                      }
                   }
@@ -237,6 +240,8 @@ namespace Notepad___Raylib {
             } // End of input handling
 
             Raylib.BeginDrawing();
+
+            Console.WriteLine($"{Raylib.GetScreenWidth()}, {Raylib.GetScreenHeight()}  {Raylib.IsWindowResized()}");
 
             // World space rendering
             Raylib.BeginMode2D(camera);
