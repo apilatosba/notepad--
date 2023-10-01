@@ -1,6 +1,7 @@
 ﻿using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace Notepad___Raylib {
@@ -41,7 +42,7 @@ namespace Notepad___Raylib {
             } else {
                position.x--;
             }
-            
+
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_UP)) {
@@ -125,6 +126,48 @@ namespace Notepad___Raylib {
          pos.y = position.y * Line.Height;
 
          return pos;
+      }
+
+      public Int2 CalculatePositionFromWorldSpaceCoordinates(in List<Line> lines, int fontSize, int leftPadding, Font font, Int2 worldSpaceCoordinates) {
+         Int2 pos = new Int2();
+
+         pos.y = worldSpaceCoordinates.y / Line.Height;
+
+         Line line = lines[pos.y];
+         string text = line.Value;
+         int t = worldSpaceCoordinates.x - leftPadding;
+         int errorTolerance = (int)Raylib.MeasureTextEx(font, ".", fontSize, 0).X / 2;
+
+         pos.x = BinarySearch(0, line.Value.Length);
+
+         return pos;
+
+         int BinarySearch(int left, int right) {
+            int m = (left + right) / 2;
+
+
+            int r = (int)Raylib.MeasureTextEx(font, text.Substring(0, m), fontSize, 0).X;
+
+            //Console.WriteLine($"L:{left}, R:{right}, M:{m}, R:{r}, T:{t}");
+
+            if(Math.Abs(r - t) <= errorTolerance) return m;
+            
+            if (left >= right) return m;
+
+            if (r < t) {
+               return BinarySearch(m + 1, right);
+            } else if (r > t) {
+               return BinarySearch(left, m - 1);
+            } else {
+               return m;
+            }
+            Debug.Assert(false);
+            return -1;
+         }
+      }
+
+      public Int2 CalculatePositionFromWorldSpaceCoordinates(in List<Line> lines, int fontSize, int leftPadding, Font font, Vector2 worldSpaceCoordinates) {
+         return CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, (Int2)worldSpaceCoordinates);
       }
 
       public bool IsCursorAtEndOfLine(in List<Line> lines) {

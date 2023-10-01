@@ -239,10 +239,20 @@ namespace Notepad___Raylib {
                mouseWheelInput = Raylib.GetMouseWheelMove();
                camera.target.Y -= mouseWheelInput * Line.Height;
 
-               MakeSureCameraNotBelowZeroInBothAxes(ref camera);
+               if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
+                  //if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
+                  Vector2 mousePosition = Raylib.GetMousePosition();
+                  Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
+
+                  //cursor.position.y = mousePositionInWorldSpace.y / Line.Height;
+
+                  cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, mousePositionInWorldSpace);
+               }
 
                //horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(lines, font), Raylib.GetScreenWidth());
             } // End of input handling
+
+            MakeSureCameraNotBelowZeroInBothAxes(ref camera);
 
             Raylib.BeginDrawing();
 
