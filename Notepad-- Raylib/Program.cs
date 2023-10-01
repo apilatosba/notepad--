@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace Notepad___Raylib {
    internal class Program {
@@ -107,8 +106,20 @@ namespace Notepad___Raylib {
             offset = new Vector2(0, 0),
          };
 
-         font = Raylib.LoadFontEx($"{customFontsDirectory}/Inconsolata-Medium.ttf", fontSize, 0); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
-         //font = Raylib.GetFontDefault();
+         // Font loading. Loading all characters in the Unicode range.
+         unsafe {
+            int startCodePoint = 0x0000; 
+            int endCodePoint = 0xFFFF;   
+
+            int glyphCount = endCodePoint - startCodePoint + 1; 
+            int* fontChars = stackalloc int[glyphCount];
+
+            for (int i = 0; i < glyphCount; i++) {
+               fontChars[i] = startCodePoint + i;
+            }
+
+            font = Raylib.LoadFontEx($"{customFontsDirectory}/Inconsolata-Medium.ttf", fontSize, fontChars, glyphCount); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+         }
 
          while (!Raylib.WindowShouldClose()) {
             // Input handling
