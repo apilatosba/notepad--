@@ -12,7 +12,8 @@ Put the contents of the zip file in a folder that is in your PATH environment va
   
 Or  
   
-Build it from source.
+Build it from source.  
+Go to [Program.cs](https://github.com/apilatosba/notepad--/blob/main/Notepad--%20Raylib/Program.cs) and comment out the line(probably first line) that says <mark>#define VISUAL_STUDIO</mark> 
 ```cmd
 dotnet publish -c Release
 ```
