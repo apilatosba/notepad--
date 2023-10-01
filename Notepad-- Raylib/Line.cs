@@ -1,4 +1,5 @@
 ﻿using Raylib_CsLo;
+// Test merge
 
 namespace Notepad___Raylib {
    internal class Line {
