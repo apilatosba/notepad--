@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Notepad___Raylib {
    internal class Program {
@@ -20,7 +21,7 @@ namespace Notepad___Raylib {
       /// <summary>
       /// How many milliseconds to wait before accepting new input.
       /// </summary>
-      static int inputDelay = 30;
+      static int inputDelay = 25;
       /// <summary>
       /// In milliseconds. This means that writing/deleting/(moving cursor) will wait after moving one character even if you are holding down the key.
       /// </summary>
@@ -107,6 +108,7 @@ namespace Notepad___Raylib {
          };
 
          font = Raylib.LoadFontEx($"{customFontsDirectory}/Inconsolata-Medium.ttf", fontSize, 0); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+         //font = Raylib.GetFontDefault();
 
          while (!Raylib.WindowShouldClose()) {
             // Input handling

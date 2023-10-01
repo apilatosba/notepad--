@@ -1,4 +1,3 @@
-cursor positioning with mouse
 the font should be setable from settings and i should look for fonts in shared fonts folder (C:\Windows\Fonts, /usr/share/fonts) and my custom fonts folder
 fix the bug: characters other than english are not rendered but saved correctly
 undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state
