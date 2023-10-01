@@ -31,7 +31,7 @@ namespace Notepad___Raylib {
                position.x++;
             }
 
-            MakeSureCursorIsVisible(lines, ref camera, fontSize, leftPadding, font);
+            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT)) {
             if (IsCursorAtBeginningOfFile()) return;
@@ -42,7 +42,7 @@ namespace Notepad___Raylib {
                position.x--;
             }
             
-            MakeSureCursorIsVisible(lines, ref camera, fontSize, leftPadding, font);
+            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_UP)) {
             if (IsCursorAtFirstLine()) return;
@@ -50,7 +50,7 @@ namespace Notepad___Raylib {
             position.y--;
             position.x = Math.Min(position.x, lines[position.y].Value.Length);
 
-            MakeSureCursorIsVisible(lines, ref camera, fontSize, leftPadding, font);
+            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN)) {
             if (IsCursorAtLastLine(lines)) return;
@@ -58,12 +58,12 @@ namespace Notepad___Raylib {
             position.y++;
             position.x = Math.Min(position.x, lines[position.y].Value.Length);
 
-            MakeSureCursorIsVisible(lines, ref camera, fontSize, leftPadding, font);
+            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
          }
       }
 
-      void MakeSureCursorIsVisible(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
+      public void MakeSureCursorIsVisibleToCamera(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
          Int2 cursorWorldSpacePosition = GetWorldSpacePosition(lines, fontSize, leftPadding, font);
 
          MakeSureCursorIsVisibleVertical(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);

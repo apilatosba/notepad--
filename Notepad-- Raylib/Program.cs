@@ -135,6 +135,7 @@ namespace Notepad___Raylib {
                         PrintPressedKeys(pressedKeys);
 #endif
                         InsertTextAtCursor(lines, cursor, pressedKeys);
+                        cursor.MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
                      }
                   }
 
@@ -243,7 +244,7 @@ namespace Notepad___Raylib {
                Raylib.ClearBackground(BACKGROUND_COLOR);
 
                RenderLines(lines, font);
-               cursor.Render(lines, fontSize, leftPadding, font);
+               cursor.Render(lines, fontSize, leftPadding, font, spacingBetweenLines);
             }
             Raylib.EndMode2D();
 
@@ -308,7 +309,9 @@ namespace Notepad___Raylib {
          }
 
          File.WriteAllLines(path, linesToFile);
+#if VISUAL_STUDIO
          Console.WriteLine($"Saved to {path}");
+#endif
       }
 
       static void RenderLines(List<Line> lines, Font font) {
