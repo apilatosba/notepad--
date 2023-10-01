@@ -38,7 +38,7 @@ namespace Notepad___Raylib {
       public static Font font;
       static int tabSize = 4;
       static string filePath;
-      static int spacingBetweenLines = 2;
+      static int spacingBetweenLines = 0;
 #if VISUAL_STUDIO
       static readonly string customFontsDirectory = "Fonts";
 #else
@@ -50,6 +50,9 @@ namespace Notepad___Raylib {
 #else
          Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);
 #endif
+         float mouseWheelInput = 0;
+         Cursor cursor = new Cursor();
+         //ScrollBar horizontalScrollBar = new ScrollBar();
 
          Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
          Raylib.SetWindowOpacity(0.1f);
@@ -93,9 +96,6 @@ namespace Notepad___Raylib {
          }
 
          lastInputTimer.Start();
-
-         Cursor cursor = new Cursor();
-         //ScrollBar horizontalScrollBar = new ScrollBar();
 
          Raylib.InitWindow(800, 600, "Notepad--");
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
@@ -234,14 +234,17 @@ namespace Notepad___Raylib {
                   }
 
                   cursor.HandleArrowKeysNavigation(lines, ref camera, fontSize, leftPadding, font);
-               }
+               } // End of keyboard input handling
+
+               mouseWheelInput = Raylib.GetMouseWheelMove();
+               camera.target.Y -= mouseWheelInput * Line.Height;
+
+               MakeSureCameraNotBelowZeroInBothAxes(ref camera);
 
                //horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(lines, font), Raylib.GetScreenWidth());
             } // End of input handling
 
             Raylib.BeginDrawing();
-
-            Console.WriteLine($"{Raylib.GetScreenWidth()}, {Raylib.GetScreenHeight()}  {Raylib.IsWindowResized()}");
 
             // World space rendering
             Raylib.BeginMode2D(camera);
@@ -423,6 +426,11 @@ namespace Notepad___Raylib {
          string executableDirectory = Path.GetDirectoryName(entryAssembly.Location);
 
          return executableDirectory;
+      }
+
+      static void MakeSureCameraNotBelowZeroInBothAxes(ref Camera2D camera) {
+         if (camera.target.X < 0) camera.target.X = 0;
+         if (camera.target.Y < 0) camera.target.Y = 0;
       }
    }
 }
