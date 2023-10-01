@@ -118,7 +118,7 @@ namespace Notepad___Raylib {
                fontChars[i] = startCodePoint + i;
             }
 
-            font = Raylib.LoadFontEx($"{customFontsDirectory}/Roboto-Bold.ttf", fontSize, fontChars, glyphCount); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+            font = Raylib.LoadFontEx($"{customFontsDirectory}/Inconsolata-Medium.ttf", fontSize, fontChars, glyphCount); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
          }
 
          while (!Raylib.WindowShouldClose()) {
