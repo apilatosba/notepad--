@@ -107,8 +107,24 @@ namespace Notepad___Raylib {
             offset = new Vector2(0, 0),
          };
 
-         font = Raylib.LoadFontEx($"{customFontsDirectory}/Inconsolata-Medium.ttf", fontSize, 0); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+         //font = Raylib.LoadFontEx($"{customFontsDirectory}/Inconsolata-Medium.ttf", fontSize, 0); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+         //font = Raylib.LoadFontEx($"{customFontsDirectory}/Roboto-Bold.ttf", fontSize, 0); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
          //font = Raylib.GetFontDefault();
+         
+         unsafe {
+            int startCodePoint = 0x0000; // Start of the Unicode range
+            int endCodePoint = 0xFFFF;   // End of the Unicode range
+
+            int glyphCount = endCodePoint - startCodePoint + 1; // Number of characters in the range
+            int* fontChars = stackalloc int[glyphCount];
+
+            for (int i = 0; i < glyphCount; i++) {
+               fontChars[i] = startCodePoint + i;
+            }
+
+            font = Raylib.LoadFontEx($"{customFontsDirectory}/Roboto-Bold.ttf", fontSize, fontChars, glyphCount); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+         }
+         
 
          while (!Raylib.WindowShouldClose()) {
             // Input handling

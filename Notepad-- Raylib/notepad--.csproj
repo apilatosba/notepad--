@@ -6,6 +6,7 @@
     <RootNamespace>Notepad___Raylib</RootNamespace>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>annotations</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
