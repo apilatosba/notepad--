@@ -2,6 +2,7 @@
 --text selection rendering
 implement zoom
 add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level
+add opening directories. vim style
 add shortcuts
 find in file. ctrl + f
 highlight the line the cursor is on
