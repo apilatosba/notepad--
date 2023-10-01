@@ -1,3 +1,4 @@
+camera should follow cursor when inserting text
 resizable window
 scrolling with mouse wheel
 cursor positioning with mouse
