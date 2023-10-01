@@ -13,5 +13,6 @@ make cursor blink. make it with a shader
 add scrollbars
 bug: camera is not clamped to the text. it can go beyond the text
 change cursor y repositioning algorithm. only works with monospace font rn.
+app icon
 the font should be setable from settings and i should look for fonts in shared fonts folder (C:\Windows\Fonts, /usr/share/fonts) and my custom fonts folder
 undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state

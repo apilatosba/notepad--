@@ -106,20 +106,7 @@ namespace Notepad___Raylib {
             offset = new Vector2(0, 0),
          };
 
-         // Font loading. Loading all characters in the Unicode range.
-         unsafe {
-            int startCodePoint = 0x0000; 
-            int endCodePoint = 0xFFFF;   
-
-            int glyphCount = endCodePoint - startCodePoint + 1; 
-            int* fontChars = stackalloc int[glyphCount];
-
-            for (int i = 0; i < glyphCount; i++) {
-               fontChars[i] = startCodePoint + i;
-            }
-
-            font = Raylib.LoadFontEx($"{customFontsDirectory}/Inconsolata-Medium.ttf", fontSize, fontChars, glyphCount); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
-         }
+         font = LoadFontWithAllUnicodeCharacters(Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf"), fontSize);
 
          while (!Raylib.WindowShouldClose()) {
             // Input handling
@@ -454,6 +441,23 @@ namespace Notepad___Raylib {
       static void MakeSureCameraNotBelowZeroInBothAxes(ref Camera2D camera) {
          if (camera.target.X < 0) camera.target.X = 0;
          if (camera.target.Y < 0) camera.target.Y = 0;
+      }
+
+      static Font LoadFontWithAllUnicodeCharacters(string path, int fontSize) {
+         // Font loading. Loading all characters in the Unicode range.
+         unsafe {
+            int startCodePoint = 0x0000;
+            int endCodePoint = 0xFFFF;
+
+            int glyphCount = endCodePoint - startCodePoint + 1;
+            int* fontChars = stackalloc int[glyphCount];
+
+            for (int i = 0; i < glyphCount; i++) {
+               fontChars[i] = startCodePoint + i;
+            }
+
+            return Raylib.LoadFontEx(path, fontSize, fontChars, glyphCount); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+         }
       }
    }
 }
