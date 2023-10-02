@@ -91,7 +91,7 @@ namespace Notepad___Raylib {
 #endif
                   switch (specialKey) {
                      case KeyboardKey.KEY_ESCAPE:
-
+                        Program.editorState = new EditorStatePaused();
                         break;
                      case KeyboardKey.KEY_BACKSPACE:
                         if (shiftSelection != null) {

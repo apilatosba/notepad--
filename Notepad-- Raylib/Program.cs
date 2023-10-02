@@ -11,7 +11,7 @@ namespace Notepad___Raylib {
    internal class Program {
       static Config config = new Config();
       const string CONFIG_FILE = "config.xml";
-      static IEditorState editorState = new EditorStatePlaying();
+      public static IEditorState editorState = new EditorStatePlaying();
       static readonly Color TEXT_COLOR = new Color(200, 200, 200, 255);
       public static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 50);
       public static int fontSize = 19;
