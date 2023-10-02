@@ -20,6 +20,11 @@ namespace Notepad___Raylib {
          set => endPosition = value;
       }
 
+      public Int2 StartPosition {
+         get => startPosition;
+         set => startPosition = value;
+      }
+
       public Selection(Int2 startPosition, Int2 endPosition) {
          this.startPosition = startPosition;
          this.endPosition = endPosition;
@@ -63,7 +68,7 @@ namespace Notepad___Raylib {
          }
       }
 
-      IEnumerable<Line> GetLinesInRange(List<Line> lines) {
+      public IEnumerable<Line> GetLinesInRange(List<Line> lines) {
          Int2 left;
          Int2 right;
 

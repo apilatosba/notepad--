@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 
@@ -143,6 +144,9 @@ namespace Notepad___Raylib {
 #if VISUAL_STUDIO
                         PrintPressedKeys(pressedKeys);
 #endif
+                        shiftSelection?.Delete(lines, cursor);
+                        shiftSelection = null;
+
                         InsertTextAtCursor(lines, cursor, pressedKeys);
                         cursor.MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
                      }
@@ -182,6 +186,9 @@ namespace Notepad___Raylib {
 
                               break;
                            case KeyboardKey.KEY_ENTER: {
+                                 shiftSelection?.Delete(lines, cursor);
+                                 shiftSelection = null;
+
                                  Line currentLine = lines[cursor.position.y];
                                  string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
 
@@ -204,9 +211,28 @@ namespace Notepad___Raylib {
                               }
                               break;
                            case KeyboardKey.KEY_TAB:
+                              if (shiftSelection != null) {
+                                 Line[] linesInRange = shiftSelection.GetLinesInRange(lines).ToArray();
+
+                                 foreach (Line line in linesInRange) {
+                                    line.InsertTextAt(0, new string(' ', tabSize));
+                                 }
+
+                                 shiftSelection.StartPosition = new Int2(shiftSelection.StartPosition.x + tabSize, shiftSelection.StartPosition.y);
+                                 cursor.position.x += tabSize;
+
+                                 break;
+                              }
+
                               InsertTextAtCursor(lines, cursor, new string(' ', tabSize));
                               break;
                            case KeyboardKey.KEY_DELETE:
+                              if (shiftSelection != null) {
+                                 shiftSelection.Delete(lines, cursor);
+                                 shiftSelection = null;
+                                 break;
+                              }
+
                               if (cursor.IsCursorAtEndOfLine(lines)) {
                                  Line currentLine = lines[cursor.position.y];
                                  Line lineBelow = lines[cursor.position.y + 1];
@@ -224,18 +250,22 @@ namespace Notepad___Raylib {
 
                               break;
                            case KeyboardKey.KEY_RIGHT:
+                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                               //camera.target.X += 10;
                               break;
                            case KeyboardKey.KEY_LEFT:
+                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                               //camera.target.X -= 10;
                               break;
                            case KeyboardKey.KEY_UP:
+                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                               if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
                                  spacingBetweenLines++;
                               }
                               //camera.target.Y -= 10;
                               break;
                            case KeyboardKey.KEY_DOWN:
+                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                               if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
                                  spacingBetweenLines--;
                               }
@@ -246,15 +276,6 @@ namespace Notepad___Raylib {
                   }
 
                   cursor.HandleArrowKeysNavigation(lines, ref camera, fontSize, leftPadding, font);
-
-                  if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) {
-                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT) ||
-                           Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT) ||
-                           Raylib.IsKeyPressed(KeyboardKey.KEY_UP) ||
-                           Raylib.IsKeyPressed(KeyboardKey.KEY_DOWN)) {
-                        shiftSelection = null;
-                     }
-                  }
                } // End of keyboard input handling
 
                mouseWheelInput = Raylib.GetMouseWheelMove();
