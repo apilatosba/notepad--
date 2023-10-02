@@ -10,9 +10,11 @@ using System.Reflection;
 
 namespace Notepad___Raylib {
    internal class Program {
+      static Config config = new Config();
+      const string CONFIG_FILE = "config.xml";
       static readonly Color TEXT_COLOR = new Color(200, 200, 200, 255);
       static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 50);
-      public static int fontSize = 20;
+      public static int fontSize = 19;
       static int leftPadding = 12;
       /// <summary>
       /// In milliseconds.
@@ -47,6 +49,17 @@ namespace Notepad___Raylib {
 #endif
 
       static void Main(string[] args) {
+         //config.tabSize = 0;
+         //config.fontSize = 0;
+         //config.Deserialize(CONFIG_FILE);
+         //Console.WriteLine(config.leftPadding);
+         //Console.WriteLine(config.spacingBetweenLines);
+         //Console.WriteLine(config.fontSize);
+         //Console.WriteLine(config.backgroundColor);
+         //Console.WriteLine(config.cursorColor);
+         //Console.WriteLine(config.font);
+         //Console.WriteLine(config.tabSize);
+         //return;
          //var q = "soemthing text".Split('\n');
          //var w = "soemthing text\n".Split('\n');
          //foreach (var item in q) {
