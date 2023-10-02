@@ -1,4 +1,5 @@
 add a settings menu. esc to open
+bug: when text is cut, enter doesnt put new line in cursor position but some other position a little above. root solution is to get rid of lineNUmber in Line class.
 shaders
 character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
 different effects with shaders. for example a flash effect when you save, text near cursor gets a radial/horizontal gradient color.
