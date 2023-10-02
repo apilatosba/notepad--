@@ -50,6 +50,7 @@ namespace Notepad___Raylib {
 #else
          Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);
 #endif
+         Selection shiftSelection = null;
          float mouseWheelInput = 0;
          Cursor cursor = new Cursor();
          //ScrollBar horizontalScrollBar = new ScrollBar();
@@ -111,6 +112,7 @@ namespace Notepad___Raylib {
          while (!Raylib.WindowShouldClose()) {
             // Input handling
             {
+               // Keyboard input handling
                if (ShouldAcceptKeyboardInput(out string pressedKeys, out KeyboardKey specialKey)) {
                   List<KeyboardKey> modifiers = new List<KeyboardKey>();
                   if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) modifiers.Add(KeyboardKey.KEY_LEFT_CONTROL);
@@ -128,6 +130,10 @@ namespace Notepad___Raylib {
                            Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
 
                         WriteLinesToFile(filePath, lines);
+                     }
+
+                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT_SHIFT) || Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT_SHIFT)) {
+                        shiftSelection ??= new Selection(cursor.position, cursor.position);
                      }
                   }
 
@@ -234,6 +240,15 @@ namespace Notepad___Raylib {
                   }
 
                   cursor.HandleArrowKeysNavigation(lines, ref camera, fontSize, leftPadding, font);
+
+                  if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) {
+                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT) ||
+                           Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT) ||
+                           Raylib.IsKeyPressed(KeyboardKey.KEY_UP) ||
+                           Raylib.IsKeyPressed(KeyboardKey.KEY_DOWN)) {
+                        shiftSelection = null;
+                     }
+                  }
                } // End of keyboard input handling
 
                mouseWheelInput = Raylib.GetMouseWheelMove();
@@ -252,6 +267,7 @@ namespace Notepad___Raylib {
                //horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(lines, font), Raylib.GetScreenWidth());
             } // End of input handling
 
+            if (shiftSelection != null) shiftSelection.EndPosition = cursor.position;
             MakeSureCameraNotBelowZeroInBothAxes(ref camera);
 
             Raylib.BeginDrawing();
@@ -262,6 +278,7 @@ namespace Notepad___Raylib {
                Raylib.ClearBackground(BACKGROUND_COLOR);
 
                RenderLines(lines, font);
+               shiftSelection?.Render(lines, fontSize, leftPadding, font);
                cursor.Render(lines, fontSize, leftPadding, font, spacingBetweenLines);
             }
             Raylib.EndMode2D();
