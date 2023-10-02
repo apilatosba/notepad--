@@ -9,6 +9,7 @@ shaders
 character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
 different effects with shaders. for example a flash effect when you save, text near cursor gets a radial/horizontal gradient color.
 add background image
+the static int inputDelay should only work for same key presses. for example if i press a and then b, the delay should not work. but if i press a and then a again, the delay should work
 make cursor blink. make it with a shader
 add scrollbars
 bug: camera is not clamped to the text. it can go beyond the text
