@@ -205,8 +205,13 @@ namespace Notepad___Raylib {
                   // Handling special keys, both with and without modifiers
                   {
                      if (specialKey != KeyboardKey.KEY_NULL) {
-
+#if VISUAL_STUDIO
+                        Console.WriteLine(specialKey);
+#endif
                         switch (specialKey) {
+                           case KeyboardKey.KEY_ESCAPE:
+
+                              break;
                            case KeyboardKey.KEY_BACKSPACE:
                               if (shiftSelection != null) {
                                  shiftSelection.Delete(lines, cursor);
@@ -506,6 +511,7 @@ namespace Notepad___Raylib {
          specialKey = KeyboardKey.KEY_NULL;
 
          KeyboardKey[] specialKeys = new KeyboardKey[] {
+            KeyboardKey.KEY_ESCAPE,
             KeyboardKey.KEY_BACKSPACE,
             KeyboardKey.KEY_ENTER,
             KeyboardKey.KEY_TAB,
