@@ -25,7 +25,7 @@ namespace Notepad___Raylib {
       /// <summary>
       /// In milliseconds. This means that writing/deleting/(moving cursor) will wait after moving one character even if you are holding down the key.
       /// </summary>
-      readonly static long waitTimeBeforeRapidInputRush = 700;
+      readonly static long waitTimeBeforeRapidInputRush = 400;
       static Stopwatch lastInputTimer = new Stopwatch();
       /// <summary>
       /// Measures how long the user has been holding down key.
@@ -47,6 +47,17 @@ namespace Notepad___Raylib {
 #endif
 
       static void Main(string[] args) {
+         //var q = "soemthing text".Split('\n');
+         //var w = "soemthing text\n".Split('\n');
+         //foreach (var item in q) {
+         //   Console.WriteLine(item);
+         //}
+         //Console.WriteLine("------------");
+         //foreach (var item in w) {
+         //   Console.WriteLine(item);
+         //}
+         //Console.WriteLine("------------");
+         //return;
 #if VISUAL_STUDIO
 #else
          Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);
@@ -112,6 +123,7 @@ namespace Notepad___Raylib {
          font = LoadFontWithAllUnicodeCharacters(Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf"), fontSize);
 
          while (!Raylib.WindowShouldClose()) {
+            Debug.Assert(!(mouseSelection != null && shiftSelection != null));
             // Input handling
             {
                // Keyboard input handling
@@ -128,10 +140,31 @@ namespace Notepad___Raylib {
 
                   // Handling key presses that have modifiers
                   {
-                     if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) &&
-                           Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
+                     if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
+                           WriteLinesToFile(filePath, lines);
+                        }
 
-                        WriteLinesToFile(filePath, lines);
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_C)) {
+                           mouseSelection?.Copy(lines);
+                           shiftSelection?.Copy(lines);
+                        }
+
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_X)) {
+                           throw new NotImplementedException();
+                        }
+
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
+                           mouseSelection?.Delete(lines, cursor);
+                           shiftSelection?.Delete(lines, cursor);
+                           shiftSelection = null;
+
+                           string clipboardText = Raylib.GetClipboardText_();
+                           List<Line> clipboard = ReadLinesFromString(clipboardText);
+                           InsertLinesAtCursor(lines, cursor, clipboard);
+
+                           cursor.MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+                        }
                      }
 
                      if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT_SHIFT) || Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT_SHIFT)) {
@@ -285,7 +318,7 @@ namespace Notepad___Raylib {
                if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
                   Vector2 mousePosition = Raylib.GetMousePosition();
                   Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
-                  
+
                   cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, mousePositionInWorldSpace);
 
                   shiftSelection = null;
@@ -376,6 +409,17 @@ namespace Notepad___Raylib {
          }
 
          if (lines.Count == 0) lines.Add(new Line("", 0));
+
+         return lines;
+      }
+
+      static List<Line> ReadLinesFromString(string text) {
+         List<Line> lines = new List<Line>();
+         string[] linesAsStringArray = text.Split('\n');
+
+         for (int i = 0; i < linesAsStringArray.Length; i++) {
+            lines.Add(new Line(linesAsStringArray[i], (uint)i));
+         }
 
          return lines;
       }
@@ -519,6 +563,25 @@ namespace Notepad___Raylib {
 
             return Raylib.LoadFontEx(path, fontSize, fontChars, glyphCount); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
          }
+      }
+
+      static void InsertLinesAtCursor(List<Line> lines, Cursor cursor, in List<Line> linesToInsert) {
+         Line line = lines[cursor.position.y];
+         string textAfterCursorFirstLine = line.Value.Substring(cursor.position.x);
+         line.RemoveTextAt(cursor.position.x, line.Value.Length - cursor.position.x, Direction.Right);
+
+         line.InsertTextAt(cursor.position.x, linesToInsert[0].Value);
+
+         for(int i = 1; i < linesToInsert.Count; i++) {
+            linesToInsert[i].LineNumber = (uint)(cursor.position.y + i);
+            lines.Insert(cursor.position.y + i, linesToInsert[i]);
+         }
+
+         Line lastInsertedLine = lines[cursor.position.y + linesToInsert.Count - 1];
+         lastInsertedLine.InsertTextAt(lastInsertedLine.Value.Length, textAfterCursorFirstLine);
+
+         cursor.position.y += linesToInsert.Count - 1;
+         cursor.position.x = lastInsertedLine.Value.Length - textAfterCursorFirstLine.Length;
       }
    }
 }

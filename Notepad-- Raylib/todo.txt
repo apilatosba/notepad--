@@ -1,6 +1,3 @@
-implement zoom
-add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level
-add opening directories. vim style
 add shortcuts
 find in file. ctrl + f
 highlight the line the cursor is on
@@ -8,11 +5,15 @@ add a settings menu. esc to open
 shaders
 character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
 different effects with shaders. for example a flash effect when you save, text near cursor gets a radial/horizontal gradient color.
+implement zoom
 add background image
+add mouse wheel acceleration
 the static int inputDelay should only work for same key presses. for example if i press a and then b, the delay should not work. but if i press a and then a again, the delay should work
 make cursor blink. make it with a shader
 add scrollbars
 bug: camera is not clamped to the text. it can go beyond the text
+add opening directories. vim style
+add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level
 change cursor y repositioning algorithm. only works with monospace font rn.
 app icon
 the font should be setable from settings and i should look for fonts in shared fonts folder (C:\Windows\Fonts, /usr/share/fonts) and my custom fonts folder

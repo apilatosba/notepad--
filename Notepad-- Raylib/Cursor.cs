@@ -20,8 +20,8 @@ namespace Notepad___Raylib {
          Raylib.DrawRectangle(distance, position.y * Line.Height, 1, Line.Height, color);
       }
 
-      // TODO add modifiers
-      public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
+      // TODO implement isControlKeyDown
+      public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, bool isControlKeyDown = false) {
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT)) {
             if (IsCursorAtEndOfFile(lines)) return;
 
@@ -150,8 +150,8 @@ namespace Notepad___Raylib {
 
             //Console.WriteLine($"L:{left}, R:{right}, M:{m}, R:{r}, T:{t}");
 
-            if(Math.Abs(r - t) <= errorTolerance) return m;
-            
+            if (Math.Abs(r - t) <= errorTolerance) return m;
+
             if (left >= right) return m;
 
             if (r < t) {

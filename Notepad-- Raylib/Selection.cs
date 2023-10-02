@@ -159,5 +159,31 @@ namespace Notepad___Raylib {
 
          cursor.position = left;
       }
+
+      public void Copy(in List<Line> lines) {
+         string text;
+         GetRightAndLeft(out Int2 left, out Int2 right);
+         Line[] linesInRange = GetLinesInRange(lines).ToArray();
+
+         switch (linesInRange.Length) {
+            case 1:
+               text = linesInRange[0].Value.Substring(left.x, right.x - left.x);
+               break;
+            case 2:
+               text = linesInRange[0].Value.Substring(left.x, linesInRange[0].Value.Length - left.x) + "\n" + linesInRange[1].Value.Substring(0, right.x);
+               break;
+            default:
+               text = linesInRange[0].Value.Substring(left.x, linesInRange[0].Value.Length - left.x);
+
+               for(int i = 1; i < linesInRange.Length - 1; i++) {
+                  text += "\n" + linesInRange[i].Value;
+               }
+
+               text += "\n" + linesInRange[linesInRange.Length - 1].Value.Substring(0, right.x);
+               break;
+         }
+
+         Raylib.SetClipboardText(text);
+      }
    }
 }
