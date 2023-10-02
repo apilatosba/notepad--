@@ -25,19 +25,10 @@ namespace Notepad___Raylib {
          this.endPosition = endPosition;
       }
 
-      public void Render(List<Line> lines, int fontSize, int leftPadding, Font font) {
-         Int2 left;
-         Int2 right;
+      public void Render(List<Line> lines, int fontSize, int leftPadding, Font font) { 
+         GetRightAndLeft(out Int2 left, out Int2 right);
 
-         if(startPosition.y == endPosition.y) {
-            left = startPosition.x <= endPosition.x ? startPosition : endPosition;
-            right = startPosition.x <= endPosition.x ? endPosition : startPosition;
-         } else {
-            left = startPosition.y < endPosition.y ? startPosition : endPosition;
-            right = startPosition.y < endPosition.y ? endPosition : startPosition;
-         }
-
-         Line[] linesInRange = GetLinesInRange().ToArray();
+         Line[] linesInRange = GetLinesInRange(lines).ToArray();
          Debug.Assert(linesInRange.Length != 0);
 
          switch (linesInRange.Length) {
@@ -51,18 +42,12 @@ namespace Notepad___Raylib {
             default:
                RenderLine(left, new Int2(linesInRange[0].Value.Length, left.y));
 
-               for(int i = left.y + 1; i < right.y; i++) {
+               for (int i = left.y + 1; i < right.y; i++) {
                   RenderLine(new Int2(0, i), new Int2(linesInRange[i - left.y].Value.Length, i));
                }
 
                RenderLine(new Int2(0, right.y), right);
                break;
-         }
-
-         IEnumerable<Line> GetLinesInRange() {
-            for(int i = left.y; i <= right.y; i++) {
-               yield return lines[i];
-            }
          }
 
          void RenderLine(Int2 start, Int2 end) {
@@ -75,6 +60,27 @@ namespace Notepad___Raylib {
             Int2 rightWorldSpacePosition = GetWorldSpacePosition(right, lines, fontSize, leftPadding, font);
 
             Raylib.DrawRectangle(leftWorldSpacePosition.x, leftWorldSpacePosition.y, rightWorldSpacePosition.x - leftWorldSpacePosition.x, Line.Height, color);
+         }
+      }
+
+      IEnumerable<Line> GetLinesInRange(List<Line> lines) {
+         Int2 left;
+         Int2 right;
+
+         GetRightAndLeft(out left, out right);
+
+         for (int i = left.y; i <= right.y; i++) {
+            yield return lines[i];
+         }
+      }
+
+      void GetRightAndLeft(out Int2 left, out Int2 right) {
+         if (startPosition.y == endPosition.y) {
+            left = startPosition.x <= endPosition.x ? startPosition : endPosition;
+            right = startPosition.x <= endPosition.x ? endPosition : startPosition;
+         } else {
+            left = startPosition.y < endPosition.y ? startPosition : endPosition;
+            right = startPosition.y < endPosition.y ? endPosition : startPosition;
          }
       }
 
@@ -100,8 +106,53 @@ namespace Notepad___Raylib {
          return pos;
       }
 
-      void Delete() {
-         throw new System.NotImplementedException();
+      /// <summary>
+      /// Deletes the selection and positions the cursor at the start of the selection.
+      /// </summary>
+      /// <param name="lines"></param>
+      /// <param name="cursor"></param>
+      public void Delete(List<Line> lines, Cursor cursor) {
+         GetRightAndLeft(out Int2 left, out Int2 right);
+         Line[] linesInRange = GetLinesInRange(lines).ToArray();
+
+         Debug.Assert(linesInRange.Length != 0);
+
+         switch (linesInRange.Length) {
+            case 1:
+               linesInRange[0].RemoveTextAt(left.x, right.x - left.x, Direction.Right);
+               break;
+            case 2:
+               linesInRange[0].RemoveTextAt(left.x, linesInRange[0].Value.Length - left.x, Direction.Right);
+               linesInRange[1].RemoveTextAt(0, right.x, Direction.Right);
+
+               linesInRange[0].InsertTextAt(linesInRange[0].Value.Length, linesInRange[1].Value);
+
+               lines.RemoveAt(right.y);
+
+               for(int i = right.y; i < lines.Count; i++) {
+                  lines[i].LineNumber--;
+               }
+               break;
+            default:
+               linesInRange[0].RemoveTextAt(left.x, linesInRange[0].Value.Length - left.x, Direction.Right);
+
+               for (int i = left.y + 1; i < right.y; i++) {
+                  lines.RemoveAt(left.y + 1);
+               }
+
+               linesInRange[linesInRange.Length - 1].RemoveTextAt(0, right.x, Direction.Right);
+
+               linesInRange[0].InsertTextAt(linesInRange[0].Value.Length, linesInRange[linesInRange.Length - 1].Value);
+
+               lines.RemoveAt(left.y + 1);
+
+               for (int i = left.y + 1; i < lines.Count; i++) {
+                  lines[i].LineNumber = (uint)(linesInRange.Length - 1);
+               }
+               break;
+         }
+
+         cursor.position = left;
       }
    }
 }

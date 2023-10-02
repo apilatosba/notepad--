@@ -154,6 +154,12 @@ namespace Notepad___Raylib {
 
                         switch (specialKey) {
                            case KeyboardKey.KEY_BACKSPACE:
+                              if (shiftSelection != null) {
+                                 shiftSelection.Delete(lines, cursor);
+                                 shiftSelection = null;
+                                 break;
+                              }
+
                               if (cursor.IsCursorAtBeginningOfFile()) break;
 
                               if (cursor.IsCursorAtBeginningOfLine()) {
