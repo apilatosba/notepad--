@@ -12,10 +12,11 @@ namespace Notepad___Raylib {
    internal class Program {
       static Config config = new Config();
       const string CONFIG_FILE = "config.xml";
+      static IEditorState editorState = new EditorStatePlaying();
       static readonly Color TEXT_COLOR = new Color(200, 200, 200, 255);
-      static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 50);
+      public static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 50);
       public static int fontSize = 19;
-      static int leftPadding = 12;
+      public static int leftPadding = 12;
       /// <summary>
       /// In milliseconds.
       /// </summary>
@@ -39,9 +40,9 @@ namespace Notepad___Raylib {
       static int inputRushCounter = 0;
       public static List<Line> lines;
       public static Font font;
-      static int tabSize = 4;
-      static string filePath;
-      static int spacingBetweenLines = 0;
+      public static int tabSize = 4;
+      public static string filePath;
+      public static int spacingBetweenLines = 0;
 #if VISUAL_STUDIO
       static readonly string customFontsDirectory = "Fonts";
 #else
@@ -136,257 +137,260 @@ namespace Notepad___Raylib {
          font = LoadFontWithAllUnicodeCharacters(Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf"), fontSize);
 
          while (!Raylib.WindowShouldClose()) {
-            Debug.Assert(!(mouseSelection != null && shiftSelection != null));
-            // Input handling
-            {
-               // Keyboard input handling
-               if (ShouldAcceptKeyboardInput(out string pressedKeys, out KeyboardKey specialKey)) {
-                  List<KeyboardKey> modifiers = new List<KeyboardKey>();
-                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) modifiers.Add(KeyboardKey.KEY_LEFT_CONTROL);
-                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) modifiers.Add(KeyboardKey.KEY_LEFT_SHIFT);
-                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_ALT)) modifiers.Add(KeyboardKey.KEY_LEFT_ALT);
-                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SUPER)) modifiers.Add(KeyboardKey.KEY_LEFT_SUPER);
-                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) modifiers.Add(KeyboardKey.KEY_RIGHT_CONTROL);
-                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SHIFT)) modifiers.Add(KeyboardKey.KEY_RIGHT_SHIFT);
-                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
-                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
+            //            Debug.Assert(!(mouseSelection != null && shiftSelection != null));
+            //            // Input handling
+            //            {
+            //               // Keyboard input handling
+            //               if (ShouldAcceptKeyboardInput(out string pressedKeys, out KeyboardKey specialKey)) {
+            //                  List<KeyboardKey> modifiers = new List<KeyboardKey>();
+            //                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) modifiers.Add(KeyboardKey.KEY_LEFT_CONTROL);
+            //                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) modifiers.Add(KeyboardKey.KEY_LEFT_SHIFT);
+            //                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_ALT)) modifiers.Add(KeyboardKey.KEY_LEFT_ALT);
+            //                  if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SUPER)) modifiers.Add(KeyboardKey.KEY_LEFT_SUPER);
+            //                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) modifiers.Add(KeyboardKey.KEY_RIGHT_CONTROL);
+            //                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SHIFT)) modifiers.Add(KeyboardKey.KEY_RIGHT_SHIFT);
+            //                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
+            //                  if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
-                  // Handling key presses that have modifiers
-                  {
-                     if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
-                           WriteLinesToFile(filePath, lines);
-                        }
+            //                  // Handling key presses that have modifiers
+            //                  {
+            //                     if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+            //                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
+            //                           WriteLinesToFile(filePath, lines);
+            //                        }
 
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_C)) {
-                           mouseSelection?.Copy(lines);
-                           shiftSelection?.Copy(lines);
-                        }
+            //                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_C)) {
+            //                           mouseSelection?.Copy(lines);
+            //                           shiftSelection?.Copy(lines);
+            //                        }
 
-                        // No mouseSelection. It causes lots of issues. So I chose the easy path and I don't allow user to ctrl+x while he is holding down mouse1. User needs to release mouse1 and then press ctrl+x.
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_X)) {
-                           shiftSelection?.Copy(lines);
-                           shiftSelection?.Delete(lines, cursor);
-                           shiftSelection = null;
-                        }
+            //                        // No mouseSelection. It causes lots of issues. So I chose the easy path and I don't allow user to ctrl+x while he is holding down mouse1. User needs to release mouse1 and then press ctrl+x.
+            //                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_X)) {
+            //                           shiftSelection?.Copy(lines);
+            //                           shiftSelection?.Delete(lines, cursor);
+            //                           shiftSelection = null;
+            //                        }
 
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
-                           mouseSelection?.Delete(lines, cursor);
-                           shiftSelection?.Delete(lines, cursor);
-                           shiftSelection = null;
+            //                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
+            //                           mouseSelection?.Delete(lines, cursor);
+            //                           shiftSelection?.Delete(lines, cursor);
+            //                           shiftSelection = null;
 
-                           string clipboardText = Raylib.GetClipboardText_();
-                           List<Line> clipboard = ReadLinesFromString(clipboardText);
-                           InsertLinesAtCursor(lines, cursor, clipboard);
+            //                           string clipboardText = Raylib.GetClipboardText_();
+            //                           List<Line> clipboard = ReadLinesFromString(clipboardText);
+            //                           InsertLinesAtCursor(lines, cursor, clipboard);
 
-                           cursor.MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
-                        }
-                     }
+            //                           cursor.MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+            //                        }
+            //                     }
 
-                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT_SHIFT) || Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT_SHIFT)) {
-                        shiftSelection ??= new Selection(cursor.position, cursor.position);
-                     }
-                  }
+            //                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT_SHIFT) || Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT_SHIFT)) {
+            //                        shiftSelection ??= new Selection(cursor.position, cursor.position);
+            //                     }
+            //                  }
 
-                  // Handling key presses that don't have modifiers ie. normal key presses
-                  {
-                     if (pressedKeys != null) {
-#if VISUAL_STUDIO
-                        PrintPressedKeys(pressedKeys);
-#endif
-                        shiftSelection?.Delete(lines, cursor);
-                        shiftSelection = null;
+            //                  // Handling key presses that don't have modifiers ie. normal key presses
+            //                  {
+            //                     if (pressedKeys != null) {
+            //#if VISUAL_STUDIO
+            //                        PrintPressedKeys(pressedKeys);
+            //#endif
+            //                        shiftSelection?.Delete(lines, cursor);
+            //                        shiftSelection = null;
 
-                        InsertTextAtCursor(lines, cursor, pressedKeys);
-                        cursor.MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
-                     }
-                  }
+            //                        InsertTextAtCursor(lines, cursor, pressedKeys);
+            //                        cursor.MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+            //                     }
+            //                  }
 
-                  // Handling special keys, both with and without modifiers
-                  {
-                     if (specialKey != KeyboardKey.KEY_NULL) {
-#if VISUAL_STUDIO
-                        Console.WriteLine(specialKey);
-#endif
-                        switch (specialKey) {
-                           case KeyboardKey.KEY_ESCAPE:
+            //                  // Handling special keys, both with and without modifiers
+            //                  {
+            //                     if (specialKey != KeyboardKey.KEY_NULL) {
+            //#if VISUAL_STUDIO
+            //                        Console.WriteLine(specialKey);
+            //#endif
+            //                        switch (specialKey) {
+            //                           case KeyboardKey.KEY_ESCAPE:
 
-                              break;
-                           case KeyboardKey.KEY_BACKSPACE:
-                              if (shiftSelection != null) {
-                                 shiftSelection.Delete(lines, cursor);
-                                 shiftSelection = null;
-                                 break;
-                              }
+            //                              break;
+            //                           case KeyboardKey.KEY_BACKSPACE:
+            //                              if (shiftSelection != null) {
+            //                                 shiftSelection.Delete(lines, cursor);
+            //                                 shiftSelection = null;
+            //                                 break;
+            //                              }
 
-                              if (cursor.IsCursorAtBeginningOfFile()) break;
+            //                              if (cursor.IsCursorAtBeginningOfFile()) break;
 
-                              if (cursor.IsCursorAtBeginningOfLine()) {
-                                 Line currentLine = lines[cursor.position.y];
-                                 Line lineAbove = lines[cursor.position.y - 1];
+            //                              if (cursor.IsCursorAtBeginningOfLine()) {
+            //                                 Line currentLine = lines[cursor.position.y];
+            //                                 Line lineAbove = lines[cursor.position.y - 1];
 
-                                 cursor.position.x = lineAbove.Value.Length;
+            //                                 cursor.position.x = lineAbove.Value.Length;
 
-                                 lineAbove.InsertTextAt(lineAbove.Value.Length, currentLine.Value);
-                                 lines.RemoveAt(cursor.position.y);
+            //                                 lineAbove.InsertTextAt(lineAbove.Value.Length, currentLine.Value);
+            //                                 lines.RemoveAt(cursor.position.y);
 
-                                 cursor.position.y--;
+            //                                 cursor.position.y--;
 
-                                 for (int i = cursor.position.y + 1; i < lines.Count; i++) {
-                                    lines[i].LineNumber--;
-                                 }
-                              } else {
-                                 RemoveTextAtCursor(lines, cursor, 1);
-                              }
+            //                                 for (int i = cursor.position.y + 1; i < lines.Count; i++) {
+            //                                    lines[i].LineNumber--;
+            //                                 }
+            //                              } else {
+            //                                 RemoveTextAtCursor(lines, cursor, 1);
+            //                              }
 
-                              break;
-                           case KeyboardKey.KEY_ENTER: {
-                                 shiftSelection?.Delete(lines, cursor);
-                                 shiftSelection = null;
+            //                              break;
+            //                           case KeyboardKey.KEY_ENTER: {
+            //                                 shiftSelection?.Delete(lines, cursor);
+            //                                 shiftSelection = null;
 
-                                 Line currentLine = lines[cursor.position.y];
-                                 string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
+            //                                 Line currentLine = lines[cursor.position.y];
+            //                                 string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
 
-                                 Line newLine = new Line(textAfterCursor, currentLine.LineNumber + 1);
+            //                                 Line newLine = new Line(textAfterCursor, currentLine.LineNumber + 1);
 
-                                 if (cursor.IsCursorAtEndOfFile(lines)) {
-                                    lines.Add(newLine);
-                                 } else {
-                                    lines.Insert((int)currentLine.LineNumber + 1, newLine);
-                                 }
+            //                                 if (cursor.IsCursorAtEndOfFile(lines)) {
+            //                                    lines.Add(newLine);
+            //                                 } else {
+            //                                    lines.Insert((int)currentLine.LineNumber + 1, newLine);
+            //                                 }
 
-                                 currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
+            //                                 currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
 
-                                 cursor.position.x = 0;
-                                 cursor.position.y++;
+            //                                 cursor.position.x = 0;
+            //                                 cursor.position.y++;
 
-                                 for (int i = cursor.position.y + 1; i < lines.Count; i++) {
-                                    lines[i].LineNumber++;
-                                 }
-                              }
-                              break;
-                           case KeyboardKey.KEY_TAB:
-                              if (shiftSelection != null) {
-                                 Line[] linesInRange = shiftSelection.GetLinesInRange(lines).ToArray();
+            //                                 for (int i = cursor.position.y + 1; i < lines.Count; i++) {
+            //                                    lines[i].LineNumber++;
+            //                                 }
+            //                              }
+            //                              break;
+            //                           case KeyboardKey.KEY_TAB:
+            //                              if (shiftSelection != null) {
+            //                                 Line[] linesInRange = shiftSelection.GetLinesInRange(lines).ToArray();
 
-                                 foreach (Line line in linesInRange) {
-                                    line.InsertTextAt(0, new string(' ', tabSize));
-                                 }
+            //                                 foreach (Line line in linesInRange) {
+            //                                    line.InsertTextAt(0, new string(' ', tabSize));
+            //                                 }
 
-                                 shiftSelection.StartPosition = new Int2(shiftSelection.StartPosition.x + tabSize, shiftSelection.StartPosition.y);
-                                 cursor.position.x += tabSize;
+            //                                 shiftSelection.StartPosition = new Int2(shiftSelection.StartPosition.x + tabSize, shiftSelection.StartPosition.y);
+            //                                 cursor.position.x += tabSize;
 
-                                 break;
-                              }
+            //                                 break;
+            //                              }
 
-                              InsertTextAtCursor(lines, cursor, new string(' ', tabSize));
-                              break;
-                           case KeyboardKey.KEY_DELETE:
-                              if (shiftSelection != null) {
-                                 shiftSelection.Delete(lines, cursor);
-                                 shiftSelection = null;
-                                 break;
-                              }
+            //                              InsertTextAtCursor(lines, cursor, new string(' ', tabSize));
+            //                              break;
+            //                           case KeyboardKey.KEY_DELETE:
+            //                              if (shiftSelection != null) {
+            //                                 shiftSelection.Delete(lines, cursor);
+            //                                 shiftSelection = null;
+            //                                 break;
+            //                              }
 
-                              if (cursor.IsCursorAtEndOfLine(lines)) {
-                                 Line currentLine = lines[cursor.position.y];
-                                 Line lineBelow = lines[cursor.position.y + 1];
+            //                              if (cursor.IsCursorAtEndOfLine(lines)) {
+            //                                 Line currentLine = lines[cursor.position.y];
+            //                                 Line lineBelow = lines[cursor.position.y + 1];
 
-                                 currentLine.InsertTextAt(currentLine.Value.Length, lineBelow.Value);
+            //                                 currentLine.InsertTextAt(currentLine.Value.Length, lineBelow.Value);
 
-                                 lines.RemoveAt(cursor.position.y + 1);
+            //                                 lines.RemoveAt(cursor.position.y + 1);
 
-                                 for (int i = cursor.position.y + 1; i < lines.Count; i++) {
-                                    lines[i].LineNumber--;
-                                 }
-                              } else {
-                                 RemoveTextAtCursor(lines, cursor, 1, Direction.Right);
-                              }
+            //                                 for (int i = cursor.position.y + 1; i < lines.Count; i++) {
+            //                                    lines[i].LineNumber--;
+            //                                 }
+            //                              } else {
+            //                                 RemoveTextAtCursor(lines, cursor, 1, Direction.Right);
+            //                              }
 
-                              break;
-                           case KeyboardKey.KEY_RIGHT:
-                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                              //camera.target.X += 10;
-                              break;
-                           case KeyboardKey.KEY_LEFT:
-                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                              //camera.target.X -= 10;
-                              break;
-                           case KeyboardKey.KEY_UP:
-                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
-                                 spacingBetweenLines++;
-                              }
-                              //camera.target.Y -= 10;
-                              break;
-                           case KeyboardKey.KEY_DOWN:
-                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
-                                 spacingBetweenLines--;
-                              }
-                              //camera.target.Y += 10;
-                              break;
-                        }
-                     }
-                  }
+            //                              break;
+            //                           case KeyboardKey.KEY_RIGHT:
+            //                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
+            //                              //camera.target.X += 10;
+            //                              break;
+            //                           case KeyboardKey.KEY_LEFT:
+            //                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
+            //                              //camera.target.X -= 10;
+            //                              break;
+            //                           case KeyboardKey.KEY_UP:
+            //                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
+            //                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
+            //                                 spacingBetweenLines++;
+            //                              }
+            //                              //camera.target.Y -= 10;
+            //                              break;
+            //                           case KeyboardKey.KEY_DOWN:
+            //                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
+            //                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
+            //                                 spacingBetweenLines--;
+            //                              }
+            //                              //camera.target.Y += 10;
+            //                              break;
+            //                        }
+            //                     }
+            //                  }
 
-                  cursor.HandleArrowKeysNavigation(lines, ref camera, fontSize, leftPadding, font);
-               } // End of keyboard input handling
+            //                  cursor.HandleArrowKeysNavigation(lines, ref camera, fontSize, leftPadding, font);
+            //               } // End of keyboard input handling
 
-               mouseWheelInput = Raylib.GetMouseWheelMove();
-               camera.target.Y -= mouseWheelInput * Line.Height;
+            //               mouseWheelInput = Raylib.GetMouseWheelMove();
+            //               camera.target.Y -= mouseWheelInput * Line.Height;
 
-               if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
-                  Vector2 mousePosition = Raylib.GetMousePosition();
-                  Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
+            //               if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
+            //                  Vector2 mousePosition = Raylib.GetMousePosition();
+            //                  Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-                  cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, mousePositionInWorldSpace);
+            //                  cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, mousePositionInWorldSpace);
 
-                  shiftSelection = null;
-                  mouseSelection = new Selection(cursor.position, cursor.position);
-               }
+            //                  shiftSelection = null;
+            //                  mouseSelection = new Selection(cursor.position, cursor.position);
+            //               }
 
-               if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
-                  Debug.Assert(mouseSelection != null);
+            //               if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
+            //                  Debug.Assert(mouseSelection != null);
 
-                  Vector2 mousePosition = Raylib.GetMousePosition();
-                  Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
+            //                  Vector2 mousePosition = Raylib.GetMousePosition();
+            //                  Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-                  mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, mousePositionInWorldSpace);
-                  cursor.position = mouseSelection.EndPosition;
-               }
+            //                  mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, mousePositionInWorldSpace);
+            //                  cursor.position = mouseSelection.EndPosition;
+            //               }
 
-               if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) {
-                  shiftSelection = mouseSelection;
-                  mouseSelection = null;
-               }
+            //               if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) {
+            //                  shiftSelection = mouseSelection;
+            //                  mouseSelection = null;
+            //               }
 
-               //horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(lines, font), Raylib.GetScreenWidth());
-            } // End of input handling
+            //               //horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(lines, font), Raylib.GetScreenWidth());
+            //            } // End of input handling
 
-            if (shiftSelection != null) shiftSelection.EndPosition = cursor.position;
-            MakeSureCameraNotBelowZeroInBothAxes(ref camera);
+            //            if (shiftSelection != null) shiftSelection.EndPosition = cursor.position;
+            //            MakeSureCameraNotBelowZeroInBothAxes(ref camera);
 
-            Raylib.BeginDrawing();
+            //            Raylib.BeginDrawing();
 
-            // World space rendering
-            Raylib.BeginMode2D(camera);
-            {
-               Raylib.ClearBackground(BACKGROUND_COLOR);
+            //            // World space rendering
+            //            Raylib.BeginMode2D(camera);
+            //            {
+            //               Raylib.ClearBackground(BACKGROUND_COLOR);
 
-               RenderLines(lines, font);
-               shiftSelection?.Render(lines, fontSize, leftPadding, font);
-               mouseSelection?.Render(lines, fontSize, leftPadding, font);
-               cursor.Render(lines, fontSize, leftPadding, font, spacingBetweenLines);
-            }
-            Raylib.EndMode2D();
+            //               RenderLines(lines, font);
+            //               shiftSelection?.Render(lines, fontSize, leftPadding, font);
+            //               mouseSelection?.Render(lines, fontSize, leftPadding, font);
+            //               cursor.Render(lines, fontSize, leftPadding, font, spacingBetweenLines);
+            //            }
+            //            Raylib.EndMode2D();
 
-            // Screen space rendering ie. UI
-            {
-               //horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
-            }
+            //            // Screen space rendering ie. UI
+            //            {
+            //               //horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
+            //            }
 
-            Raylib.EndDrawing();
+            //            Raylib.EndDrawing();
+            editorState.HandleInput();
+            editorState.PostHandleInput();
+            editorState.Render();
          }
 
          Raylib.UnloadFont(font);
@@ -434,7 +438,7 @@ namespace Notepad___Raylib {
          return lines;
       }
 
-      static List<Line> ReadLinesFromString(string text) {
+      public static List<Line> ReadLinesFromString(string text) {
          List<Line> lines = new List<Line>();
          string[] linesAsStringArray = text.Split('\n');
 
@@ -445,7 +449,7 @@ namespace Notepad___Raylib {
          return lines;
       }
 
-      static void WriteLinesToFile(string path, List<Line> lines) {
+      public static void WriteLinesToFile(string path, List<Line> lines) {
          string[] linesToFile = new string[lines.Count];
 
          for (int i = 0; i < lines.Count; i++) {
@@ -458,26 +462,26 @@ namespace Notepad___Raylib {
 #endif
       }
 
-      static void RenderLines(List<Line> lines, Font font) {
+      public static void RenderLines(List<Line> lines, Font font) {
          for (int i = 0; i < lines.Count; i++) {
             Raylib.DrawTextEx(font, lines[i].Value, new Vector2(leftPadding, i * (Line.Height + spacingBetweenLines)), fontSize, 0, TEXT_COLOR);
          }
       }
 
-      static void InsertTextAtCursor(List<Line> lines, Cursor cursor, string text) {
+      public static void InsertTextAtCursor(List<Line> lines, Cursor cursor, string text) {
          Line line = lines[cursor.position.y];
          line.InsertTextAt(cursor.position.x, text);
 
          cursor.position.x += text.Length;
       }
 
-      static void RemoveTextAtCursor(List<Line> lines, Cursor cursor, int count, Direction direction = Direction.Left) {
+      public static void RemoveTextAtCursor(List<Line> lines, Cursor cursor, int count, Direction direction = Direction.Left) {
          Line line = lines[cursor.position.y];
          line.RemoveTextAt(cursor.position.x, count, direction);
          cursor.position.x += direction == Direction.Left ? -count : 0;
       }
 
-      static bool ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey) {
+      public static bool ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey) {
          pressedChars = null;
          specialKey = KeyboardKey.KEY_NULL;
 
@@ -565,7 +569,7 @@ namespace Notepad___Raylib {
          return executableDirectory;
       }
 
-      static void MakeSureCameraNotBelowZeroInBothAxes(ref Camera2D camera) {
+      public static void MakeSureCameraNotBelowZeroInBothAxes(ref Camera2D camera) {
          if (camera.target.X < 0) camera.target.X = 0;
          if (camera.target.Y < 0) camera.target.Y = 0;
       }
@@ -587,7 +591,7 @@ namespace Notepad___Raylib {
          }
       }
 
-      static void InsertLinesAtCursor(List<Line> lines, Cursor cursor, in List<Line> linesToInsert) {
+      public static void InsertLinesAtCursor(List<Line> lines, Cursor cursor, in List<Line> linesToInsert) {
          Line line = lines[cursor.position.y];
          string textAfterCursorFirstLine = line.Value.Substring(cursor.position.x);
          line.RemoveTextAt(cursor.position.x, line.Value.Length - cursor.position.x, Direction.Right);
