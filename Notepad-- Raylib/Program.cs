@@ -21,7 +21,7 @@ namespace Notepad___Raylib {
       /// <summary>
       /// How many milliseconds to wait before accepting new input.
       /// </summary>
-      static int inputDelay = 25;
+      static int inputDelay = 22;
       /// <summary>
       /// In milliseconds. This means that writing/deleting/(moving cursor) will wait after moving one character even if you are holding down the key.
       /// </summary>
@@ -52,6 +52,7 @@ namespace Notepad___Raylib {
          Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);
 #endif
          Selection shiftSelection = null;
+         Selection mouseSelection = null;
          float mouseWheelInput = 0;
          Cursor cursor = new Cursor();
          //ScrollBar horizontalScrollBar = new ScrollBar();
@@ -99,7 +100,7 @@ namespace Notepad___Raylib {
 
          lastInputTimer.Start();
 
-         Raylib.InitWindow(800, 600, "Notepad--");
+         Raylib.InitWindow(1150, 560, "Notepad--");
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
             zoom = 1.0f,
@@ -281,14 +282,29 @@ namespace Notepad___Raylib {
                mouseWheelInput = Raylib.GetMouseWheelMove();
                camera.target.Y -= mouseWheelInput * Line.Height;
 
+               if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
+                  Vector2 mousePosition = Raylib.GetMousePosition();
+                  Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
+                  
+                  cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, mousePositionInWorldSpace);
+
+                  shiftSelection = null;
+                  mouseSelection = new Selection(cursor.position, cursor.position);
+               }
+
                if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
-                  //if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
+                  Debug.Assert(mouseSelection != null);
+
                   Vector2 mousePosition = Raylib.GetMousePosition();
                   Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-                  //cursor.position.y = mousePositionInWorldSpace.y / Line.Height;
+                  mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, mousePositionInWorldSpace);
+                  cursor.position = mouseSelection.EndPosition;
+               }
 
-                  cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(lines, fontSize, leftPadding, font, mousePositionInWorldSpace);
+               if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) {
+                  shiftSelection = mouseSelection;
+                  mouseSelection = null;
                }
 
                //horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(lines, font), Raylib.GetScreenWidth());
@@ -306,6 +322,7 @@ namespace Notepad___Raylib {
 
                RenderLines(lines, font);
                shiftSelection?.Render(lines, fontSize, leftPadding, font);
+               mouseSelection?.Render(lines, fontSize, leftPadding, font);
                cursor.Render(lines, fontSize, leftPadding, font, spacingBetweenLines);
             }
             Raylib.EndMode2D();
