@@ -3,5 +3,6 @@
       void HandleInput();
       void PostHandleInput();
       void Render();
+      void Update();
    }
 }

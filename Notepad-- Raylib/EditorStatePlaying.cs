@@ -272,5 +272,11 @@ namespace Notepad___Raylib {
 
          Raylib.EndDrawing();
       }
+
+      public void Update() {
+         HandleInput();
+         PostHandleInput();
+         Render();
+      }
    }
 }
