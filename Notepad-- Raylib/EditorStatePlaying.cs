@@ -1,4 +1,6 @@
-﻿using Raylib_CsLo;
+﻿#define VISUAL_STUDIO
+using Raylib_CsLo;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
@@ -16,6 +18,19 @@ namespace Notepad___Raylib {
          offset = new Vector2(0, 0),
       };
       float mouseWheelInput = 0;
+      static Int2? lastKnownCursorPosition = null;
+
+      public EditorStatePlaying() {
+#if VISUAL_STUDIO
+         Program.config.Deserialize(Program.CONFIG_FILE_NAME);
+#else
+         Program.config.Deserialize(Program.GetConfigPath());
+#endif
+         Raylib.UnloadFont(Program.font);
+         Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+
+         cursor.position = lastKnownCursorPosition ?? new Int2(0, 0);
+      }
 
       public void HandleInput() {
          Debug.Assert(!(mouseSelection != null && shiftSelection != null));
@@ -60,7 +75,7 @@ namespace Notepad___Raylib {
                      List<Line> clipboard = Program.ReadLinesFromString(clipboardText);
                      Program.InsertLinesAtCursor(Program.lines, cursor, clipboard);
 
-                     cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.fontSize, Program.leftPadding, Program.font);
+                     cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
                   }
                }
 
@@ -73,13 +88,13 @@ namespace Notepad___Raylib {
             {
                if (pressedKeys != null) {
 #if VISUAL_STUDIO
-                        PrintPressedKeys(pressedKeys);
+                  Program.PrintPressedKeys(pressedKeys);
 #endif
                   shiftSelection?.Delete(Program.lines, cursor);
                   shiftSelection = null;
 
                   Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
-                  cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.fontSize, Program.leftPadding, Program.font);
+                  cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
                }
             }
 
@@ -91,12 +106,14 @@ namespace Notepad___Raylib {
 #endif
                   switch (specialKey) {
                      case KeyboardKey.KEY_ESCAPE:
+                        lastKnownCursorPosition = cursor.position;
                         Program.editorState = new EditorStatePaused();
                         break;
                      case KeyboardKey.KEY_BACKSPACE:
                         if (shiftSelection != null) {
                            shiftSelection.Delete(Program.lines, cursor);
                            shiftSelection = null;
+                           cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
                            break;
                         }
 
@@ -120,6 +137,7 @@ namespace Notepad___Raylib {
                            Program.RemoveTextAtCursor(Program.lines, cursor, 1);
                         }
 
+                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
                         break;
                      case KeyboardKey.KEY_ENTER: {
                            shiftSelection?.Delete(Program.lines, cursor);
@@ -145,6 +163,8 @@ namespace Notepad___Raylib {
                               Program.lines[i].LineNumber++;
                            }
                         }
+
+                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
                         break;
                      case KeyboardKey.KEY_TAB:
                         if (shiftSelection != null) {
@@ -157,10 +177,14 @@ namespace Notepad___Raylib {
                            shiftSelection.StartPosition = new Int2(shiftSelection.StartPosition.x + Program.tabSize, shiftSelection.StartPosition.y);
                            cursor.position.x += Program.tabSize;
 
+                           cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
+
                            break;
                         }
 
                         Program.InsertTextAtCursor(Program.lines, cursor, new string(' ', Program.tabSize));
+
+                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
                         break;
                      case KeyboardKey.KEY_DELETE:
                         if (shiftSelection != null) {
@@ -211,7 +235,7 @@ namespace Notepad___Raylib {
                }
             }
 
-            cursor.HandleArrowKeysNavigation(Program.lines, ref camera, Program.fontSize, Program.leftPadding, Program.font);
+            cursor.HandleArrowKeysNavigation(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
          } // End of keyboard input handling
 
          mouseWheelInput = Raylib.GetMouseWheelMove();
@@ -221,7 +245,7 @@ namespace Notepad___Raylib {
             Vector2 mousePosition = Raylib.GetMousePosition();
             Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-            cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.fontSize, Program.leftPadding, Program.font, mousePositionInWorldSpace);
+            cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font, mousePositionInWorldSpace);
 
             shiftSelection = null;
             mouseSelection = new Selection(cursor.position, cursor.position);
@@ -233,7 +257,7 @@ namespace Notepad___Raylib {
             Vector2 mousePosition = Raylib.GetMousePosition();
             Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-            mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.fontSize, Program.leftPadding, Program.font, mousePositionInWorldSpace);
+            mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font, mousePositionInWorldSpace);
             cursor.position = mouseSelection.EndPosition;
          }
 
@@ -251,17 +275,15 @@ namespace Notepad___Raylib {
       }
 
       public void Render() {
-         Raylib.BeginDrawing();
-
          // World space rendering
          Raylib.BeginMode2D(camera);
          {
-            Raylib.ClearBackground(Program.BACKGROUND_COLOR);
+            Raylib.ClearBackground(Program.config.backgroundColor);
 
             Program.RenderLines(Program.lines, Program.font);
-            shiftSelection?.Render(Program.lines, Program.fontSize, Program.leftPadding, Program.font);
-            mouseSelection?.Render(Program.lines, Program.fontSize, Program.leftPadding, Program.font);
-            cursor.Render(Program.lines, Program.fontSize, Program.leftPadding, Program.font, Program.spacingBetweenLines);
+            shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font);
+            mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font);
+            cursor.Render(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font, Program.spacingBetweenLines);
          }
          Raylib.EndMode2D();
 
@@ -269,8 +291,6 @@ namespace Notepad___Raylib {
          {
             //horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
          }
-
-         Raylib.EndDrawing();
       }
 
       public void Update() {

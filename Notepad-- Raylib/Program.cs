@@ -9,12 +9,12 @@ using System.Reflection;
 
 namespace Notepad___Raylib {
    internal class Program {
-      static Config config = new Config();
-      const string CONFIG_FILE = "config.xml";
+      public static Config config = new Config();
+      public const string CONFIG_FILE_NAME = "config.xml";
       public static IEditorState editorState = new EditorStatePlaying();
-      static readonly Color TEXT_COLOR = new Color(200, 200, 200, 255);
-      public static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 50);
-      public static int fontSize = 19;
+      //static readonly Color TEXT_COLOR = new Color(200, 200, 200, 255);
+      //public static readonly Color BACKGROUND_COLOR = new Color(31, 31, 31, 50);
+      //public static int fontSize = 19;
       public static int leftPadding = 12;
       /// <summary>
       /// In milliseconds.
@@ -107,10 +107,14 @@ namespace Notepad___Raylib {
             offset = new Vector2(0, 0),
          };
 
-         font = LoadFontWithAllUnicodeCharacters(Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf"), fontSize);
+         font = LoadFontWithAllUnicodeCharacters(Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf"), config.fontSize);
 
          while (!Raylib.WindowShouldClose()) {
+            Raylib.BeginDrawing();
+
             editorState.Update();
+
+            Raylib.EndDrawing();
          }
 
          Raylib.UnloadFont(font);
@@ -135,12 +139,12 @@ namespace Notepad___Raylib {
          return string.IsNullOrEmpty(pressedKeys) ? null : pressedKeys;
       }
 
-      static void PrintPressedKeys(List<char> pressedKeys) {
+      public static void PrintPressedKeys(List<char> pressedKeys) {
          string keys = new string(pressedKeys.ToArray());
          PrintPressedKeys(keys);
       }
 
-      static void PrintPressedKeys(string pressedKeys) {
+      public static void PrintPressedKeys(string pressedKeys) {
          if (!string.IsNullOrEmpty(pressedKeys))
             Console.WriteLine(pressedKeys);
       }
@@ -184,7 +188,7 @@ namespace Notepad___Raylib {
 
       public static void RenderLines(List<Line> lines, Font font) {
          for (int i = 0; i < lines.Count; i++) {
-            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(leftPadding, i * (Line.Height + spacingBetweenLines)), fontSize, 0, TEXT_COLOR);
+            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(leftPadding, i * (Line.Height + spacingBetweenLines)), config.fontSize, 0, config.textColor);
          }
       }
 
@@ -264,10 +268,10 @@ namespace Notepad___Raylib {
       /// <returns>in pixels</returns>
       public static int FindDistanceToRightMostChar(in List<Line> lines, Font font) {
          Line longestLine = FindLongestLine(lines);
-         return (int)Raylib.MeasureTextEx(font, longestLine.Value, fontSize, 0).X + leftPadding;
+         return (int)Raylib.MeasureTextEx(font, longestLine.Value, config.fontSize, 0).X + leftPadding;
       }
 
-      static Line FindLongestLine(in List<Line> lines) {
+      public static Line FindLongestLine(in List<Line> lines) {
          Line longestLine = lines[0];
          for (int i = 1; i < lines.Count; i++) {
             if (lines[i].Value.Length > longestLine.Value.Length) {
@@ -282,7 +286,7 @@ namespace Notepad___Raylib {
          Console.WriteLine("-h, --help: Print help and exit.");
       }
 
-      static string GetExecutableDirectory() {
+      public static string GetExecutableDirectory() {
          Assembly entryAssembly = Assembly.GetEntryAssembly();
          string executableDirectory = Path.GetDirectoryName(entryAssembly.Location);
 
@@ -294,7 +298,7 @@ namespace Notepad___Raylib {
          if (camera.target.Y < 0) camera.target.Y = 0;
       }
 
-      static Font LoadFontWithAllUnicodeCharacters(string path, int fontSize) {
+      public static Font LoadFontWithAllUnicodeCharacters(string path, int fontSize) {
          // Font loading. Loading all characters in the Unicode range.
          unsafe {
             int startCodePoint = 0x0000;
@@ -318,7 +322,7 @@ namespace Notepad___Raylib {
 
          line.InsertTextAt(cursor.position.x, linesToInsert[0].Value);
 
-         for(int i = 1; i < linesToInsert.Count; i++) {
+         for (int i = 1; i < linesToInsert.Count; i++) {
             linesToInsert[i].LineNumber = (uint)(cursor.position.y + i);
             lines.Insert(cursor.position.y + i, linesToInsert[i]);
          }
@@ -328,6 +332,18 @@ namespace Notepad___Raylib {
 
          cursor.position.y += linesToInsert.Count - 1;
          cursor.position.x = lastInsertedLine.Value.Length - textAfterCursorFirstLine.Length;
+      }
+
+      public static string GetConfigPath() {
+         return Path.Combine(GetExecutableDirectory(), CONFIG_FILE_NAME);
+      }
+
+      public static string GetFontFilePath() {
+#if VISUAL_STUDIO
+         return Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf");
+#else
+         return Path.Combine(GetExecutableDirectory(), "Fonts", config.font.EndsWith(".ttf") ? config.font : config.font + ".ttf");
+#endif
       }
    }
 }

@@ -1,1 +1,2 @@
 window stretches while resizing that is because raylib doesn't support drawing while resizing. https://github.com/raysan5/raylib/issues/1680
+dont forget to comment out #define VISUAL_STUDIO before publishing

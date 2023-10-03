@@ -9,7 +9,7 @@ namespace Notepad___Raylib {
       uint lineNumber;
       public static int Height {
          get {
-            return GetLineHeight(Program.font, Program.fontSize);
+            return GetLineHeight(Program.font, Program.config.fontSize);
          }
       }
 
