@@ -338,12 +338,12 @@ namespace Notepad___Raylib {
          return Path.Combine(GetExecutableDirectory(), CONFIG_FILE_NAME);
       }
 
-      public static string GetFontFilePath() {
-#if VISUAL_STUDIO
-         return Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf");
-#else
-         return Path.Combine(GetExecutableDirectory(), "Fonts", config.font.EndsWith(".ttf") ? config.font : config.font + ".ttf");
-#endif
-      }
+//      public static string GetFontFilePath() {
+//#if VISUAL_STUDIO
+//         return Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf");
+//#else
+//         return Path.Combine(GetExecutableDirectory(), "Fonts", config.font.EndsWith(".ttf") ? config.font : config.font + ".ttf");
+//#endif
+//      }
    }
 }

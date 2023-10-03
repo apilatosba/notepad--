@@ -20,17 +20,18 @@ namespace Notepad___Raylib {
       float mouseWheelInput = 0;
       static Int2? lastKnownCursorPosition = null;
 
-      public EditorStatePlaying() {
-#if VISUAL_STUDIO
-         Program.config.Deserialize(Program.CONFIG_FILE_NAME);
-#else
-         Program.config.Deserialize(Program.GetConfigPath());
-#endif
-         Raylib.UnloadFont(Program.font);
-         Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+      // TODO this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib. if you have static variables of classes that belongs other assemblies it becomes problematic. using Program.font other than in constructor didnt cause any issue. the target architecture of the assemblies must be the same i think. I don't know how to fix this. I will just comment out this code for now.
+//      public EditorStatePlaying() {
+//         Raylib.UnloadFont(Program.font);
+//#if VISUAL_STUDIO
+//         Program.config.Deserialize(Program.CONFIG_FILE_NAME);
+//#else
+//         Program.config.Deserialize(Program.GetConfigPath());
+//#endif
+//         //Program.font = Program.LoadFontWithAllUnicodeCharacters("Fonts/Inconsolata-Medium.ttf", Program.config.fontSize);
 
-         cursor.position = lastKnownCursorPosition ?? new Int2(0, 0);
-      }
+//         cursor.position = lastKnownCursorPosition ?? new Int2(0, 0);
+//      }
 
       public void HandleInput() {
          Debug.Assert(!(mouseSelection != null && shiftSelection != null));
