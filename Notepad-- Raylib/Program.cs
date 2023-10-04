@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -105,6 +105,9 @@ namespace Notepad___Raylib {
          lastInputTimer.Start();
 
          Raylib.InitWindow(1150, 560, "Notepad--");
+
+         Shader shader = Raylib.LoadShader(null, "Shaders/flash.frag");
+         
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
             zoom = 1.0f,
@@ -118,8 +121,12 @@ namespace Notepad___Raylib {
          while (!Raylib.WindowShouldClose()) {
             Raylib.BeginDrawing();
 
+            Raylib.BeginShaderMode(shader);
+
             editorState.Update();
             
+            Raylib.EndShaderMode();
+
             Raylib.EndDrawing();
          }
 
