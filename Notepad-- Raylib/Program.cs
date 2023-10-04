@@ -159,10 +159,10 @@ namespace Notepad___Raylib {
          string[] linesFromFile = File.ReadAllLines(path);
 
          for (int i = 0; i < linesFromFile.Length; i++) {
-            lines.Add(new Line(linesFromFile[i], (uint)i));
+            lines.Add(new Line(linesFromFile[i]));
          }
 
-         if (lines.Count == 0) lines.Add(new Line("", 0));
+         if (lines.Count == 0) lines.Add(new Line(""));
 
          return lines;
       }
@@ -172,7 +172,7 @@ namespace Notepad___Raylib {
          string[] linesAsStringArray = text.Split('\n');
 
          for (int i = 0; i < linesAsStringArray.Length; i++) {
-            lines.Add(new Line(linesAsStringArray[i], (uint)i));
+            lines.Add(new Line(linesAsStringArray[i]));
          }
 
          return lines;
@@ -328,7 +328,6 @@ namespace Notepad___Raylib {
          line.InsertTextAt(cursor.position.x, linesToInsert[0].Value);
 
          for (int i = 1; i < linesToInsert.Count; i++) {
-            //linesToInsert[i].LineNumber = (uint)(cursor.position.y + i);
             lines.Insert(cursor.position.y + i, linesToInsert[i]);
          }
 
