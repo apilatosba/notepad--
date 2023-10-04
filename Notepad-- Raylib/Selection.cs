@@ -134,9 +134,9 @@ namespace Notepad___Raylib {
 
                lines.RemoveAt(right.y);
 
-               for(int i = right.y; i < lines.Count; i++) {
-                  lines[i].LineNumber--;
-               }
+               //for(int i = right.y; i < lines.Count; i++) {
+               //   lines[i].LineNumber--;
+               //}
                break;
             default:
                linesInRange[0].RemoveTextAt(left.x, linesInRange[0].Value.Length - left.x, Direction.Right);
@@ -151,9 +151,9 @@ namespace Notepad___Raylib {
 
                lines.RemoveAt(left.y + 1);
 
-               for (int i = left.y + 1; i < lines.Count; i++) {
-                  lines[i].LineNumber = (uint)(linesInRange.Length - 1);
-               }
+               //for (int i = left.y + 1; i < lines.Count; i++) {
+               //   lines[i].LineNumber = (uint)(linesInRange.Length - 1);
+               //}
                break;
          }
 

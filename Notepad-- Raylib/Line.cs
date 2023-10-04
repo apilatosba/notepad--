@@ -6,7 +6,7 @@ namespace Notepad___Raylib {
       /// <summary>
       /// Zero-based.
       /// </summary>
-      uint lineNumber;
+      //uint lineNumber;
       public static int Height {
          get {
             return GetLineHeight(Program.font, Program.config.fontSize);
@@ -14,10 +14,10 @@ namespace Notepad___Raylib {
       }
 
       public string Value => value;
-      public uint LineNumber {
-         get { return lineNumber; }
-         set { lineNumber = value; }
-      }
+      //public uint LineNumber {
+      //   get { return lineNumber; }
+      //   set { lineNumber = value; }
+      //}
 
       public Line() {
          value = "";
@@ -25,7 +25,7 @@ namespace Notepad___Raylib {
 
       public Line(string value, uint lineNumber) {
          this.value = value;
-         this.lineNumber = lineNumber;
+         //this.lineNumber = lineNumber;
       }
 
       /// <summary>
@@ -34,7 +34,7 @@ namespace Notepad___Raylib {
       /// <param name="line">a copy</param>
       public Line(Line line) {
          this.value = line.value;
-         this.lineNumber = line.lineNumber;
+         //this.lineNumber = line.lineNumber;
       }
 
       public void InsertTextAt(int index, string c) {

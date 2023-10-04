@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -147,9 +147,9 @@ namespace Notepad___Raylib {
 
                            cursor.position.y--;
 
-                           for (int i = cursor.position.y + 1; i < Program.lines.Count; i++) {
-                              Program.lines[i].LineNumber--;
-                           }
+                           //for (int i = cursor.position.y + 1; i < Program.lines.Count; i++) {
+                           //   Program.lines[i].LineNumber--;
+                           //}
                         } else {
                            Program.RemoveTextAtCursor(Program.lines, cursor, 1);
                         }
@@ -163,12 +163,13 @@ namespace Notepad___Raylib {
                            Line currentLine = Program.lines[cursor.position.y];
                            string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
 
-                           Line newLine = new Line(textAfterCursor, currentLine.LineNumber + 1);
+                           Line newLine = new Line(textAfterCursor, /*currentLine.LineNumber + 1*/ 0);
 
                            if (cursor.IsCursorAtEndOfFile(Program.lines)) {
                               Program.lines.Add(newLine);
                            } else {
-                              Program.lines.Insert((int)currentLine.LineNumber + 1, newLine);
+                              //Program.lines.Insert((int)currentLine.LineNumber + 1, newLine);
+                              Program.lines.Insert(Program.lines.IndexOf(currentLine) + 1, newLine);
                            }
 
                            currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
@@ -176,9 +177,9 @@ namespace Notepad___Raylib {
                            cursor.position.x = 0;
                            cursor.position.y++;
 
-                           for (int i = cursor.position.y + 1; i < Program.lines.Count; i++) {
-                              Program.lines[i].LineNumber++;
-                           }
+                           //for (int i = cursor.position.y + 1; i < Program.lines.Count; i++) {
+                           //   Program.lines[i].LineNumber++;
+                           //}
                         }
 
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
@@ -218,9 +219,9 @@ namespace Notepad___Raylib {
 
                            Program.lines.RemoveAt(cursor.position.y + 1);
 
-                           for (int i = cursor.position.y + 1; i < Program.lines.Count; i++) {
-                              Program.lines[i].LineNumber--;
-                           }
+                           //for (int i = cursor.position.y + 1; i < Program.lines.Count; i++) {
+                           //   Program.lines[i].LineNumber--;
+                           //}
                         } else {
                            Program.RemoveTextAtCursor(Program.lines, cursor, 1, Direction.Right);
                         }

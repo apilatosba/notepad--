@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -328,7 +328,7 @@ namespace Notepad___Raylib {
          line.InsertTextAt(cursor.position.x, linesToInsert[0].Value);
 
          for (int i = 1; i < linesToInsert.Count; i++) {
-            linesToInsert[i].LineNumber = (uint)(cursor.position.y + i);
+            //linesToInsert[i].LineNumber = (uint)(cursor.position.y + i);
             lines.Insert(cursor.position.y + i, linesToInsert[i]);
          }
 
