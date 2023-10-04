@@ -1,3 +1,4 @@
+if user types "notepad-- file.txt" and file.txt doesnt exist, create it instead of saying file doesnt exist
 shaders
 character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
 different effects with shaders. for example a flash effect when you save, text near cursor gets a radial/horizontal gradient color.
