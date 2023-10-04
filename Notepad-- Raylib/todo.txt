@@ -1,4 +1,3 @@
-bug: when text is cut, enter doesnt put new line in cursor position but some other position a little above. root solution is to get rid of lineNUmber in Line class.
 shaders
 character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
 different effects with shaders. for example a flash effect when you save, text near cursor gets a radial/horizontal gradient color.
@@ -6,6 +5,7 @@ implement zoom
 add background image
 add mouse wheel acceleration
 the static int inputDelay should only work for same key presses. for example if i press a and then b, the delay should not work. but if i press a and then a again, the delay should work
+when i press edit settings button new opened notepad-- instance has console window. it shouldnt have
 add shortcuts
 find in file. ctrl + f
 highlight the line the cursor is on
