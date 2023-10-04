@@ -1,4 +1,4 @@
-﻿#define VISUAL_STUDIO
+﻿//#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -80,7 +80,6 @@ namespace Notepad___Raylib {
                   default:
                      if (File.Exists(args[i])) {
                         if (lines == null) {
-                           lines = ReadLinesFromFile(args[i]);
                            filePath = args[i];
                         } else {
                            Console.WriteLine("ERROR: Specify only one file\n");
@@ -90,17 +89,19 @@ namespace Notepad___Raylib {
                      } else {
                         if (args[i].StartsWith("-")) {
                            Console.WriteLine($"Invalid flag: \"{args[i]}\"\n");
+                           return;
                         } else {
-                           Console.WriteLine($"File {args[i]} does not exist.");
+                           //Console.WriteLine($"File {args[i]} does not exist.");
+                           File.Create(args[i]).Close();
+                           filePath = args[i];
                         }
-
-                        return;
                      }
                      break;
                }
             }
          }
 
+         lines = ReadLinesFromFile(filePath);
          lastInputTimer.Start();
 
          Raylib.InitWindow(1150, 560, "Notepad--");
