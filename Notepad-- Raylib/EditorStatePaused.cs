@@ -1,4 +1,4 @@
-﻿#define VISUAL_STUDIO
+﻿//#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System.Diagnostics;
 using System.IO;
@@ -35,16 +35,6 @@ namespace Notepad___Raylib {
          Rectangle settings = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y - window.height / 4, 2 * window.width / 7, 2 * window.height / 13);
          //Raylib.DrawRectangleRec(settings, Raylib.RED);
          if(RayGui.GuiButton(settings, "Edit Settings")) {
-#if VISUAL_STUDIO
-#else
-            string configPath = Path.Combine(Program.GetExecutableDirectory(), Program.CONFIG_FILE_NAME);
-      
-            if (!File.Exists(configPath)) {
-               File.Create(configPath).Close();
-               new Config().Serialize(configPath);
-            }
-#endif
-
             Process.Start(new ProcessStartInfo("notepad--", Program.CONFIG_FILE_NAME) {
                UseShellExecute = true,
                CreateNoWindow = true,

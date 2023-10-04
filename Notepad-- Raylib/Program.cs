@@ -1,4 +1,4 @@
-﻿#define VISUAL_STUDIO
+﻿//#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -47,6 +47,16 @@ namespace Notepad___Raylib {
 #else
          Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);
 #endif
+#if VISUAL_STUDIO
+#else
+         string configPath = Path.Combine(GetExecutableDirectory(), CONFIG_FILE_NAME);
+
+         if (!File.Exists(configPath)) {
+            File.Create(configPath).Close();
+            new Config().Serialize(configPath);
+         }
+#endif
+
          //ScrollBar horizontalScrollBar = new ScrollBar();
          config.Deserialize(GetConfigPath());
 
@@ -341,7 +351,7 @@ namespace Notepad___Raylib {
 #if VISUAL_STUDIO
          return Path.Combine(customFontsDirectory, config.fontName.EndsWith(".ttf") ? config.fontName : config.fontName + ".ttf");
 #else
-         return Path.Combine(GetExecutableDirectory(), "Fonts", config.font.EndsWith(".ttf") ? config.font : config.font + ".ttf");
+         return Path.Combine(GetExecutableDirectory(), "Fonts", config.fontName.EndsWith(".ttf") ? config.fontName : config.fontName + ".ttf");
 #endif
       }
    }

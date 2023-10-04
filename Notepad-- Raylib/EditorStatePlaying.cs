@@ -1,10 +1,11 @@
-﻿#define VISUAL_STUDIO
+﻿//#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Linq;
+using System.IO;
 
 namespace Notepad___Raylib {
    internal class EditorStatePlaying : IEditorState {
@@ -54,11 +55,16 @@ namespace Notepad___Raylib {
             if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
             if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
+            ///////////////////////////////////////////
             // Handling key presses that have modifiers
+            ///////////////////////////////////////////
             {
                if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
                      Program.WriteLinesToFile(Program.filePath, Program.lines);
+                     
+                     if(Path.GetFileName(Program.filePath) == Program.CONFIG_FILE_NAME) 
+                        Program.config.Deserialize(Program.GetConfigPath());
                   }
 
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_C)) {
@@ -91,7 +97,9 @@ namespace Notepad___Raylib {
                }
             }
 
+            ////////////////////////////////////////////////////////////////////////
             // Handling key presses that don't have modifiers ie. normal key presses
+            ////////////////////////////////////////////////////////////////////////
             {
                if (pressedKeys != null) {
 #if VISUAL_STUDIO
@@ -105,7 +113,9 @@ namespace Notepad___Raylib {
                }
             }
 
+            /////////////////////////////////////////////////////////
             // Handling special keys, both with and without modifiers
+            /////////////////////////////////////////////////////////
             {
                if (specialKey != KeyboardKey.KEY_NULL) {
 #if VISUAL_STUDIO
