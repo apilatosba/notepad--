@@ -9,7 +9,7 @@ namespace Notepad___Raylib {
       [XmlElement] public int spacingBetweenLines = 0;
       [XmlElement] public int tabSize = 4;
       [XmlElement] public string fontName = "Inconsolata-Medium.ttf";
-      [XmlElement] public Color textColor = new Color(200, 200, 200, 255);
+      [XmlElement] public Color textColor = new Color(225, 225, 225, 255);
       [XmlElement] public Color backgroundColor = new Color(31, 31, 31, 50);
       [XmlElement] public Color cursorColor = new Color(150, 150, 150, 255);
 
