@@ -8,7 +8,7 @@ namespace Notepad___Raylib {
       [XmlElement] public int leftPadding = 4;
       [XmlElement] public int spacingBetweenLines = 0;
       [XmlElement] public int tabSize = 4;
-      [XmlElement] public string font = "Inconsolata-Medium.ttf";
+      [XmlElement] public string fontName = "Inconsolata-Medium.ttf";
       [XmlElement] public Color textColor = new Color(200, 200, 200, 255);
       [XmlElement] public Color backgroundColor = new Color(31, 31, 31, 50);
       [XmlElement] public Color cursorColor = new Color(150, 150, 150, 255);
@@ -23,7 +23,7 @@ namespace Notepad___Raylib {
          leftPadding = config.leftPadding;
          spacingBetweenLines = config.spacingBetweenLines;
          tabSize = config.tabSize;
-         font = config.font;
+         fontName = config.fontName;
          textColor = config.textColor;
          backgroundColor = config.backgroundColor;
          cursorColor = config.cursorColor;

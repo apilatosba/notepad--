@@ -82,7 +82,7 @@ namespace Notepad___Raylib {
                      List<Line> clipboard = Program.ReadLinesFromString(clipboardText);
                      Program.InsertLinesAtCursor(Program.lines, cursor, clipboard);
 
-                     cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
+                     cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                   }
                }
 
@@ -101,7 +101,7 @@ namespace Notepad___Raylib {
                   shiftSelection = null;
 
                   Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
-                  cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
+                  cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                }
             }
 
@@ -120,7 +120,7 @@ namespace Notepad___Raylib {
                         if (shiftSelection != null) {
                            shiftSelection.Delete(Program.lines, cursor);
                            shiftSelection = null;
-                           cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
+                           cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                            break;
                         }
 
@@ -144,7 +144,7 @@ namespace Notepad___Raylib {
                            Program.RemoveTextAtCursor(Program.lines, cursor, 1);
                         }
 
-                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
+                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                         break;
                      case KeyboardKey.KEY_ENTER: {
                            shiftSelection?.Delete(Program.lines, cursor);
@@ -171,27 +171,27 @@ namespace Notepad___Raylib {
                            }
                         }
 
-                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
+                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                         break;
                      case KeyboardKey.KEY_TAB:
                         if (shiftSelection != null) {
                            Line[] linesInRange = shiftSelection.GetLinesInRange(Program.lines).ToArray();
 
                            foreach (Line line in linesInRange) {
-                              line.InsertTextAt(0, new string(' ', Program.tabSize));
+                              line.InsertTextAt(0, new string(' ', Program.config.tabSize));
                            }
 
-                           shiftSelection.StartPosition = new Int2(shiftSelection.StartPosition.x + Program.tabSize, shiftSelection.StartPosition.y);
-                           cursor.position.x += Program.tabSize;
+                           shiftSelection.StartPosition = new Int2(shiftSelection.StartPosition.x + Program.config.tabSize, shiftSelection.StartPosition.y);
+                           cursor.position.x += Program.config.tabSize;
 
-                           cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
+                           cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
 
                            break;
                         }
 
-                        Program.InsertTextAtCursor(Program.lines, cursor, new string(' ', Program.tabSize));
+                        Program.InsertTextAtCursor(Program.lines, cursor, new string(' ', Program.config.tabSize));
 
-                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
+                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                         break;
                      case KeyboardKey.KEY_DELETE:
                         if (shiftSelection != null) {
@@ -227,14 +227,14 @@ namespace Notepad___Raylib {
                      case KeyboardKey.KEY_UP:
                         if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                         if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
-                           Program.spacingBetweenLines++;
+                           Program.config.spacingBetweenLines++;
                         }
                         //camera.target.Y -= 10;
                         break;
                      case KeyboardKey.KEY_DOWN:
                         if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                         if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
-                           Program.spacingBetweenLines--;
+                           Program.config.spacingBetweenLines--;
                         }
                         //camera.target.Y += 10;
                         break;
@@ -242,7 +242,7 @@ namespace Notepad___Raylib {
                }
             }
 
-            cursor.HandleArrowKeysNavigation(Program.lines, ref camera, Program.config.fontSize, Program.leftPadding, Program.font);
+            cursor.HandleArrowKeysNavigation(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
          } // End of keyboard input handling
 
          mouseWheelInput = Raylib.GetMouseWheelMove();
@@ -252,7 +252,7 @@ namespace Notepad___Raylib {
             Vector2 mousePosition = Raylib.GetMousePosition();
             Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-            cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font, mousePositionInWorldSpace);
+            cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, mousePositionInWorldSpace);
 
             shiftSelection = null;
             mouseSelection = new Selection(cursor.position, cursor.position);
@@ -264,7 +264,7 @@ namespace Notepad___Raylib {
             Vector2 mousePosition = Raylib.GetMousePosition();
             Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-            mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font, mousePositionInWorldSpace);
+            mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, mousePositionInWorldSpace);
             cursor.position = mouseSelection.EndPosition;
          }
 
@@ -288,9 +288,9 @@ namespace Notepad___Raylib {
             Raylib.ClearBackground(Program.config.backgroundColor);
 
             Program.RenderLines(Program.lines, Program.font);
-            shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font);
-            mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font);
-            cursor.Render(Program.lines, Program.config.fontSize, Program.leftPadding, Program.font, Program.spacingBetweenLines);
+            shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
+            mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
+            cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines);
          }
          Raylib.EndMode2D();
 
