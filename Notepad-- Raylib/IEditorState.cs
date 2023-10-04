@@ -1,8 +1,10 @@
 ﻿namespace Notepad___Raylib {
    internal interface IEditorState {
-      void HandleInput();
-      void PostHandleInput();
-      void Render();
+      protected void HandleInput();
+      protected void PostHandleInput();
+      protected void Render();
       void Update();
+      protected void SetStateTo(IEditorState state);
+      protected internal void EnterState();
    }
 }

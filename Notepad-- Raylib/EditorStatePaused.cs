@@ -16,7 +16,7 @@ namespace Notepad___Raylib {
          if(Program.ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey)) {
             switch(specialKey) {
                case KeyboardKey.KEY_ESCAPE:
-                  Program.editorState = new EditorStatePlaying();
+                  SetStateTo(new EditorStatePlaying());
                   break;
             }
          }
@@ -60,6 +60,15 @@ namespace Notepad___Raylib {
          HandleInput();
          PostHandleInput();
          Render();
+      }
+
+      public void SetStateTo(IEditorState state) {
+         Program.editorState = state;
+         state.EnterState();
+      }
+
+      public void EnterState() {
+
       }
    }
 }

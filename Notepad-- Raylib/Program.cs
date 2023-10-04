@@ -54,6 +54,7 @@ namespace Notepad___Raylib {
          Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);
 #endif
          //ScrollBar horizontalScrollBar = new ScrollBar();
+         config.Deserialize(GetConfigPath());
 
          Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
          Raylib.SetWindowOpacity(0.1f);
@@ -107,13 +108,13 @@ namespace Notepad___Raylib {
             offset = new Vector2(0, 0),
          };
 
-         font = LoadFontWithAllUnicodeCharacters(Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf"), config.fontSize);
+         font = LoadFontWithAllUnicodeCharacters(GetFontFilePath(), config.fontSize);
 
          while (!Raylib.WindowShouldClose()) {
             Raylib.BeginDrawing();
 
             editorState.Update();
-
+            
             Raylib.EndDrawing();
          }
 
@@ -335,15 +336,19 @@ namespace Notepad___Raylib {
       }
 
       public static string GetConfigPath() {
+#if VISUAL_STUDIO
+         return CONFIG_FILE_NAME;
+#else
          return Path.Combine(GetExecutableDirectory(), CONFIG_FILE_NAME);
+#endif
       }
 
-//      public static string GetFontFilePath() {
-//#if VISUAL_STUDIO
-//         return Path.Combine(customFontsDirectory, "Inconsolata-Medium.ttf");
-//#else
-//         return Path.Combine(GetExecutableDirectory(), "Fonts", config.font.EndsWith(".ttf") ? config.font : config.font + ".ttf");
-//#endif
-//      }
+      public static string GetFontFilePath() {
+#if VISUAL_STUDIO
+         return Path.Combine(customFontsDirectory, config.font.EndsWith(".ttf") ? config.font : config.font + ".ttf");
+#else
+         return Path.Combine(GetExecutableDirectory(), "Fonts", config.font.EndsWith(".ttf") ? config.font : config.font + ".ttf");
+#endif
+      }
    }
 }

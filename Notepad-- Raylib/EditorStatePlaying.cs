@@ -20,18 +20,24 @@ namespace Notepad___Raylib {
       float mouseWheelInput = 0;
       static Int2? lastKnownCursorPosition = null;
 
-      // TODO this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib. if you have static variables of classes that belongs other assemblies it becomes problematic. using Program.font other than in constructor didnt cause any issue. the target architecture of the assemblies must be the same i think. I don't know how to fix this. I will just comment out this code for now.
-//      public EditorStatePlaying() {
-//         Raylib.UnloadFont(Program.font);
-//#if VISUAL_STUDIO
-//         Program.config.Deserialize(Program.CONFIG_FILE_NAME);
-//#else
-//         Program.config.Deserialize(Program.GetConfigPath());
-//#endif
-//         //Program.font = Program.LoadFontWithAllUnicodeCharacters("Fonts/Inconsolata-Medium.ttf", Program.config.fontSize);
+      // this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib.
+      // if you have static variables of classes that belongs other assemblies it becomes problematic.
+      // using Program.font other than in constructor didnt cause any issue. the target architecture of the assemblies must be the same i think.
+      // I don't know how to fix this. I will just comment out this code for now.
+      // https://stackoverflow.com/questions/4398334/the-type-initializer-for-myclass-threw-an-exception
+      // https://learn.microsoft.com/en-us/dotnet/api/system.typeinitializationexception?view=net-7.0
 
-//         cursor.position = lastKnownCursorPosition ?? new Int2(0, 0);
-//      }
+      //      public EditorStatePlaying() {
+      //         Raylib.UnloadFont(Program.font);
+      //#if VISUAL_STUDIO
+      //         Program.config.Deserialize(Program.CONFIG_FILE_NAME);
+      //#else
+      //         Program.config.Deserialize(Program.GetConfigPath());
+      //#endif
+      //         //Program.font = Program.LoadFontWithAllUnicodeCharacters("Fonts/Inconsolata-Medium.ttf", Program.config.fontSize);
+
+      //         cursor.position = lastKnownCursorPosition ?? new Int2(0, 0);
+      //      }
 
       public void HandleInput() {
          Debug.Assert(!(mouseSelection != null && shiftSelection != null));
@@ -108,7 +114,7 @@ namespace Notepad___Raylib {
                   switch (specialKey) {
                      case KeyboardKey.KEY_ESCAPE:
                         lastKnownCursorPosition = cursor.position;
-                        Program.editorState = new EditorStatePaused();
+                        SetStateTo(new EditorStatePaused());
                         break;
                      case KeyboardKey.KEY_BACKSPACE:
                         if (shiftSelection != null) {
@@ -298,6 +304,20 @@ namespace Notepad___Raylib {
          HandleInput();
          PostHandleInput();
          Render();
+      }
+
+      public void SetStateTo(IEditorState state) {
+         Program.editorState = state;
+         state.EnterState();
+      }
+
+      public void EnterState() {
+         Raylib.UnloadFont(Program.font);
+         Program.config.Deserialize(Program.GetConfigPath());
+
+         Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+
+         cursor.position = lastKnownCursorPosition ?? new Int2(0, 0);
       }
    }
 }
