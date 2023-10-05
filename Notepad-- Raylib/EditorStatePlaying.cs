@@ -180,7 +180,12 @@ namespace Notepad___Raylib {
                            cursor.position.y--;
 
                         } else {
-                           Program.RemoveTextAtCursor(Program.lines, cursor, 1);
+                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                              int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Left);
+                              Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump);
+                           } else {
+                              Program.RemoveTextAtCursor(Program.lines, cursor, 1);
+                           }
                         }
 
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
