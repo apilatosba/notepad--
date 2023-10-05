@@ -11,13 +11,13 @@ namespace Notepad___Raylib {
       /// position.y is line number.
       /// </summary>
       public Int2 position;
-      Color color = new Color(150, 150, 150, 255);
+      //Color color = new Color(150, 150, 150, 255); It is in config now.
 
       // TODO render cursor considering spacingBetweenLines
       public void Render(in List<Line> lines, int fontSize, int leftPadding, Font font, int spacingBetweenLines) {
          int distance = GetWorldSpacePosition(lines, fontSize, leftPadding, font).x;
 
-         Raylib.DrawRectangle(distance, position.y * Line.Height, 1, Line.Height, color);
+         Raylib.DrawRectangle(distance, position.y * Line.Height, 1, Line.Height, Program.config.cursorColor);
       }
 
       public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, bool isControlKeyDown) {
@@ -53,6 +53,7 @@ namespace Notepad___Raylib {
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_UP)) {
+            if (isControlKeyDown) return;
             if (IsCursorAtFirstLine()) return;
 
             position.y--;
@@ -61,13 +62,13 @@ namespace Notepad___Raylib {
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN)) {
+            if (isControlKeyDown) return;
             if (IsCursorAtLastLine(lines)) return;
 
             position.y++;
             position.x = Math.Min(position.x, lines[position.y].Value.Length);
 
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
-
          }
       }
 

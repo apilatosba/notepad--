@@ -249,7 +249,7 @@ namespace Notepad___Raylib {
                            Program.lines.RemoveAt(cursor.position.y + 1);
 
                         } else {
-                           if(modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                               int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Right);
                               Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump, Direction.Right);
                            } else {
@@ -268,15 +268,15 @@ namespace Notepad___Raylib {
                         break;
                      case KeyboardKey.KEY_UP:
                         if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                        if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
-                           Program.config.spacingBetweenLines++;
+                        if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                           camera.target.Y -= Line.Height;
                         }
                         //camera.target.Y -= 10;
                         break;
                      case KeyboardKey.KEY_DOWN:
                         if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                        if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
-                           Program.config.spacingBetweenLines--;
+                        if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                           camera.target.Y += Line.Height;
                         }
                         //camera.target.Y += 10;
                         break;
@@ -299,7 +299,11 @@ namespace Notepad___Raylib {
             Vector2 mousePosition = Raylib.GetMousePosition();
             Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-            cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, mousePositionInWorldSpace);
+            cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines,
+                                                                                Program.config.fontSize,
+                                                                                Program.config.leftPadding,
+                                                                                Program.font,
+                                                                                mousePositionInWorldSpace);
 
             shiftSelection = null;
             mouseSelection = new Selection(cursor.position, cursor.position);
@@ -311,7 +315,11 @@ namespace Notepad___Raylib {
             Vector2 mousePosition = Raylib.GetMousePosition();
             Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-            mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, mousePositionInWorldSpace);
+            mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines,
+                                                                                           Program.config.fontSize,
+                                                                                           Program.config.leftPadding,
+                                                                                           Program.font,
+                                                                                           mousePositionInWorldSpace);
             cursor.position = mouseSelection.EndPosition;
          }
 
@@ -346,6 +354,11 @@ namespace Notepad___Raylib {
          Raylib.BeginMode2D(camera);
          {
             Raylib.ClearBackground(Program.config.backgroundColor);
+
+            Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
+            Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, Raylib.GetScreenWidth(), Line.Height);
+            Raylib.DrawRectangleRec(highlightLineRect, new Color(20, 20, 20, 255));
+            Raylib.EndBlendMode();
 
             Program.RenderLines(Program.lines, Program.font);
             shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
