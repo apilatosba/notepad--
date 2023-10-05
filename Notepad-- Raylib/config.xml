@@ -6,9 +6,9 @@
   <tabSize>4</tabSize>
   <font>Inconsolata-Medium.ttf</font>
   <textColor>
-    <r>225</r>
-    <g>225</g>
-    <b>225</b>
+    <r>215</r>
+    <g>215</g>
+    <b>215</b>
     <a>255</a>
   </textColor>
   <backgroundColor>
@@ -18,9 +18,9 @@
     <a>50</a>
   </backgroundColor>
   <cursorColor>
-    <r>150</r>
-    <g>150</g>
-    <b>150</b>
+    <r>227</r>
+    <g>227</g>
+    <b>227</b>
     <a>255</a>
   </cursorColor>
 </Config>
