@@ -13,14 +13,14 @@ namespace Notepad___Raylib {
       }
 
       public void HandleInput() {
-         if(Program.ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey)) {
-            switch(specialKey) {
-                  case KeyboardKey.KEY_ESCAPE:
-                     SetStateTo(new EditorStatePlaying());
-                     break;
-               }
+         if (Program.ShouldAcceptKeyboardInput(out _, out KeyboardKey specialKey)) {
+            switch (specialKey) {
+               case KeyboardKey.KEY_ESCAPE:
+                  SetStateTo(new EditorStatePlaying());
+                  break;
             }
          }
+      }
 
       public void PostHandleInput() {
          window = new Rectangle(Raylib.GetScreenWidth() / 4, 0, Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight());
@@ -34,7 +34,7 @@ namespace Notepad___Raylib {
          Int2 centerOfWindow = new Int2((int)(window.x + window.width / 2), (int)(window.y + window.height / 2));
          Rectangle settings = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y - window.height / 4, 2 * window.width / 7, 2 * window.height / 13);
          //Raylib.DrawRectangleRec(settings, Raylib.RED);
-         if(RayGui.GuiButton(settings, "Edit Settings")) {
+         if (RayGui.GuiButton(settings, "Edit Settings")) {
             Process.Start(new ProcessStartInfo("notepad--", Program.CONFIG_FILE_NAME) {
                UseShellExecute = true,
                CreateNoWindow = true,
