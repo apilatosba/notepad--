@@ -296,7 +296,7 @@ namespace Notepad___Raylib {
          }
 
          if (flashShaderTimer.IsRunning) {
-            flashShaderTransparency = MathF.Exp(-1 * 5 * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
+            flashShaderTransparency = MathF.Exp(-1 * 6 * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
          }
 
          fixed (float* value = &flashShaderTransparency) {
