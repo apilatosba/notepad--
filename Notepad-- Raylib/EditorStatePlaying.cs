@@ -356,8 +356,8 @@ namespace Notepad___Raylib {
             Raylib.ClearBackground(Program.config.backgroundColor);
 
             Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
-            Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, Raylib.GetScreenWidth(), Line.Height);
-            Raylib.DrawRectangleRec(highlightLineRect, new Color(20, 20, 20, 255));
+            Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, float.MaxValue, Line.Height);
+            Raylib.DrawRectangleRec(highlightLineRect, new Color(13, 13, 13, 255));
             Raylib.EndBlendMode();
 
             Program.RenderLines(Program.lines, Program.font);
