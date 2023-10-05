@@ -21,7 +21,8 @@ namespace Notepad___Raylib {
       float mouseWheelInput = 0;
       static Int2? lastKnownCursorPosition = null;
       float flashShaderTransparency = 0.0f;
-      Stopwatch flashShaderTimer = new Stopwatch();
+      readonly Stopwatch flashShaderTimer = new Stopwatch();
+      string missedKeyPressesBetweenFrames = string.Empty;
 
       // this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib.
       // if you have static variables of classes that belongs other assemblies it becomes problematic.
@@ -46,7 +47,8 @@ namespace Notepad___Raylib {
          Debug.Assert(!(mouseSelection != null && shiftSelection != null));
 
          // Keyboard input handling
-         if (Program.ShouldAcceptKeyboardInput(out string pressedKeys, out KeyboardKey specialKey)) {
+         string pressedKeys;
+         if (Program.ShouldAcceptKeyboardInput(out pressedKeys, out KeyboardKey specialKey)) {
             List<KeyboardKey> modifiers = new List<KeyboardKey>();
             if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) modifiers.Add(KeyboardKey.KEY_LEFT_CONTROL);
             if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) modifiers.Add(KeyboardKey.KEY_LEFT_SHIFT);
@@ -56,6 +58,8 @@ namespace Notepad___Raylib {
             if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SHIFT)) modifiers.Add(KeyboardKey.KEY_RIGHT_SHIFT);
             if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
             if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
+
+            pressedKeys = missedKeyPressesBetweenFrames + pressedKeys;
 
             ///////////////////////////////////////////
             // Handling key presses that have modifiers
@@ -290,6 +294,10 @@ namespace Notepad___Raylib {
                                              Program.config.leftPadding,
                                              Program.font,
                                              modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL));
+
+            missedKeyPressesBetweenFrames = string.Empty;
+         } else {
+            missedKeyPressesBetweenFrames += pressedKeys;
          } // End of keyboard input handling
 
          mouseWheelInput = Raylib.GetMouseWheelMove();

@@ -15,12 +15,12 @@ namespace Notepad___Raylib {
       public void HandleInput() {
          if(Program.ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey)) {
             switch(specialKey) {
-               case KeyboardKey.KEY_ESCAPE:
-                  SetStateTo(new EditorStatePlaying());
-                  break;
+                  case KeyboardKey.KEY_ESCAPE:
+                     SetStateTo(new EditorStatePlaying());
+                     break;
+               }
             }
          }
-      }
 
       public void PostHandleInput() {
          window = new Rectangle(Raylib.GetScreenWidth() / 4, 0, Raylib.GetScreenWidth() / 2, Raylib.GetScreenHeight());

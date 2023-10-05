@@ -20,6 +20,8 @@ namespace Notepad___Raylib {
       /// How many milliseconds to wait before accepting new input.
       /// </summary>
       static int inputDelay = 22;
+      static char lastPressedKey;
+      static KeyboardKey lastPressedSpecialKey;
       /// <summary>
       /// In milliseconds. This means that writing/deleting/(moving cursor) will wait after moving one character even if you are holding down the key.
       /// </summary>
@@ -225,14 +227,19 @@ namespace Notepad___Raylib {
       }
 
       public static bool ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey) {
-         pressedChars = null;
          specialKey = KeyboardKey.KEY_NULL;
 
          timeSinceLastInput = lastInputTimer.ElapsedMilliseconds;
 
-         if (timeSinceLastInput < inputDelay) return false;
-
          if ((pressedChars = GetPressedCharsAsString()) != null || IsSpecialKeyPressed(out specialKey)) {
+            if (timeSinceLastInput < inputDelay) {
+               if (pressedChars?[^1] == lastPressedKey || specialKey == lastPressedSpecialKey)
+                  return false;
+            }
+
+            lastPressedKey = pressedChars?[^1] ?? lastPressedKey;
+            lastPressedSpecialKey = specialKey == KeyboardKey.KEY_NULL ? lastPressedSpecialKey : specialKey;
+
             keyHoldTimer.Start();
 
             if (inputRushCounter > 0 && keyHoldTimer.ElapsedMilliseconds < waitTimeBeforeRapidInputRush) return false;
@@ -258,17 +265,17 @@ namespace Notepad___Raylib {
          specialKey = KeyboardKey.KEY_NULL;
 
          KeyboardKey[] specialKeys = new KeyboardKey[] {
-            KeyboardKey.KEY_ESCAPE,
-            KeyboardKey.KEY_BACKSPACE,
-            KeyboardKey.KEY_ENTER,
-            KeyboardKey.KEY_TAB,
-            KeyboardKey.KEY_DELETE,
             KeyboardKey.KEY_HOME,
             KeyboardKey.KEY_END,
+            KeyboardKey.KEY_ESCAPE,
+            KeyboardKey.KEY_DELETE,
+            KeyboardKey.KEY_TAB,
+            KeyboardKey.KEY_ENTER,
+            KeyboardKey.KEY_BACKSPACE,
+            KeyboardKey.KEY_UP,
+            KeyboardKey.KEY_DOWN,
             KeyboardKey.KEY_RIGHT,
             KeyboardKey.KEY_LEFT,
-            KeyboardKey.KEY_UP,
-            KeyboardKey.KEY_DOWN
          };
 
          foreach (KeyboardKey key in specialKeys) {
