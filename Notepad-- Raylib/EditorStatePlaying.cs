@@ -286,6 +286,12 @@ namespace Notepad___Raylib {
       }
 
       public void Render() {
+         if (Raylib.IsWindowResized()) {
+            Program.windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
+            Program.windowCoverTexture = Raylib.LoadTextureFromImage(Program.windowCoverImage);
+            Console.WriteLine("window cover image re-generated");
+         }
+
          // World space rendering
          Raylib.BeginMode2D(camera);
          {
@@ -301,6 +307,13 @@ namespace Notepad___Raylib {
          // Screen space rendering ie. UI
          {
             //horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
+
+            Raylib.BeginShaderMode(Program.flashShader);
+
+            //Raylib.DrawRectangleRec(windowCover, new Color(255, 255, 255, 255));
+            Raylib.DrawTexture(Program.windowCoverTexture, 0, 0, Raylib.WHITE);
+
+            Raylib.EndShaderMode();
          }
       }
 

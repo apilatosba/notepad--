@@ -35,6 +35,9 @@ namespace Notepad___Raylib {
       static int inputRushCounter = 0;
       public static List<Line> lines;
       public static Font font;
+      public static Shader flashShader;
+      public static Image windowCoverImage;
+      public static Texture windowCoverTexture;
       public static string filePath;
 #if VISUAL_STUDIO
       static readonly string customFontsDirectory = "Fonts";
@@ -56,7 +59,6 @@ namespace Notepad___Raylib {
             new Config().Serialize(configPath);
          }
 #endif
-
          //ScrollBar horizontalScrollBar = new ScrollBar();
          config.Deserialize(GetConfigPath());
 
@@ -106,7 +108,9 @@ namespace Notepad___Raylib {
          Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
          //Raylib.SetWindowOpacity(0.5f);
 
-         Shader shader = Raylib.LoadShader(null, "Shaders/flash.frag");
+         flashShader = Raylib.LoadShader(null, "Shaders/flash.frag");
+         windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
+         windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
          
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
