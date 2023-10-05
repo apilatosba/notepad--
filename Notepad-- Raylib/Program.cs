@@ -60,9 +60,6 @@ namespace Notepad___Raylib {
          //ScrollBar horizontalScrollBar = new ScrollBar();
          config.Deserialize(GetConfigPath());
 
-         Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
-         Raylib.SetWindowOpacity(0.1f);
-
          // Command line arguments
          {
             if (args.Length == 0) {
@@ -106,6 +103,9 @@ namespace Notepad___Raylib {
 
          Raylib.InitWindow(1150, 560, "Notepad--");
 
+         Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
+         //Raylib.SetWindowOpacity(0.5f);
+
          Shader shader = Raylib.LoadShader(null, "Shaders/flash.frag");
          
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
@@ -121,11 +121,11 @@ namespace Notepad___Raylib {
          while (!Raylib.WindowShouldClose()) {
             Raylib.BeginDrawing();
 
-            Raylib.BeginShaderMode(shader);
+            //Raylib.BeginShaderMode(shader);
 
             editorState.Update();
             
-            Raylib.EndShaderMode();
+            //Raylib.EndShaderMode();
 
             Raylib.EndDrawing();
          }
