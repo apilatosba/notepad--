@@ -4,9 +4,11 @@
 in vec2 fragTexCoord;
 in vec4 fragColor;
 
+uniform float transparency;
+
 out vec4 finalColor;
 
 void main()
 {
-    finalColor = vec4(fragTexCoord, 0, 1.0);
+    finalColor = vec4(fragColor.xyz, transparency);
 }

@@ -36,8 +36,9 @@ namespace Notepad___Raylib {
       public static List<Line> lines;
       public static Font font;
       public static Shader flashShader;
+      public static int flashShaderTransparencyLoc;
       public static Image windowCoverImage;
-      public static Texture windowCoverTexture;
+      public static Texture windowCoverTexture; // Rectangle doesnt work with uv's. https://github.com/raysan5/raylib/issues/1730
       public static string filePath;
 #if VISUAL_STUDIO
       static readonly string customFontsDirectory = "Fonts";
@@ -109,6 +110,7 @@ namespace Notepad___Raylib {
          //Raylib.SetWindowOpacity(0.5f);
 
          flashShader = Raylib.LoadShader(null, "Shaders/flash.frag");
+         flashShaderTransparencyLoc = Raylib.GetShaderLocation(flashShader, "transparency");
          windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
          windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
          

@@ -20,6 +20,8 @@ namespace Notepad___Raylib {
       };
       float mouseWheelInput = 0;
       static Int2? lastKnownCursorPosition = null;
+      float flashShaderTransparency = 0.0f;
+      Stopwatch flashShaderTimer = new Stopwatch();
 
       // this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib.
       // if you have static variables of classes that belongs other assemblies it becomes problematic.
@@ -61,9 +63,11 @@ namespace Notepad___Raylib {
             {
                if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
+                     flashShaderTimer.Restart();
+
                      Program.WriteLinesToFile(Program.filePath, Program.lines);
-                     
-                     if(Path.GetFileName(Program.filePath) == Program.CONFIG_FILE_NAME) 
+
+                     if (Path.GetFileName(Program.filePath) == Program.CONFIG_FILE_NAME)
                         Program.config.Deserialize(Program.GetConfigPath());
                   }
 
@@ -123,7 +127,7 @@ namespace Notepad___Raylib {
             {
                if (specialKey != KeyboardKey.KEY_NULL) {
 #if VISUAL_STUDIO
-                        Console.WriteLine(specialKey);
+                  Console.WriteLine(specialKey);
 #endif
                   switch (specialKey) {
                      case KeyboardKey.KEY_ESCAPE:
@@ -285,11 +289,18 @@ namespace Notepad___Raylib {
          Program.MakeSureCameraNotBelowZeroInBothAxes(ref camera);
       }
 
-      public void Render() {
+      public unsafe void Render() {
          if (Raylib.IsWindowResized()) {
             Program.windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
             Program.windowCoverTexture = Raylib.LoadTextureFromImage(Program.windowCoverImage);
-            Console.WriteLine("window cover image re-generated");
+         }
+
+         if (flashShaderTimer.IsRunning) {
+            flashShaderTransparency = MathF.Exp(-1 * 5 * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
+         }
+
+         fixed (float* value = &flashShaderTransparency) {
+            Raylib.SetShaderValue(Program.flashShader, Program.flashShaderTransparencyLoc, value, ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
          }
 
          // World space rendering
