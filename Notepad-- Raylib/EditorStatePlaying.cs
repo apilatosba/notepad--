@@ -67,8 +67,9 @@ namespace Notepad___Raylib {
 
                      Program.WriteLinesToFile(Program.filePath, Program.lines);
 
-                     if (Path.GetFileName(Program.filePath) == Program.CONFIG_FILE_NAME)
+                     if (Path.GetFileName(Program.filePath) == Program.CONFIG_FILE_NAME) {
                         Program.config.Deserialize(Program.GetConfigPath());
+                     }
                   }
 
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_C)) {
@@ -130,6 +131,29 @@ namespace Notepad___Raylib {
                   Console.WriteLine(specialKey);
 #endif
                   switch (specialKey) {
+                     case KeyboardKey.KEY_HOME:
+                        if (!(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT))) {
+                           if(shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
+                        }
+
+                        if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                           cursor.position.y = 0;
+                        }
+
+                        cursor.position.x = 0;
+                        cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                        break;
+                     case KeyboardKey.KEY_END: {
+                           if (!(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT))) {
+                              if (shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
+                           }
+
+                           Line currentLine = Program.lines[cursor.position.y];
+
+                           cursor.position.x = currentLine.Value.Length;
+                           cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                        }
+                        break;
                      case KeyboardKey.KEY_ESCAPE:
                         lastKnownCursorPosition = cursor.position;
                         SetStateTo(new EditorStatePaused());

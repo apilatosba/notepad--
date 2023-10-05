@@ -109,11 +109,11 @@ namespace Notepad___Raylib {
          Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
          //Raylib.SetWindowOpacity(0.5f);
 
-         flashShader = Raylib.LoadShader(null, "Shaders/flash.frag");
+         flashShader = Raylib.LoadShader(null, Path.Combine(GetShadersDirectory(), "flash.frag"));
          flashShaderTransparencyLoc = Raylib.GetShaderLocation(flashShader, "transparency");
          windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
          windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
-         
+
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
             zoom = 1.0f,
@@ -130,7 +130,7 @@ namespace Notepad___Raylib {
             //Raylib.BeginShaderMode(shader);
 
             editorState.Update();
-            
+
             //Raylib.EndShaderMode();
 
             Raylib.EndDrawing();
@@ -263,6 +263,8 @@ namespace Notepad___Raylib {
             KeyboardKey.KEY_ENTER,
             KeyboardKey.KEY_TAB,
             KeyboardKey.KEY_DELETE,
+            KeyboardKey.KEY_HOME,
+            KeyboardKey.KEY_END,
             KeyboardKey.KEY_RIGHT,
             KeyboardKey.KEY_LEFT,
             KeyboardKey.KEY_UP,
@@ -365,6 +367,14 @@ namespace Notepad___Raylib {
          return Path.Combine(customFontsDirectory, config.fontName.EndsWith(".ttf") ? config.fontName : config.fontName + ".ttf");
 #else
          return Path.Combine(GetExecutableDirectory(), "Fonts", config.fontName.EndsWith(".ttf") ? config.fontName : config.fontName + ".ttf");
+#endif
+      }
+
+      public static string GetShadersDirectory() {
+#if VISUAL_STUDIO
+         return "Shaders";
+#else
+         return Path.Combine(GetExecutableDirectory(), "Shaders");
 #endif
       }
    }
