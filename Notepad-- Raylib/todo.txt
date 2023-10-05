@@ -4,7 +4,6 @@ different effects with shaders. for example text near cursor gets a radial/horiz
 implement zoom
 add background image
 add mouse wheel acceleration
-the static int inputDelay should only work for same key presses. for example if i press a and then b, the delay should not work. but if i press a and then a again, the delay should work
 when i press edit settings button new opened notepad-- instance has console window. it shouldnt have
 add shortcuts
 find in file. ctrl + f
