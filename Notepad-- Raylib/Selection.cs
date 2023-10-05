@@ -25,6 +25,8 @@ namespace Notepad___Raylib {
          set => startPosition = value;
       }
 
+      public Selection() { }
+
       public Selection(Int2 startPosition, Int2 endPosition) {
          this.startPosition = startPosition;
          this.endPosition = endPosition;

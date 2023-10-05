@@ -82,11 +82,15 @@ namespace Notepad___Raylib {
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
                      mouseSelection?.Delete(Program.lines, cursor);
                      shiftSelection?.Delete(Program.lines, cursor);
-                     shiftSelection = null;
+                     shiftSelection = new Selection() {
+                        StartPosition = cursor.position
+                     };
 
                      string clipboardText = Raylib.GetClipboardText_();
                      List<Line> clipboard = Program.ReadLinesFromString(clipboardText);
                      Program.InsertLinesAtCursor(Program.lines, cursor, clipboard);
+
+                     shiftSelection.EndPosition = cursor.position;
 
                      cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                   }
