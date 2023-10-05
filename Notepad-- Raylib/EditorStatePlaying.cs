@@ -133,7 +133,7 @@ namespace Notepad___Raylib {
                   switch (specialKey) {
                      case KeyboardKey.KEY_HOME:
                         if (!(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT))) {
-                           if(shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
+                           if (shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
                         }
 
                         if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
@@ -274,7 +274,12 @@ namespace Notepad___Raylib {
                }
             }
 
-            cursor.HandleArrowKeysNavigation(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+            cursor.HandleArrowKeysNavigation(Program.lines,
+                                             ref camera,
+                                             Program.config.fontSize,
+                                             Program.config.leftPadding,
+                                             Program.font,
+                                             modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL));
          } // End of keyboard input handling
 
          mouseWheelInput = Raylib.GetMouseWheelMove();

@@ -20,8 +20,7 @@ namespace Notepad___Raylib {
          Raylib.DrawRectangle(distance, position.y * Line.Height, 1, Line.Height, color);
       }
 
-      // TODO implement isControlKeyDown
-      public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, bool isControlKeyDown = false) {
+      public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, bool isControlKeyDown) {
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT)) {
             if (IsCursorAtEndOfFile(lines)) return;
 
@@ -29,7 +28,11 @@ namespace Notepad___Raylib {
                position.x = 0;
                position.y++;
             } else {
-               position.x++;
+               if (isControlKeyDown) {
+                  position.x += CalculateHowManyCharactersToJump(lines, Direction.Right);
+               } else {
+                  position.x++;
+               }
             }
 
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
@@ -40,7 +43,11 @@ namespace Notepad___Raylib {
             if (IsCursorAtBeginningOfLine()) {
                position.x = lines[--position.y].Value.Length;
             } else {
-               position.x--;
+               if (isControlKeyDown) {
+                  position.x -= CalculateHowManyCharactersToJump(lines, Direction.Left);
+               } else {
+                  position.x--;
+               }
             }
 
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
@@ -163,6 +170,46 @@ namespace Notepad___Raylib {
             }
             Debug.Assert(false);
             return -1;
+         }
+      }
+
+      public int CalculateHowManyCharactersToJump(in List<Line> lines, Direction direction) {
+         switch (direction) {
+            case Direction.Right: {
+                  Line currentLine = lines[position.y];
+
+                  try {
+                     int j = 1;
+                     for (int i = 1; currentLine.Value[position.x + i] != ' '; i++) {
+                        j++;
+                     }
+                     return j;
+                  }
+                  catch (IndexOutOfRangeException) {
+                     return currentLine.Value.Length - position.x;
+                  }
+
+                  break;
+               }
+            case Direction.Left: {
+                  Line currentLine = lines[position.y];
+
+                  try {
+                     int j = 1;
+                     for (int i = -1; currentLine.Value[position.x + i] != ' '; i--) {
+                        j++;
+                     }
+                     return j;
+                  }
+                  catch (IndexOutOfRangeException) {
+                     return position.x;
+                  }
+
+                  break;
+               }
+            default:
+               Debug.Assert(false);
+               return -1;
          }
       }
 
