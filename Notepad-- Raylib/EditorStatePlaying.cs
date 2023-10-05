@@ -249,7 +249,12 @@ namespace Notepad___Raylib {
                            Program.lines.RemoveAt(cursor.position.y + 1);
 
                         } else {
-                           Program.RemoveTextAtCursor(Program.lines, cursor, 1, Direction.Right);
+                           if(modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                              int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Right);
+                              Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump, Direction.Right);
+                           } else {
+                              Program.RemoveTextAtCursor(Program.lines, cursor, 1, Direction.Right);
+                           }
                         }
 
                         break;
