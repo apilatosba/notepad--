@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -67,6 +67,13 @@ namespace Notepad___Raylib {
             ///////////////////////////////////////////
             {
                if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                  if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) {
+                     cursor.position = new Int2(Program.lines[Program.lines.Count - 1].Value.Length, Program.lines.Count - 1);
+                     shiftSelection = new Selection(new Int2(0, 0), cursor.position);
+
+                     cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                  }
+
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
                      int previousfontSize = Program.config.fontSize;
 
