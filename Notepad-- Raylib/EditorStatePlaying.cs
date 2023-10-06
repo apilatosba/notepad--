@@ -348,6 +348,15 @@ namespace Notepad___Raylib {
          mouseWheelInput = Raylib.GetMouseWheelMove();
          camera.target.Y -= mouseWheelInput * Line.Height;
 
+         {
+            int heightOfAllLines = Program.lines.Count * Line.Height;
+            int cameraThreshold = heightOfAllLines - Line.Height;
+
+            if(camera.target.Y > cameraThreshold) {
+               camera.target.Y = cameraThreshold;
+            }
+         }
+
          if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
             Vector2 mousePosition = Raylib.GetMousePosition();
             Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
@@ -387,6 +396,10 @@ namespace Notepad___Raylib {
       public void PostHandleInput() {
          if (shiftSelection != null) shiftSelection.EndPosition = cursor.position;
          Program.MakeSureCameraNotBelowZeroInBothAxes(ref camera);
+
+         if (cursor.IsCursorAtLastLine(Program.lines)) {
+            Console.WriteLine($"{Program.lines.Count}, {cursor.position.y}");
+         }
       }
 
       public unsafe void Render() {

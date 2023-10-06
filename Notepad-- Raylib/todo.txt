@@ -9,7 +9,7 @@ find in file. ctrl + f
 save the window size and position
 make cursor blink. make it with a shader
 add scrollbars
-bug: camera is not clamped to the text. it can go beyond the text
+bug: if mouse is pressed below the text, program crashes
 add opening directories. vim style
 add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level
 change cursor y repositioning algorithm. only works with monospace font rn.
