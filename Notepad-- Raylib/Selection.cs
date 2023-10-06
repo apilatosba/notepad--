@@ -181,5 +181,10 @@ namespace Notepad___Raylib {
 
          Raylib.SetClipboardText(text);
       }
+
+      public void Cut(List<Line> lines, Cursor cursor) {
+         Copy(lines);
+         Delete(lines, cursor);
+      }
    }
 }

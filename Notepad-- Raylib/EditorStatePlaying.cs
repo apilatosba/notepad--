@@ -98,8 +98,7 @@ namespace Notepad___Raylib {
 
                   // No mouseSelection. It causes lots of issues. So I chose the easy path and I don't allow user to ctrl+x while he is holding down mouse1. User needs to release mouse1 and then press ctrl+x.
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_X)) {
-                     shiftSelection?.Copy(Program.lines);
-                     shiftSelection?.Delete(Program.lines, cursor);
+                     shiftSelection?.Cut(Program.lines, cursor);
                      shiftSelection = null;
                   }
 
@@ -117,6 +116,20 @@ namespace Notepad___Raylib {
                      shiftSelection.EndPosition = cursor.position;
 
                      cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                  }
+
+                  if (Raylib.IsKeyPressed(KeyboardKey.KEY_L)) {
+                     if (!cursor.IsCursorAtLastLine(Program.lines)) {
+                        shiftSelection = null;
+                        cursor.position.x = 0;
+                        shiftSelection = new Selection() {
+                           StartPosition = cursor.position
+                        };
+                        cursor.position.y++;
+                        shiftSelection.EndPosition = cursor.position;
+                        shiftSelection.Cut(Program.lines, cursor);
+                        shiftSelection = null;
+                     }
                   }
                }
 

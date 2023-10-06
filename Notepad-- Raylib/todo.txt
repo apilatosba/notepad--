@@ -3,6 +3,7 @@ character shader. a flash effect when typed. start with pure white then quickly 
 different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
 implement zoom
 add background image
+when you ctrl+v paste, dont shiftSelect the pasted text. highlight them instead. do it with a shader
 add mouse wheel acceleration
 add shortcuts
 find in file. ctrl + f
