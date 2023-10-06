@@ -141,6 +141,8 @@ namespace Notepad___Raylib {
 
          pos.y = worldSpaceCoordinates.y / Line.Height;
 
+         if(pos.y > lines.Count - 1) pos.y = lines.Count - 1;
+
          Line line = lines[pos.y];
          string text = line.Value;
          int t = worldSpaceCoordinates.x - leftPadding;

@@ -396,10 +396,6 @@ namespace Notepad___Raylib {
       public void PostHandleInput() {
          if (shiftSelection != null) shiftSelection.EndPosition = cursor.position;
          Program.MakeSureCameraNotBelowZeroInBothAxes(ref camera);
-
-         if (cursor.IsCursorAtLastLine(Program.lines)) {
-            Console.WriteLine($"{Program.lines.Count}, {cursor.position.y}");
-         }
       }
 
       public unsafe void Render() {
