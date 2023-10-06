@@ -1,4 +1,6 @@
-﻿namespace Notepad___Raylib {
+﻿using Raylib_CsLo;
+
+namespace Notepad___Raylib {
    internal interface IEditorState {
       protected void HandleInput();
       protected void PostHandleInput();

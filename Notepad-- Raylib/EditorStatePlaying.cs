@@ -390,11 +390,33 @@ namespace Notepad___Raylib {
             Raylib.SetShaderValue(Program.flashShader, Program.flashShaderTransparencyLoc, value, ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
          }
 
+         //////////////////////////////////////
+         // Screen space rendering (background)
+         //////////////////////////////////////
+         {
+            Vector2 position;
+            float scale;
+            int w = Program.background.width;
+            int h = Program.background.height;
+            int sw = Raylib.GetScreenWidth();
+            int sh = Raylib.GetScreenHeight();
+
+            if (h * ((float)sw / w) >= sh) {
+               scale = (float)sw / w;
+               position = new Vector2(0, -((h * scale - sh) / 2));
+            } else {
+               scale = (float)sh / h;
+               position = new Vector2(-((w * scale - sw) / 2), 0);
+            }
+
+            Raylib.DrawTextureEx(Program.background, position, 0, scale, Raylib.WHITE);
+         }
+
+         ////////////////////////
          // World space rendering
+         ////////////////////////
          Raylib.BeginMode2D(camera);
          {
-            Raylib.ClearBackground(Program.config.backgroundColor);
-
             Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
             Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, float.MaxValue, Line.Height);
             Raylib.DrawRectangleRec(highlightLineRect, new Color(13, 13, 13, 255));
@@ -407,7 +429,9 @@ namespace Notepad___Raylib {
          }
          Raylib.EndMode2D();
 
+         ////////////////////////////////
          // Screen space rendering ie. UI
+         ////////////////////////////////
          {
             //horizontalScrollBar.RenderHorizontal(Raylib.GetScreenWidth());
 

@@ -41,6 +41,7 @@ namespace Notepad___Raylib {
       public static int flashShaderTransparencyLoc;
       public static Image windowCoverImage;
       public static Texture windowCoverTexture; // Rectangle doesnt work with uv's. https://github.com/raysan5/raylib/issues/1730
+      public static Texture background;
       public static string filePath;
 #if VISUAL_STUDIO
       static readonly string customFontsDirectory = "Fonts";
@@ -66,7 +67,8 @@ namespace Notepad___Raylib {
 
          try {
             config.Deserialize(GetConfigPath());
-         } catch (InvalidOperationException) {
+         }
+         catch (InvalidOperationException) {
             Console.WriteLine("Your config file was corrupt. Reverting it to previous settings now.");
             config.Serialize(GetConfigPath());
          }
@@ -122,6 +124,8 @@ namespace Notepad___Raylib {
          windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
          windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
 
+         background = Raylib.LoadTexture(Path.Combine(GetImagesDirectory(), "482950.png"));
+
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
             zoom = 1.0f,
@@ -135,11 +139,7 @@ namespace Notepad___Raylib {
          while (!Raylib.WindowShouldClose()) {
             Raylib.BeginDrawing();
 
-            //Raylib.BeginShaderMode(shader);
-
             editorState.Update();
-
-            //Raylib.EndShaderMode();
 
             Raylib.EndDrawing();
          }
@@ -388,6 +388,14 @@ namespace Notepad___Raylib {
          return "Shaders";
 #else
          return Path.Combine(GetExecutableDirectory(), "Shaders");
+#endif
+      }
+
+      public static string GetImagesDirectory() {
+#if VISUAL_STUDIO
+         return "Images";
+#else
+         return Path.Combine(GetExecutableDirectory(), "Images");
 #endif
       }
    }
