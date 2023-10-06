@@ -1,4 +1,5 @@
 ﻿using Raylib_CsLo;
+using System;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -12,6 +13,8 @@ namespace Notepad___Raylib {
       [XmlElement] public Color textColor = new Color(215, 215, 215, 255);
       [XmlElement] public Color backgroundColor = new Color(31, 31, 31, 50);
       [XmlElement] public Color cursorColor = new Color(227, 227, 227, 255);
+      [XmlElement] public string backgroundImage = "482950.png";
+      [XmlElement] public float backgroundLucidity = 0.5f;
 
       public void Deserialize(string path) {
          XmlSerializer serializer = new XmlSerializer(typeof(Config));
@@ -27,6 +30,8 @@ namespace Notepad___Raylib {
          textColor = config.textColor;
          backgroundColor = config.backgroundColor;
          cursorColor = config.cursorColor;
+         backgroundImage = config.backgroundImage;
+         backgroundLucidity = config.backgroundLucidity;
       }
 
       public void Serialize(string path) {

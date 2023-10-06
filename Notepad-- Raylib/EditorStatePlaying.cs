@@ -409,7 +409,8 @@ namespace Notepad___Raylib {
                position = new Vector2(-((w * scale - sw) / 2), 0);
             }
 
-            Raylib.DrawTextureEx(Program.background, position, 0, scale, Raylib.WHITE);
+            int lucidity = (int)(Math.Clamp(Program.config.backgroundLucidity, 0, 1) * 255);
+            Raylib.DrawTextureEx(Program.background, position, 0, scale, new Color(lucidity, lucidity, lucidity, 255));
          }
 
          ////////////////////////

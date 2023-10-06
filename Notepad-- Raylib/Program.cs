@@ -124,7 +124,7 @@ namespace Notepad___Raylib {
          windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
          windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
 
-         background = Raylib.LoadTexture(Path.Combine(GetImagesDirectory(), "482950.png"));
+         background = Raylib.LoadTexture(Path.Combine(GetImagesDirectory(), config.backgroundImage));
 
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
