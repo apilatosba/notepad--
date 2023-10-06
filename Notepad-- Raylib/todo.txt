@@ -1,3 +1,4 @@
+also load the font when you save the config file when editing the config file.
 --shaders
 character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
 different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
