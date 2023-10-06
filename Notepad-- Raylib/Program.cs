@@ -67,7 +67,7 @@ namespace Notepad___Raylib {
          try {
             config.Deserialize(GetConfigPath());
          } catch (InvalidOperationException) {
-            Console.WriteLine("Your config file was corrupt. Reverting it to default settings now.");
+            Console.WriteLine("Your config file was corrupt. Reverting it to previous settings now.");
             config.Serialize(GetConfigPath());
          }
 
@@ -176,7 +176,7 @@ namespace Notepad___Raylib {
             Console.WriteLine(pressedKeys);
       }
 
-      static List<Line> ReadLinesFromFile(string path) {
+      public static List<Line> ReadLinesFromFile(string path) {
          List<Line> lines = new List<Line>();
          string[] linesFromFile = File.ReadAllLines(path);
 

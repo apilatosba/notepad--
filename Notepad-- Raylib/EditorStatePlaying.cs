@@ -79,6 +79,7 @@ namespace Notepad___Raylib {
                         catch (InvalidOperationException) {
                            Console.WriteLine("Your config file was corrupt. Reverting it to default settings now.");
                            Program.config.Serialize(Program.GetConfigPath());
+                           Program.lines = Program.ReadLinesFromFile(Program.filePath);
                         }
                      }
                   }
@@ -417,7 +418,7 @@ namespace Notepad___Raylib {
             Program.config.Deserialize(Program.GetConfigPath());
          }
          catch (InvalidOperationException) {
-            Console.WriteLine("Your config file was corrupt. Reverting it to default settings now.");
+            Console.WriteLine("Your config file was corrupt. Reverting it to previous settings now.");
             Program.config.Serialize(Program.GetConfigPath());
          }
 
