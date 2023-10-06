@@ -153,6 +153,10 @@ namespace Notepad___Raylib {
                               if (shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
                            }
 
+                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                              cursor.position.y = Program.lines.Count - 1;
+                           }
+
                            Line currentLine = Program.lines[cursor.position.y];
 
                            cursor.position.x = currentLine.Value.Length;
