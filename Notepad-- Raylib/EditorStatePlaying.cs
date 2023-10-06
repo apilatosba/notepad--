@@ -60,6 +60,7 @@ namespace Notepad___Raylib {
             if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
             pressedKeys = missedKeyPressesBetweenFrames + pressedKeys;
+            pressedKeys = pressedKeys == string.Empty ? null : pressedKeys;
 
             ///////////////////////////////////////////
             // Handling key presses that have modifiers
