@@ -68,6 +68,8 @@ namespace Notepad___Raylib {
             {
                if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
+                     int previousfontSize = Program.config.fontSize;
+
                      flashShaderTimer.Restart();
 
                      Program.WriteLinesToFile(Program.filePath, Program.lines);
@@ -75,9 +77,14 @@ namespace Notepad___Raylib {
                      if (Path.GetFileName(Program.filePath) == Program.CONFIG_FILE_NAME) {
                         try {
                            Program.config.Deserialize(Program.GetConfigPath());
+
+                           if (Program.config.fontSize != previousfontSize) {
+                              Raylib.UnloadFont(Program.font);
+                              Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+                           }
                         }
                         catch (InvalidOperationException) {
-                           Console.WriteLine("Your config file was corrupt. Reverting it to default settings now.");
+                           Console.WriteLine("Your config file was corrupt. Reverting it to previous settings now.");
                            Program.config.Serialize(Program.GetConfigPath());
                            Program.lines = Program.ReadLinesFromFile(Program.filePath);
                         }
