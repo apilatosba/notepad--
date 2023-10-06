@@ -6,6 +6,7 @@ when you ctrl+v paste, dont shiftSelect the pasted text. highlight them instead.
 add mouse wheel acceleration
 add shortcuts
 find in file. ctrl + f
+save the window size and position
 make cursor blink. make it with a shader
 add scrollbars
 bug: camera is not clamped to the text. it can go beyond the text

@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Notepad___Raylib {
    internal class Program {
@@ -42,6 +43,8 @@ namespace Notepad___Raylib {
       public static Image windowCoverImage;
       public static Texture windowCoverTexture; // Rectangle doesnt work with uv's. https://github.com/raysan5/raylib/issues/1730
       public static Texture background;
+      public static Vector2 backgroundPosition;
+      public static float backgroundScale;
       public static string filePath;
 #if VISUAL_STUDIO
       static readonly string customFontsDirectory = "Fonts";
@@ -126,6 +129,21 @@ namespace Notepad___Raylib {
 
          background = Raylib.LoadTexture(Path.Combine(GetImagesDirectory(), config.backgroundImage));
 
+         {
+            int w = background.width;
+            int h = background.height;
+            int sw = Raylib.GetScreenWidth();
+            int sh = Raylib.GetScreenHeight();
+
+            if (h * ((float)sw / w) >= sh) {
+               backgroundScale = (float)sw / w;
+               backgroundPosition = new Vector2(0, -((h * backgroundScale - sh) / 2));
+            } else {
+               backgroundScale = (float)sh / h;
+               backgroundPosition = new Vector2(-((w * backgroundScale - sw) / 2), 0);
+            }
+         }
+         
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
             zoom = 1.0f,

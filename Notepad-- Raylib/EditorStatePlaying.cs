@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -394,23 +394,23 @@ namespace Notepad___Raylib {
          // Screen space rendering (background)
          //////////////////////////////////////
          {
-            Vector2 position;
-            float scale;
-            int w = Program.background.width;
-            int h = Program.background.height;
-            int sw = Raylib.GetScreenWidth();
-            int sh = Raylib.GetScreenHeight();
+            if (Raylib.IsWindowResized()) {
+               int w = Program.background.width;
+               int h = Program.background.height;
+               int sw = Raylib.GetScreenWidth();
+               int sh = Raylib.GetScreenHeight();
 
-            if (h * ((float)sw / w) >= sh) {
-               scale = (float)sw / w;
-               position = new Vector2(0, -((h * scale - sh) / 2));
-            } else {
-               scale = (float)sh / h;
-               position = new Vector2(-((w * scale - sw) / 2), 0);
+               if (h * ((float)sw / w) >= sh) {
+                  Program.backgroundScale = (float)sw / w;
+                  Program.backgroundPosition = new Vector2(0, -((h * Program.backgroundScale - sh) / 2));
+               } else {
+                  Program.backgroundScale = (float)sh / h;
+                  Program.backgroundPosition = new Vector2(-((w * Program.backgroundScale - sw) / 2), 0);
+               }
             }
 
             int lucidity = (int)(Math.Clamp(Program.config.backgroundLucidity, 0, 1) * 255);
-            Raylib.DrawTextureEx(Program.background, position, 0, scale, new Color(lucidity, lucidity, lucidity, 255));
+            Raylib.DrawTextureEx(Program.background, Program.backgroundPosition, 0, Program.backgroundScale, new Color(lucidity, lucidity, lucidity, 255));
          }
 
          ////////////////////////
