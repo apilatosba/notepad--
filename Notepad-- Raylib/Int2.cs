@@ -2,7 +2,7 @@
 using System.Numerics;
 
 namespace Notepad___Raylib {
-   internal struct Int2 {
+   public struct Int2 {
       public int x;
       public int y;
 

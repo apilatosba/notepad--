@@ -9,6 +9,7 @@ using System.Reflection;
 
 namespace Notepad___Raylib {
    internal class Program {
+      public static WindowSaveData windowSaveData = new WindowSaveData();
       public static Config config = new Config();
       public const string CONFIG_FILE_NAME = "config.xml";
       public static IEditorState editorState = new EditorStatePlaying();
@@ -75,6 +76,8 @@ namespace Notepad___Raylib {
             config.Serialize(GetConfigPath());
          }
 
+         windowSaveData = WindowSaveData.Deserialize(GetWindowSaveDataPath());
+
          // Command line arguments
          {
             if (args.Length == 0) {
@@ -116,9 +119,12 @@ namespace Notepad___Raylib {
          lines = ReadLinesFromFile(filePath);
          lastInputTimer.Start();
 
-         Raylib.InitWindow(1150, 560, "Notepad--");
+         Raylib.InitWindow(windowSaveData.size.x, windowSaveData.size.y, "Notepad--");
 
-         Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
+         Raylib.SetWindowPosition(windowSaveData.position.x, windowSaveData.position.y);
+         Raylib.SetWindowState((windowSaveData.maximized ? ConfigFlags.FLAG_WINDOW_MAXIMIZED : 0)
+                               | ConfigFlags.FLAG_WINDOW_RESIZABLE
+                               | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
          //Raylib.SetWindowOpacity(0.5f);
 
          flashShader = Raylib.LoadShader(null, Path.Combine(GetShadersDirectory(), "flash.frag"));
@@ -142,7 +148,7 @@ namespace Notepad___Raylib {
                backgroundPosition = new Vector2(-((w * backgroundScale - sw) / 2), 0);
             }
          }
-         
+
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
             zoom = 1.0f,
@@ -160,6 +166,11 @@ namespace Notepad___Raylib {
 
             Raylib.EndDrawing();
          }
+
+         windowSaveData.size = new Int2(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+         windowSaveData.position = (Int2)Raylib.GetWindowPosition();
+         windowSaveData.maximized = Raylib.IsWindowState(ConfigFlags.FLAG_WINDOW_MAXIMIZED);
+         windowSaveData.Serialize(GetWindowSaveDataPath());
 
          Raylib.UnloadFont(font);
          Raylib.CloseWindow();
@@ -413,6 +424,14 @@ namespace Notepad___Raylib {
          return "Images";
 #else
          return Path.Combine(GetExecutableDirectory(), "Images");
+#endif
+      }
+
+      public static string GetWindowSaveDataPath() {
+#if VISUAL_STUDIO
+         return "window.xml";
+#else
+         return Path.Combine(GetExecutableDirectory(), "window.xml");
 #endif
       }
    }
