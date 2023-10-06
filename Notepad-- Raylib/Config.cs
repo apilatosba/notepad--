@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 
 namespace Notepad___Raylib {
    public class Config {
-      [XmlElement] public int fontSize = 16;
+      [XmlElement] public int fontSize = 19;
       [XmlElement] public int leftPadding = 4;
       [XmlElement] public int spacingBetweenLines = 0;
       [XmlElement] public int tabSize = 4;

@@ -4,7 +4,7 @@
   <leftPadding>4</leftPadding>
   <spacingBetweenLines>0</spacingBetweenLines>
   <tabSize>4</tabSize>
-  <font>Inconsolata-Medium.ttf</font>
+  <fontName>Inconsolata-Medium.ttf</fontName>
   <textColor>
     <r>215</r>
     <g>215</g>

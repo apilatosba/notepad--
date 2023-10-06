@@ -73,7 +73,13 @@ namespace Notepad___Raylib {
                      Program.WriteLinesToFile(Program.filePath, Program.lines);
 
                      if (Path.GetFileName(Program.filePath) == Program.CONFIG_FILE_NAME) {
-                        Program.config.Deserialize(Program.GetConfigPath());
+                        try {
+                           Program.config.Deserialize(Program.GetConfigPath());
+                        }
+                        catch (InvalidOperationException) {
+                           Console.WriteLine("Your config file was corrupt. Reverting it to default settings now.");
+                           Program.config.Serialize(Program.GetConfigPath());
+                        }
                      }
                   }
 
@@ -406,7 +412,14 @@ namespace Notepad___Raylib {
 
       public void EnterState() {
          Raylib.UnloadFont(Program.font);
-         Program.config.Deserialize(Program.GetConfigPath());
+
+         try {
+            Program.config.Deserialize(Program.GetConfigPath());
+         }
+         catch (InvalidOperationException) {
+            Console.WriteLine("Your config file was corrupt. Reverting it to default settings now.");
+            Program.config.Serialize(Program.GetConfigPath());
+         }
 
          Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
 

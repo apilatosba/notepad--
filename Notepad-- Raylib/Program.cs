@@ -63,7 +63,13 @@ namespace Notepad___Raylib {
          }
 #endif
          //ScrollBar horizontalScrollBar = new ScrollBar();
-         config.Deserialize(GetConfigPath());
+
+         try {
+            config.Deserialize(GetConfigPath());
+         } catch (InvalidOperationException) {
+            Console.WriteLine("Your config file was corrupt. Reverting it to default settings now.");
+            config.Serialize(GetConfigPath());
+         }
 
          // Command line arguments
          {
