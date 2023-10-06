@@ -186,5 +186,37 @@ namespace Notepad___Raylib {
          Copy(lines);
          Delete(lines, cursor);
       }
+
+      /// <summary>
+      /// Given string is appended to the end of the selection before copying it to the clipboard.
+      /// </summary>
+      /// <param name="lines"></param>
+      /// <param name="textToAppend"></param>
+      public void CopyAndAppend(in List<Line> lines, string textToAppend) {
+         string text;
+         GetRightAndLeft(out Int2 left, out Int2 right);
+         Line[] linesInRange = GetLinesInRange(lines).ToArray();
+
+         switch (linesInRange.Length) {
+            case 1:
+               text = linesInRange[0].Value.Substring(left.x, right.x - left.x);
+               break;
+            case 2:
+               text = linesInRange[0].Value.Substring(left.x, linesInRange[0].Value.Length - left.x) + "\n" + linesInRange[1].Value.Substring(0, right.x);
+               break;
+            default:
+               text = linesInRange[0].Value.Substring(left.x, linesInRange[0].Value.Length - left.x);
+
+               for (int i = 1; i < linesInRange.Length - 1; i++) {
+                  text += "\n" + linesInRange[i].Value;
+               }
+
+               text += "\n" + linesInRange[linesInRange.Length - 1].Value.Substring(0, right.x);
+               break;
+         }
+
+         text += textToAppend;
+         Raylib.SetClipboardText(text);
+      }
    }
 }

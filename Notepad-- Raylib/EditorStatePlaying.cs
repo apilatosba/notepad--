@@ -129,6 +129,19 @@ namespace Notepad___Raylib {
                         shiftSelection.EndPosition = cursor.position;
                         shiftSelection.Cut(Program.lines, cursor);
                         shiftSelection = null;
+                     } else {
+                        cursor.position.x = 0;
+                        shiftSelection = new Selection() {
+                           StartPosition = cursor.position
+                        };
+                        cursor.position.x = Program.lines[cursor.position.y].Value.Length;
+                        shiftSelection.EndPosition = cursor.position;
+                        shiftSelection.CopyAndAppend(Program.lines, "\n");
+                        shiftSelection.Delete(Program.lines, cursor);
+                        shiftSelection = null;
+                        Program.lines.RemoveAt(cursor.position.y);
+                        cursor.position.y--;
+                        cursor.position.x = 0;
                      }
                   }
                }
