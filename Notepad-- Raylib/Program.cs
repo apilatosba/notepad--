@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -121,6 +121,7 @@ namespace Notepad___Raylib {
 
          Raylib.InitWindow(windowSaveData.size.x, windowSaveData.size.y, "Notepad--");
 
+         Raylib.SetWindowIcon(Raylib.LoadImage(Path.Combine(GetImagesDirectory(), "icon4.png")));
          Raylib.SetWindowPosition(windowSaveData.position.x, windowSaveData.position.y);
          Raylib.SetWindowState((windowSaveData.maximized ? ConfigFlags.FLAG_WINDOW_MAXIMIZED : 0)
                                | ConfigFlags.FLAG_WINDOW_RESIZABLE

@@ -6,12 +6,10 @@ when you ctrl+v paste, dont shiftSelect the pasted text. highlight them instead.
 add mouse wheel acceleration
 add shortcuts
 find in file. ctrl + f
-save the window size and position
 make cursor blink. make it with a shader
 add scrollbars
 add opening directories. vim style
 add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level
 change cursor y repositioning algorithm. only works with monospace font rn.
-app icon
 i should look for fonts in shared fonts folder (C:\Windows\Fonts, /usr/share/fonts) and my custom fonts folder. change the GetFontPath method
 undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state
