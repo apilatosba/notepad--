@@ -7,6 +7,7 @@ add mouse wheel acceleration
 add shortcuts
 find in file. ctrl + f
 make cursor blink. make it with a shader
+check unload methods for all load methods
 add scrollbars
 add opening directories. vim style
 add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level

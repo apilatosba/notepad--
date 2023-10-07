@@ -70,6 +70,44 @@ namespace Notepad___Raylib {
          }
       }
 
+      public void Render(List<Line> lines, int fontSize, int leftPadding, Font font, Color c) {
+         GetRightAndLeft(out Int2 left, out Int2 right);
+
+         Line[] linesInRange = GetLinesInRange(lines).ToArray();
+         Debug.Assert(linesInRange.Length != 0);
+
+         switch (linesInRange.Length) {
+            case 1:
+               RenderLine(left, right);
+               break;
+            case 2:
+               RenderLine(left, new Int2(linesInRange[0].Value.Length, left.y));
+               RenderLine(new Int2(0, right.y), right);
+               break;
+            default:
+               RenderLine(left, new Int2(linesInRange[0].Value.Length, left.y));
+
+               for (int i = left.y + 1; i < right.y; i++) {
+                  RenderLine(new Int2(0, i), new Int2(linesInRange[i - left.y].Value.Length, i));
+               }
+
+               RenderLine(new Int2(0, right.y), right);
+               break;
+         }
+
+         void RenderLine(Int2 start, Int2 end) {
+            Debug.Assert(start.y == end.y);
+
+            Int2 left = start.x <= end.x ? start : end;
+            Int2 right = start.x <= end.x ? end : start;
+
+            Int2 leftWorldSpacePosition = GetWorldSpacePosition(left, lines, fontSize, leftPadding, font);
+            Int2 rightWorldSpacePosition = GetWorldSpacePosition(right, lines, fontSize, leftPadding, font);
+
+            Raylib.DrawRectangle(leftWorldSpacePosition.x, leftWorldSpacePosition.y, rightWorldSpacePosition.x - leftWorldSpacePosition.x, Line.Height, c);
+         }
+      }
+
       public IEnumerable<Line> GetLinesInRange(List<Line> lines) {
          Int2 left;
          Int2 right;

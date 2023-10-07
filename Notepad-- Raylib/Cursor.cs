@@ -20,6 +20,12 @@ namespace Notepad___Raylib {
          Raylib.DrawRectangle(distance, position.y * Line.Height, 1, Line.Height, Program.config.cursorColor);
       }
 
+      public void Render(in List<Line> lines, int fontSize, int leftPadding, Font font, int spacingBetweenLines, Color color) {
+         int distance = GetWorldSpacePosition(lines, fontSize, leftPadding, font).x;
+
+         Raylib.DrawRectangle(distance, position.y * Line.Height, 1, Line.Height, color);
+      }
+
       public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, bool isControlKeyDown) {
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT)) {
             if (IsCursorAtEndOfFile(lines)) return;

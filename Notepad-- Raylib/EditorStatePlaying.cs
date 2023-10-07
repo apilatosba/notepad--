@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Linq;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Notepad___Raylib {
    internal class EditorStatePlaying : IEditorState {
@@ -149,6 +150,15 @@ namespace Notepad___Raylib {
                         Program.lines.RemoveAt(cursor.position.y);
                         cursor.position.y--;
                         cursor.position.x = 0;
+                     }
+                  }
+
+                  if (Raylib.IsKeyPressed(KeyboardKey.KEY_M)) {
+                     unsafe {
+                        Image image = Raylib.LoadImageFromTexture(Program.textMask.texture);
+                        Image* imagePtr = &image;
+                        Raylib.ImageFlipVertical(imagePtr);
+                        Raylib.ExportImage(*imagePtr, "text mask.png");
                      }
                   }
                }
@@ -359,7 +369,7 @@ namespace Notepad___Raylib {
             int heightOfAllLines = Program.lines.Count * Line.Height;
             int cameraThreshold = heightOfAllLines - Line.Height;
 
-            if(camera.target.Y > cameraThreshold) {
+            if (camera.target.Y > cameraThreshold) {
                camera.target.Y = cameraThreshold;
             }
          }
@@ -409,6 +419,8 @@ namespace Notepad___Raylib {
          if (Raylib.IsWindowResized()) {
             Program.windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
             Program.windowCoverTexture = Raylib.LoadTextureFromImage(Program.windowCoverImage);
+
+            Program.textMask = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
          }
 
          if (flashShaderTimer.IsRunning) {
@@ -447,6 +459,7 @@ namespace Notepad___Raylib {
          ////////////////////////
          Raylib.BeginMode2D(camera);
          {
+
             Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
             Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, float.MaxValue, Line.Height);
             Raylib.DrawRectangleRec(highlightLineRect, new Color(13, 13, 13, 255));
@@ -458,6 +471,21 @@ namespace Notepad___Raylib {
             cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines);
          }
          Raylib.EndMode2D();
+
+         //////////////////////////
+         // RenderTexture rendering
+         //////////////////////////
+         Raylib.BeginTextureMode(Program.textMask);
+         {
+            Raylib.BeginMode2D(camera);
+            Raylib.ClearBackground(Raylib.BLANK);
+            Program.RenderLines(Program.lines, Program.font, Raylib.WHITE);
+            shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+            mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+            cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines, Raylib.WHITE);
+            Raylib.EndMode2D();
+         }
+         Raylib.EndTextureMode();
 
          ////////////////////////////////
          // Screen space rendering ie. UI

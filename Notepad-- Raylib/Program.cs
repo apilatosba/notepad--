@@ -43,6 +43,7 @@ namespace Notepad___Raylib {
       public static Image windowCoverImage;
       public static Texture windowCoverTexture; // Rectangle doesnt work with uv's. https://github.com/raysan5/raylib/issues/1730
       public static Texture background;
+      public static RenderTexture textMask;
       public static Vector2 backgroundPosition;
       public static float backgroundScale;
       public static string filePath;
@@ -150,6 +151,8 @@ namespace Notepad___Raylib {
             }
          }
 
+         textMask = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
             zoom = 1.0f,
@@ -242,9 +245,15 @@ namespace Notepad___Raylib {
 #endif
       }
 
-      public static void RenderLines(List<Line> lines, Font font) {
+      public static void RenderLines(in List<Line> lines, Font font) {
          for (int i = 0; i < lines.Count; i++) {
             Raylib.DrawTextEx(font, lines[i].Value, new Vector2(config.leftPadding, i * (Line.Height + config.spacingBetweenLines)), config.fontSize, 0, config.textColor);
+         }
+      }
+
+      public static void RenderLines(in List<Line> lines, Font font, Color color) {
+         for (int i = 0; i < lines.Count; i++) {
+            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(config.leftPadding, i * (Line.Height + config.spacingBetweenLines)), config.fontSize, 0, color);
          }
       }
 
