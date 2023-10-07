@@ -434,43 +434,43 @@ namespace Notepad___Raylib {
          //////////////////////////////////////
          // Screen space rendering (background)
          //////////////////////////////////////
-         {
-            if (Raylib.IsWindowResized()) {
-               int w = Program.background.width;
-               int h = Program.background.height;
-               int sw = Raylib.GetScreenWidth();
-               int sh = Raylib.GetScreenHeight();
-
-               if (h * ((float)sw / w) >= sh) {
-                  Program.backgroundScale = (float)sw / w;
-                  Program.backgroundPosition = new Vector2(0, -((h * Program.backgroundScale - sh) / 2));
-               } else {
-                  Program.backgroundScale = (float)sh / h;
-                  Program.backgroundPosition = new Vector2(-((w * Program.backgroundScale - sw) / 2), 0);
-               }
-            }
-
-            int lucidity = (int)(Math.Clamp(Program.config.backgroundLucidity, 0, 1) * 255);
-            Raylib.DrawTextureEx(Program.background, Program.backgroundPosition, 0, Program.backgroundScale, new Color(lucidity, lucidity, lucidity, 255));
-         }
+         //{
+         //   if (Raylib.IsWindowResized()) {
+         //      int w = Program.background.width;
+         //      int h = Program.background.height;
+         //      int sw = Raylib.GetScreenWidth();
+         //      int sh = Raylib.GetScreenHeight();
+         //
+         //      if (h * ((float)sw / w) >= sh) {
+         //         Program.backgroundScale = (float)sw / w;
+         //         Program.backgroundPosition = new Vector2(0, -((h * Program.backgroundScale - sh) / 2));
+         //      } else {
+         //         Program.backgroundScale = (float)sh / h;
+         //         Program.backgroundPosition = new Vector2(-((w * Program.backgroundScale - sw) / 2), 0);
+         //      }
+         //   }
+         //
+         //   int lucidity = (int)(Math.Clamp(Program.config.backgroundLucidity, 0, 1) * 255);
+         //   Raylib.DrawTextureEx(Program.background, Program.backgroundPosition, 0, Program.backgroundScale, new Color(lucidity, lucidity, lucidity, 255));
+         //}
 
          ////////////////////////
          // World space rendering
          ////////////////////////
-         Raylib.BeginMode2D(camera);
-         {
-
-            Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
-            Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, float.MaxValue, Line.Height);
-            Raylib.DrawRectangleRec(highlightLineRect, new Color(13, 13, 13, 255));
-            Raylib.EndBlendMode();
-
-            Program.RenderLines(Program.lines, Program.font);
-            shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
-            mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
-            cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines);
-         }
-         Raylib.EndMode2D();
+         //Raylib.BeginMode2D(camera);
+         //{
+         //
+         //   Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
+         //   Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, float.MaxValue, Line.Height);
+         //   Raylib.DrawRectangleRec(highlightLineRect, new Color(13, 13, 13, 255));
+         //   Raylib.EndBlendMode();
+         //
+         //   Program.RenderLines(Program.lines, Program.font);
+         //   shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
+         //   mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
+         //   cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines);
+         //}
+         //Raylib.EndMode2D();
 
          //////////////////////////
          // RenderTexture rendering
@@ -486,6 +486,27 @@ namespace Notepad___Raylib {
             Raylib.EndMode2D();
          }
          Raylib.EndTextureMode();
+
+         fixed(Texture* value = &Program.textMask.texture) {
+            Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderTextMaskLoc, value, ShaderUniformDataType.SHADER_UNIFORM_SAMPLER2D);
+         }
+         //Raylib.SetShaderValueTexture(Program.bloomShader, Program.bloomShaderTextMaskLoc, Program.textMask.texture);
+         Raylib.BeginShaderMode(Program.bloomShader);
+         {
+            unsafe {
+               //Image image = Raylib.LoadImageFromTexture(Program.textMask.texture);
+               //Image* imagePtr = &image;
+               //Raylib.ImageFlipVertical(imagePtr);
+               //Texture texture = Raylib.LoadTextureFromImage(*imagePtr);
+               //Raylib.DrawTextureRec(Program.textMask.texture,
+               //                      new Rectangle(0, 0, Program.textMask.texture.width, -Program.textMask.texture.height),
+               //                      new Vector2(0, 0),
+               //                      Raylib.WHITE);
+
+               Raylib.DrawTexture(Program.textMask.texture, 0, 0, Raylib.WHITE);
+            }
+         }
+         Raylib.EndShaderMode();
 
          ////////////////////////////////
          // Screen space rendering ie. UI
