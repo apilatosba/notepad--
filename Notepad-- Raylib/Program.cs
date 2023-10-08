@@ -42,6 +42,8 @@ namespace Notepad___Raylib {
       public static Shader bloomShader;
       public static int flashShaderTransparencyLoc;
       public static int bloomShaderTextMaskLoc;
+      public static int bloomShaderResolutionLoc;
+      public static int bloomShaderStrengthLoc;
       public static Image windowCoverImage;
       public static Texture windowCoverTexture; // Rectangle doesnt work with uv's. https://github.com/raysan5/raylib/issues/1730
       public static Texture background;
@@ -78,7 +80,7 @@ namespace Notepad___Raylib {
             Console.WriteLine("Your config file was corrupt. Reverting it to previous settings now.");
             config.Serialize(GetConfigPath());
          }
-
+         
          windowSaveData = WindowSaveData.Deserialize(GetWindowSaveDataPath());
 
          // Command line arguments
@@ -129,7 +131,6 @@ namespace Notepad___Raylib {
          Raylib.SetWindowState((windowSaveData.maximized ? ConfigFlags.FLAG_WINDOW_MAXIMIZED : 0)
                                | ConfigFlags.FLAG_WINDOW_RESIZABLE
                                | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
-         //Raylib.SetWindowOpacity(0.5f);
 
          flashShader = Raylib.LoadShader(null, Path.Combine(GetShadersDirectory(), "flash.frag"));
          flashShaderTransparencyLoc = Raylib.GetShaderLocation(flashShader, "transparency");
@@ -138,6 +139,8 @@ namespace Notepad___Raylib {
 
          bloomShader = Raylib.LoadShader(null, Path.Combine(GetShadersDirectory(), "bloom.frag"));
          bloomShaderTextMaskLoc = Raylib.GetShaderLocation(bloomShader, "textMask");
+         bloomShaderResolutionLoc = Raylib.GetShaderLocation(bloomShader, "resolution");
+         bloomShaderStrengthLoc = Raylib.GetShaderLocation(bloomShader, "strength");
 
          background = Raylib.LoadTexture(Path.Combine(GetImagesDirectory(), config.backgroundImage));
 
@@ -167,7 +170,7 @@ namespace Notepad___Raylib {
          };
 
          font = LoadFontWithAllUnicodeCharacters(GetFontFilePath(), config.fontSize);
-
+         
          while (!Raylib.WindowShouldClose()) {
             Raylib.BeginDrawing();
 

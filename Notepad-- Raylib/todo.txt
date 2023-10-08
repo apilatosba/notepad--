@@ -8,6 +8,7 @@ add shortcuts
 find in file. ctrl + f
 make cursor blink. make it with a shader
 switch to window state undecorated
+changing font size when zooming but loading andunloading font takes about a second which is not good since it creates lag. i should have load a range of fonts with varying sizes but one font with all unicode characters takes up 2mb space. if i were to load, lets say 1-60 sizes, so that is 60 * 2mb which is 120mb. 120mb not good. 
 check unload methods for all load methods
 add scrollbars
 add opening directories. vim style
