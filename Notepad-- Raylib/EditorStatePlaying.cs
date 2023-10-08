@@ -420,6 +420,7 @@ namespace Notepad___Raylib {
             Program.windowCoverTexture = Raylib.LoadTextureFromImage(Program.windowCoverImage);
 
             Program.textMask = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+            Raylib.SetTextureWrap(Program.textMask.texture, TextureWrap.TEXTURE_WRAP_CLAMP);
          }
 
          if (flashShaderTimer.IsRunning) {

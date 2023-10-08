@@ -160,6 +160,7 @@ namespace Notepad___Raylib {
          }
 
          textMask = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+         Raylib.SetTextureWrap(textMask.texture, TextureWrap.TEXTURE_WRAP_CLAMP);
 
          Raylib.SetExitKey(KeyboardKey.KEY_NULL);
          Camera2D camera = new Camera2D() {
