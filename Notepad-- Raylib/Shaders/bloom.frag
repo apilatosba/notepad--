@@ -12,6 +12,10 @@ out vec4 finalColor;
 
 void main()
 {
+   if(strength < 0.001) {
+      discard;
+   }
+
    float distanceToClosestText = 9999;
    int a = 27; // better if this is odd
    vec4 threshold = vec4(0.2, 0.2, 0.2, 0.2);

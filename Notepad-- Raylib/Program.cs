@@ -185,7 +185,14 @@ namespace Notepad___Raylib {
          windowSaveData.maximized = Raylib.IsWindowState(ConfigFlags.FLAG_WINDOW_MAXIMIZED);
          windowSaveData.Serialize(GetWindowSaveDataPath());
 
+         Raylib.UnloadImage(windowCoverImage);
+         Raylib.UnloadTexture(windowCoverTexture);
+         Raylib.UnloadTexture(background);
+         Raylib.UnloadRenderTexture(textMask);
+         Raylib.UnloadShader(flashShader);
+         Raylib.UnloadShader(bloomShader);
          Raylib.UnloadFont(font);
+
          Raylib.CloseWindow();
       }
 

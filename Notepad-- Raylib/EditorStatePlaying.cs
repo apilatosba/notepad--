@@ -416,6 +416,10 @@ namespace Notepad___Raylib {
 
       public unsafe void Render() {
          if (Raylib.IsWindowResized()) {
+            Raylib.UnloadImage(Program.windowCoverImage);
+            Raylib.UnloadTexture(Program.windowCoverTexture);
+            Raylib.UnloadRenderTexture(Program.textMask);
+
             Program.windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
             Program.windowCoverTexture = Raylib.LoadTextureFromImage(Program.windowCoverImage);
 
