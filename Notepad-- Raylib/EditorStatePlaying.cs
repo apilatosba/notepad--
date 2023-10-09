@@ -75,6 +75,7 @@ namespace Notepad___Raylib {
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) {
                      cursor.position = new Int2(Program.lines[Program.lines.Count - 1].Value.Length, Program.lines.Count - 1);
                      shiftSelection = new Selection(new Int2(0, 0), cursor.position);
+                     cursor.exXPosition = cursor.position.x;
 
                      cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                   }
@@ -112,6 +113,9 @@ namespace Notepad___Raylib {
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_X)) {
                      shiftSelection?.Cut(Program.lines, cursor);
                      shiftSelection = null;
+
+                     cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                     cursor.exXPosition = cursor.position.x;
                   }
 
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
@@ -128,6 +132,7 @@ namespace Notepad___Raylib {
                      shiftSelection.EndPosition = cursor.position;
 
                      cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                     cursor.exXPosition = cursor.position.x;
                   }
 
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_L)) {
@@ -155,6 +160,9 @@ namespace Notepad___Raylib {
                         cursor.position.y--;
                         cursor.position.x = 0;
                      }
+
+                     cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                     cursor.exXPosition = cursor.position.x;
                   }
 
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_M)) {
@@ -184,6 +192,7 @@ namespace Notepad___Raylib {
 
                   Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
                   cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                  cursor.exXPosition = cursor.position.x;
                }
             }
 
@@ -207,6 +216,7 @@ namespace Notepad___Raylib {
 
                         cursor.position.x = 0;
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                        cursor.exXPosition = cursor.position.x;
                         break;
                      case KeyboardKey.KEY_END: {
                            if (!(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT))) {
@@ -221,6 +231,7 @@ namespace Notepad___Raylib {
 
                            cursor.position.x = currentLine.Value.Length;
                            cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                           cursor.exXPosition = cursor.position.x;
                         }
                         break;
                      case KeyboardKey.KEY_ESCAPE:
@@ -233,6 +244,7 @@ namespace Notepad___Raylib {
                            shiftSelection.Delete(Program.lines, cursor);
                            shiftSelection = null;
                            cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                           cursor.exXPosition = cursor.position.x;
                            break;
                         }
 
@@ -259,6 +271,7 @@ namespace Notepad___Raylib {
                         }
 
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                        cursor.exXPosition = cursor.position.x;
                         break;
                      case KeyboardKey.KEY_ENTER: {
                            shiftSelection?.Delete(Program.lines, cursor);
@@ -279,6 +292,7 @@ namespace Notepad___Raylib {
 
                            cursor.position.x = 0;
                            cursor.position.y++;
+                           cursor.exXPosition = cursor.position.x;
                         }
 
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
@@ -295,6 +309,7 @@ namespace Notepad___Raylib {
                            cursor.position.x += Program.config.tabSize;
 
                            cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                           cursor.exXPosition = cursor.position.x;
 
                            break;
                         }
@@ -302,6 +317,7 @@ namespace Notepad___Raylib {
                         Program.InsertTextAtCursor(Program.lines, cursor, new string(' ', Program.config.tabSize));
 
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                        cursor.exXPosition = cursor.position.x;
                         break;
                      case KeyboardKey.KEY_DELETE:
                         if (shiftSelection != null) {
@@ -330,7 +346,7 @@ namespace Notepad___Raylib {
                         break;
                      case KeyboardKey.KEY_RIGHT:
                         if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                        //camera.target.X += 10;
+                        
                         break;
                      case KeyboardKey.KEY_LEFT:
                         if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;

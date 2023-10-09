@@ -11,6 +11,7 @@ namespace Notepad___Raylib {
       /// position.y is line number.
       /// </summary>
       public Int2 position;
+      public int exXPosition;
       //Color color = new Color(150, 150, 150, 255); It is in config now.
 
       // TODO render cursor considering spacingBetweenLines
@@ -42,6 +43,7 @@ namespace Notepad___Raylib {
             }
 
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+            exXPosition = position.x;
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT)) {
             if (IsCursorAtBeginningOfFile()) return;
@@ -57,13 +59,14 @@ namespace Notepad___Raylib {
             }
 
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+            exXPosition = position.x;
 
          } else if (Raylib.IsKeyDown(KeyboardKey.KEY_UP)) {
             if (isControlKeyDown) return;
             if (IsCursorAtFirstLine()) return;
 
             position.y--;
-            position.x = Math.Min(position.x, lines[position.y].Value.Length);
+            position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
 
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
@@ -72,7 +75,7 @@ namespace Notepad___Raylib {
             if (IsCursorAtLastLine(lines)) return;
 
             position.y++;
-            position.x = Math.Min(position.x, lines[position.y].Value.Length);
+            position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
 
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
          }
