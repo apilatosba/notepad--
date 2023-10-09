@@ -9,6 +9,9 @@ find in file. ctrl + f
 make cursor blink. make it with a shader
 switch to window state undecorated
 changing font size when zooming but loading andunloading font takes about a second which is not good since it creates lag. i should have load a range of fonts with varying sizes but one font with all unicode characters takes up 2mb space. if i were to load, lets say 1-60 sizes, so that is 60 * 2mb which is 120mb. 120mb not good. 
+render bloom shader at quarter resolution
+    or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
+    or the both
 frontend to settings
 quit button in editor state paused
 add scrollbars

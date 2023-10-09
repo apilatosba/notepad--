@@ -49,16 +49,18 @@ namespace Notepad___Raylib {
 
          // Keyboard input handling
          string pressedKeys;
+
+         List<KeyboardKey> modifiers = new List<KeyboardKey>();
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) modifiers.Add(KeyboardKey.KEY_LEFT_CONTROL);
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) modifiers.Add(KeyboardKey.KEY_LEFT_SHIFT);
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_ALT)) modifiers.Add(KeyboardKey.KEY_LEFT_ALT);
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SUPER)) modifiers.Add(KeyboardKey.KEY_LEFT_SUPER);
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) modifiers.Add(KeyboardKey.KEY_RIGHT_CONTROL);
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SHIFT)) modifiers.Add(KeyboardKey.KEY_RIGHT_SHIFT);
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
+
          if (Program.ShouldAcceptKeyboardInput(out pressedKeys, out KeyboardKey specialKey)) {
-            List<KeyboardKey> modifiers = new List<KeyboardKey>();
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) modifiers.Add(KeyboardKey.KEY_LEFT_CONTROL);
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT)) modifiers.Add(KeyboardKey.KEY_LEFT_SHIFT);
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_ALT)) modifiers.Add(KeyboardKey.KEY_LEFT_ALT);
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SUPER)) modifiers.Add(KeyboardKey.KEY_LEFT_SUPER);
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) modifiers.Add(KeyboardKey.KEY_RIGHT_CONTROL);
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SHIFT)) modifiers.Add(KeyboardKey.KEY_RIGHT_SHIFT);
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
             pressedKeys = missedKeyPressesBetweenFrames + pressedKeys;
             pressedKeys = pressedKeys == string.Empty ? null : pressedKeys;
@@ -364,7 +366,25 @@ namespace Notepad___Raylib {
          } // End of keyboard input handling
 
          mouseWheelInput = Raylib.GetMouseWheelMove();
-         camera.target.Y -= mouseWheelInput * Line.Height;
+
+         if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+            //camera.zoom += mouseWheelInput * 0.04f;
+            if (mouseWheelInput > 0) {
+               Program.config.fontSize++;
+               Program.config.Serialize(Program.GetConfigPath());
+
+               Raylib.UnloadFont(Program.font);
+               Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+            } else if (mouseWheelInput < 0) {
+               Program.config.fontSize--;
+               Program.config.Serialize(Program.GetConfigPath());
+
+               Raylib.UnloadFont(Program.font);
+               Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+            }
+         } else {
+            camera.target.Y -= mouseWheelInput * Line.Height;
+         }
 
          {
             int heightOfAllLines = Program.lines.Count * Line.Height;

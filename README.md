@@ -22,4 +22,4 @@ Also you need to add [Fonts folder](https://github.com/apilatosba/notepad--/tree
 
 ## References
 Raylib: https://www.raylib.com/ - Great library, big thumbs up.
-
+Bloom: https://learnopengl.com/Advanced-Lighting/Bloom
