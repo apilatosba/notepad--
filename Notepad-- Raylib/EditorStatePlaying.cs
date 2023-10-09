@@ -20,6 +20,7 @@ namespace Notepad___Raylib {
          offset = new Vector2(0, 0),
       };
       static Int2? lastKnownCursorPosition = null;
+      static Vector2? lastKnownCameraTarget = null;
       float mouseWheelInput = 0;
       float flashShaderTransparency = 0.0f;
       readonly Stopwatch flashShaderTimer = new Stopwatch();
@@ -224,6 +225,7 @@ namespace Notepad___Raylib {
                         break;
                      case KeyboardKey.KEY_ESCAPE:
                         lastKnownCursorPosition = cursor.position;
+                        lastKnownCameraTarget = camera.target;
                         SetStateTo(new EditorStatePaused());
                         break;
                      case KeyboardKey.KEY_BACKSPACE:
@@ -593,6 +595,7 @@ namespace Notepad___Raylib {
          Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
 
          cursor.position = lastKnownCursorPosition ?? new Int2(0, 0);
+         camera.target = lastKnownCameraTarget ?? new Vector2(0, 0);
       }
    }
 }
