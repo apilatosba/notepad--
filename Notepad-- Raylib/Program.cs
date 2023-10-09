@@ -51,6 +51,7 @@ namespace Notepad___Raylib {
       public static Vector2 backgroundPosition;
       public static float backgroundScale;
       public static string filePath;
+      public static bool isQuitButtonPressed = false;
 #if VISUAL_STUDIO
       static readonly string customFontsDirectory = "Fonts";
 #else
@@ -172,7 +173,7 @@ namespace Notepad___Raylib {
 
          font = LoadFontWithAllUnicodeCharacters(GetFontFilePath(), config.fontSize);
          
-         while (!Raylib.WindowShouldClose()) {
+         while (!Raylib.WindowShouldClose() && !isQuitButtonPressed) {
             Raylib.BeginDrawing();
 
             editorState.Update();

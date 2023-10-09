@@ -13,7 +13,6 @@ render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
     or the both
 frontend to settings
-quit button in editor state paused
 add scrollbars
 add opening directories. vim style
 add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level

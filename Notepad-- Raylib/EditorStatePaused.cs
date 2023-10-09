@@ -44,6 +44,12 @@ namespace Notepad___Raylib {
 #endif
             });
          }
+
+         Rectangle quit = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y + window.height / 4, 2 * window.width / 7, 2 * window.height / 13);
+
+         if(RayGui.GuiButton(quit, "Quit")) {
+            Program.isQuitButtonPressed = true;
+         }
       }
 
       public void Update() {
