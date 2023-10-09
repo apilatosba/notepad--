@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -332,16 +332,18 @@ namespace Notepad___Raylib {
                         //camera.target.X -= 10;
                         break;
                      case KeyboardKey.KEY_UP:
-                        if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                         if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                            camera.target.Y -= Line.Height;
+                        } else {
+                           if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                         }
                         //camera.target.Y -= 10;
                         break;
                      case KeyboardKey.KEY_DOWN:
-                        if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                         if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                            camera.target.Y += Line.Height;
+                        } else {
+                           if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                         }
                         //camera.target.Y += 10;
                         break;
@@ -479,36 +481,40 @@ namespace Notepad___Raylib {
          //////////////////////////
          // RenderTexture rendering
          //////////////////////////
-         Raylib.BeginTextureMode(Program.textMask);
-         {
-            Raylib.BeginMode2D(camera);
-            Raylib.ClearBackground(Raylib.BLANK);
-            Program.RenderLines(Program.lines, Program.font, Raylib.WHITE);
-            shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
-            mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
-            cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines, Raylib.WHITE);
-            Raylib.EndMode2D();
+         float strength = 0.0f;
+         if (flashShaderTimer.IsRunning) {
+            strength = MathF.Exp(-1 * 2.5f * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
          }
-         Raylib.EndTextureMode();
 
-         Raylib.BeginShaderMode(Program.bloomShader);
-         {
-            Vector2 resolution = new Vector2(Program.textMask.texture.width, Program.textMask.texture.height);
-            float strength = 0.0f;
-            if (flashShaderTimer.IsRunning) {
-               strength = MathF.Exp(-1 * 2.5f * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
+         if (strength > 0.001f) {
+            Raylib.BeginTextureMode(Program.textMask);
+            {
+               Raylib.BeginMode2D(camera);
+               Raylib.ClearBackground(Raylib.BLANK);
+               Program.RenderLines(Program.lines, Program.font, Raylib.WHITE);
+               shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+               mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+               cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines, Raylib.WHITE);
+               Raylib.EndMode2D();
             }
-            
-            Raylib.SetShaderValueTexture(Program.bloomShader, Program.bloomShaderTextMaskLoc, Program.textMask.texture);
-            Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderResolutionLoc, &resolution, ShaderUniformDataType.SHADER_UNIFORM_VEC2);
-            Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderStrengthLoc, &strength, ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
+            Raylib.EndTextureMode();
 
-            Raylib.DrawTextureRec(Program.windowCoverTexture,
-                                  new Rectangle(0, 0, Program.windowCoverTexture.width, -Program.windowCoverTexture.height),
-                                  new Vector2(0, 0),
-                                  Raylib.WHITE);
+            Raylib.BeginShaderMode(Program.bloomShader);
+            {
+               Vector2 resolution = new Vector2(Program.textMask.texture.width, Program.textMask.texture.height);
+
+
+               Raylib.SetShaderValueTexture(Program.bloomShader, Program.bloomShaderTextMaskLoc, Program.textMask.texture);
+               Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderResolutionLoc, &resolution, ShaderUniformDataType.SHADER_UNIFORM_VEC2);
+               Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderStrengthLoc, &strength, ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
+
+               Raylib.DrawTextureRec(Program.windowCoverTexture,
+                                     new Rectangle(0, 0, Program.windowCoverTexture.width, -Program.windowCoverTexture.height),
+                                     new Vector2(0, 0),
+                                     Raylib.WHITE);
+            }
+            Raylib.EndShaderMode();
          }
-         Raylib.EndShaderMode();
 
          ////////////////////////////////
          // Screen space rendering ie. UI

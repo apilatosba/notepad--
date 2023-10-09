@@ -17,7 +17,7 @@ void main()
    }
 
    float distanceToClosestText = 9999;
-   int a = 27; // better if this is odd
+   int a = 27; // length of the one side of square which will be scanned to see if any of these pixel includes text. better if this is odd
    vec4 threshold = vec4(0.2, 0.2, 0.2, 0.2);
 
    for(int i = -a / 2; i < a / 2; i++) {

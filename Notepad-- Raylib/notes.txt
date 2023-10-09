@@ -3,3 +3,4 @@ dont forget to comment out #define VISUAL_STUDIO before publishing
 when building with visual studio, set output type to WinExe(windows application) to get rid of console opening when you launch new instance of notepad--.
 jpg is not supported.
 range of background lucidity is 0-1.
+on linux it works with "dotnet notepad--.dll file"
