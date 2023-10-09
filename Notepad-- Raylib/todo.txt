@@ -8,7 +8,6 @@ add shortcuts
 find in file. ctrl + f
 make cursor blink. make it with a shader
 switch to window state undecorated
-further optimization: stop drawing when no input is present. should be easy to implement Clueless. make HandleInput return a boolean value or out paramater that has a name like isInputPresentAndHandled and if it is true then render otherwise dont render
 a int value that holds the value of where cursor should be at when moving with up and down arrow keys. have a int value, set it to cursor.position.x every time user presses a key except when he presses up or down arrow key. i think that would work
 render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.

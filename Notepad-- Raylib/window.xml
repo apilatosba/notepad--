@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WindowSaveData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <position>
-    <x>271</x>
-    <y>239</y>
-    <Column>271</Column>
-    <Row>239</Row>
+    <x>511</x>
+    <y>214</y>
+    <Column>511</Column>
+    <Row>214</Row>
   </position>
   <size>
-    <x>1092</x>
+    <x>1095</x>
     <y>571</y>
-    <Column>1092</Column>
+    <Column>1095</Column>
     <Row>571</Row>
   </size>
   <maximized>false</maximized>

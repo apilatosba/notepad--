@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -24,10 +24,8 @@ namespace Notepad___Raylib {
       float flashShaderTransparency = 0.0f;
       readonly Stopwatch flashShaderTimer = new Stopwatch();
       readonly Stopwatch timeSinceLastMouseInput = new Stopwatch();
+      readonly Stopwatch windowResizeTimer = new Stopwatch(); // This gets triggered even when window de-minimized which is what i am using it for.
       string missedKeyPressesBetweenFrames = string.Empty;
-      //bool previousStateOfIsInputPresentAndHandled = false;
-      bool isBloomShaderRunning = false;
-      bool isRenderingJustStopped = false;
 
       // this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib.
       // if you have static variables of classes that belongs other assemblies it becomes problematic.
@@ -452,6 +450,8 @@ namespace Notepad___Raylib {
 
       public unsafe void Render() {
          if (Raylib.IsWindowResized()) {
+            windowResizeTimer.Restart();
+
             Raylib.UnloadImage(Program.windowCoverImage);
             Raylib.UnloadTexture(Program.windowCoverTexture);
             Raylib.UnloadRenderTexture(Program.textMask);
@@ -521,8 +521,6 @@ namespace Notepad___Raylib {
          }
 
          if (strength > 0.001f) {
-            isBloomShaderRunning = true;
-
             Raylib.BeginTextureMode(Program.textMask);
             {
                Raylib.BeginMode2D(camera);
@@ -550,8 +548,6 @@ namespace Notepad___Raylib {
                                      Raylib.WHITE);
             }
             Raylib.EndShaderMode();
-         } else {
-            isBloomShaderRunning = false;
          }
 
          ////////////////////////////////
@@ -573,19 +569,9 @@ namespace Notepad___Raylib {
          HandleInput();
          PostHandleInput();
 
-         if(Program.TimeSinceLastKeyboardInput < 5000 || timeSinceLastMouseInput.ElapsedMilliseconds < 5000) {
+         if(Program.TimeSinceLastKeyboardInput < 5000 || timeSinceLastMouseInput.ElapsedMilliseconds < 5000 || windowResizeTimer.ElapsedMilliseconds < 3000) {
             Render();
          }
-
-         //if (isInputPresentAndHandled || Raylib.GetTime() < 5d || isBloomShaderRunning) {
-         //   Render();
-         //   isRenderingJustStopped = true;
-         //} else {
-         //   if (isRenderingJustStopped) {
-         //      Render();
-         //   }
-         //   isRenderingJustStopped = false;
-         //}
       }
 
       public void SetStateTo(IEditorState state) {
