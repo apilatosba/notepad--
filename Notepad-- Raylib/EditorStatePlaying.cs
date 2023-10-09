@@ -23,7 +23,11 @@ namespace Notepad___Raylib {
       float mouseWheelInput = 0;
       float flashShaderTransparency = 0.0f;
       readonly Stopwatch flashShaderTimer = new Stopwatch();
+      readonly Stopwatch timeSinceLastMouseInput = new Stopwatch();
       string missedKeyPressesBetweenFrames = string.Empty;
+      //bool previousStateOfIsInputPresentAndHandled = false;
+      bool isBloomShaderRunning = false;
+      bool isRenderingJustStopped = false;
 
       // this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib.
       // if you have static variables of classes that belongs other assemblies it becomes problematic.
@@ -47,7 +51,6 @@ namespace Notepad___Raylib {
       public void HandleInput() {
          Debug.Assert(!(mouseSelection != null && shiftSelection != null));
 
-         // Keyboard input handling
          string pressedKeys;
 
          List<KeyboardKey> modifiers = new List<KeyboardKey>();
@@ -60,8 +63,8 @@ namespace Notepad___Raylib {
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
+         // Keyboard input handling
          if (Program.ShouldAcceptKeyboardInput(out pressedKeys, out KeyboardKey specialKey)) {
-
             pressedKeys = missedKeyPressesBetweenFrames + pressedKeys;
             pressedKeys = pressedKeys == string.Empty ? null : pressedKeys;
 
@@ -367,23 +370,27 @@ namespace Notepad___Raylib {
 
          mouseWheelInput = Raylib.GetMouseWheelMove();
 
-         if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-            //camera.zoom += mouseWheelInput * 0.04f;
-            if (mouseWheelInput > 0) {
-               Program.config.fontSize++;
-               Program.config.Serialize(Program.GetConfigPath());
+         if (mouseWheelInput != 0) {
+            timeSinceLastMouseInput.Restart();
 
-               Raylib.UnloadFont(Program.font);
-               Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
-            } else if (mouseWheelInput < 0) {
-               Program.config.fontSize--;
-               Program.config.Serialize(Program.GetConfigPath());
+            if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+               //camera.zoom += mouseWheelInput * 0.04f;
+               if (mouseWheelInput > 0) {
+                  Program.config.fontSize++;
+                  Program.config.Serialize(Program.GetConfigPath());
 
-               Raylib.UnloadFont(Program.font);
-               Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+                  Raylib.UnloadFont(Program.font);
+                  Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+               } else if (mouseWheelInput < 0) {
+                  Program.config.fontSize--;
+                  Program.config.Serialize(Program.GetConfigPath());
+
+                  Raylib.UnloadFont(Program.font);
+                  Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+               }
+            } else {
+               camera.target.Y -= mouseWheelInput * Line.Height;
             }
-         } else {
-            camera.target.Y -= mouseWheelInput * Line.Height;
          }
 
          {
@@ -396,6 +403,8 @@ namespace Notepad___Raylib {
          }
 
          if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
+            timeSinceLastMouseInput.Restart();
+
             Vector2 mousePosition = Raylib.GetMousePosition();
             Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
@@ -412,6 +421,8 @@ namespace Notepad___Raylib {
          if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
             Debug.Assert(mouseSelection != null);
 
+            timeSinceLastMouseInput.Restart();
+
             Vector2 mousePosition = Raylib.GetMousePosition();
             Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
@@ -420,10 +431,13 @@ namespace Notepad___Raylib {
                                                                                            Program.config.leftPadding,
                                                                                            Program.font,
                                                                                            mousePositionInWorldSpace);
+
             cursor.position = mouseSelection.EndPosition;
          }
 
          if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) {
+            timeSinceLastMouseInput.Restart();
+
             shiftSelection = mouseSelection;
             mouseSelection = null;
          }
@@ -507,6 +521,8 @@ namespace Notepad___Raylib {
          }
 
          if (strength > 0.001f) {
+            isBloomShaderRunning = true;
+
             Raylib.BeginTextureMode(Program.textMask);
             {
                Raylib.BeginMode2D(camera);
@@ -534,6 +550,8 @@ namespace Notepad___Raylib {
                                      Raylib.WHITE);
             }
             Raylib.EndShaderMode();
+         } else {
+            isBloomShaderRunning = false;
          }
 
          ////////////////////////////////
@@ -554,7 +572,20 @@ namespace Notepad___Raylib {
       public void Update() {
          HandleInput();
          PostHandleInput();
-         Render();
+
+         if(Program.TimeSinceLastKeyboardInput < 5000 || timeSinceLastMouseInput.ElapsedMilliseconds < 5000) {
+            Render();
+         }
+
+         //if (isInputPresentAndHandled || Raylib.GetTime() < 5d || isBloomShaderRunning) {
+         //   Render();
+         //   isRenderingJustStopped = true;
+         //} else {
+         //   if (isRenderingJustStopped) {
+         //      Render();
+         //   }
+         //   isRenderingJustStopped = false;
+         //}
       }
 
       public void SetStateTo(IEditorState state) {

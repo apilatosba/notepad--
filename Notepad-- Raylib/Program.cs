@@ -58,6 +58,8 @@ namespace Notepad___Raylib {
       static readonly string customFontsDirectory = Path.Combine(GetExecutableDirectory(), "Fonts");
 #endif
 
+      public static long TimeSinceLastKeyboardInput => timeSinceLastInput;
+
       static void Main(string[] args) {
 #if VISUAL_STUDIO
 #else
