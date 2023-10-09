@@ -8,7 +8,8 @@ add shortcuts
 find in file. ctrl + f
 make cursor blink. make it with a shader
 switch to window state undecorated
-changing font size when zooming but loading andunloading font takes about a second which is not good since it creates lag. i should have load a range of fonts with varying sizes but one font with all unicode characters takes up 2mb space. if i were to load, lets say 1-60 sizes, so that is 60 * 2mb which is 120mb. 120mb not good. 
+further optimization: stop drawing when no input is present. should be easy to implement Clueless
+a int value that holds the value of where cursor should be at when moving with up and down arrow keys. have a int value, set it to cursor.position.x every time user presses a key except when he presses up or down arrow key. i think that would work
 render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
     or the both
