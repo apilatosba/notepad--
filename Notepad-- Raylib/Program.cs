@@ -56,6 +56,7 @@ namespace Notepad___Raylib {
       public static float backgroundScale;
       public static string filePath;
       public static bool isQuitButtonPressed = false;
+      public static Stack<UndoItem> undoHistory = new Stack<UndoItem>();
 #if VISUAL_STUDIO
       static readonly string customFontsDirectory = "Fonts";
 #else

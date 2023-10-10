@@ -72,6 +72,21 @@ namespace Notepad___Raylib {
             ///////////////////////////////////////////
             {
                if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                  if (Raylib.IsKeyPressed(KeyboardKey.KEY_Z)) {
+                     UndoItem undoItem;
+
+                     try {
+                        undoItem = Program.undoHistory.Pop();
+                        Program.lines[undoItem.lineNumber] = undoItem.line;
+                        cursor.position = undoItem.cursorPosition;
+                        cursor.exXPosition = cursor.position.x;
+                     }
+                     catch (InvalidOperationException) {
+                        // stack is empty
+                        // todo some shader effect? 
+                     }
+                  }
+
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) {
                      cursor.position = new Int2(Program.lines[Program.lines.Count - 1].Value.Length, Program.lines.Count - 1);
                      shiftSelection = new Selection(new Int2(0, 0), cursor.position);
@@ -204,6 +219,11 @@ namespace Notepad___Raylib {
 #if VISUAL_STUDIO
                   Program.PrintPressedKeys(pressedKeys);
 #endif
+                  Program.undoHistory.Push(new UndoItem(new Line(Program.lines[cursor.position.y]),
+                                                        cursor.position.y,
+                                                        UndeReason.NormalKeyStroke,
+                                                        cursor.position));
+
                   shiftSelection?.Delete(Program.lines, cursor);
                   shiftSelection = null;
 
@@ -279,6 +299,11 @@ namespace Notepad___Raylib {
                            cursor.position.y--;
 
                         } else {
+                           Program.undoHistory.Push(new UndoItem(new Line(Program.lines[cursor.position.y]),
+                                                                             cursor.position.y,
+                                                                             UndeReason.Deletion,
+                                                                             cursor.position));
+
                            if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                               int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Left);
                               Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump);
@@ -331,6 +356,11 @@ namespace Notepad___Raylib {
                            break;
                         }
 
+                        Program.undoHistory.Push(new UndoItem(new Line(Program.lines[cursor.position.y]),
+                                                              cursor.position.y,
+                                                              UndeReason.NormalKeyStroke,
+                                                              cursor.position));
+
                         Program.InsertTextAtCursor(Program.lines, cursor, new string(' ', Program.config.tabSize));
 
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
@@ -352,6 +382,11 @@ namespace Notepad___Raylib {
                            Program.lines.RemoveAt(cursor.position.y + 1);
 
                         } else {
+                           Program.undoHistory.Push(new UndoItem(new Line(Program.lines[cursor.position.y]),
+                                                                 cursor.position.y,
+                                                                 UndeReason.Deletion,
+                                                                 cursor.position));
+
                            if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                               int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Right);
                               Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump, Direction.Right);
