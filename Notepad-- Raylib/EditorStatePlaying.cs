@@ -496,7 +496,7 @@ namespace Notepad___Raylib {
 
             Program.windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
             Program.windowCoverTexture = Raylib.LoadTextureFromImage(Program.windowCoverImage);
-            
+
             Program.textMask = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
             Raylib.SetTextureWrap(Program.textMask.texture, TextureWrap.TEXTURE_WRAP_CLAMP);
          }
@@ -548,6 +548,36 @@ namespace Notepad___Raylib {
             cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines);
          }
          Raylib.EndMode2D();
+
+         //Raylib.BeginTextureMode(Program.textMask);
+         //{
+         //   Raylib.BeginMode2D(camera);
+         //   Raylib.ClearBackground(Raylib.BLANK);
+         //   Program.RenderLines(Program.lines, Program.font, Raylib.WHITE);
+         //   shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+         //   mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+         //   cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines, Raylib.WHITE);
+         //   Raylib.EndMode2D();
+         //}
+         //Raylib.EndTextureMode();
+
+         //Raylib.BeginTextureMode(Program.textMask);
+         //bool isHorizontal = false;
+
+         //for (int i = 0; i < 10; i++) {
+         //   isHorizontal = !isHorizontal;
+         //   int horizontal = isHorizontal ? 1 : 0;
+
+         //   Raylib.BeginShaderMode(Program.twoPassGaussianBlur);
+         //   Raylib.SetShaderValue(Program.twoPassGaussianBlur, Program.twoPassGaussianBlurShaderHorizontalLoc, &horizontal, ShaderUniformDataType.SHADER_UNIFORM_INT);
+         //   Raylib.SetShaderValueTexture(Program.twoPassGaussianBlur, Program.twoPassGaussianBlurShaderTextMaskLoc, Program.textMask.texture);
+         //   Raylib.DrawTextureRec(Program.textMask.texture,
+         //                         new Rectangle(0, 0, Program.textMask.texture.width, -Program.textMask.texture.height),
+         //                         new Vector2(0, 0),
+         //                         Raylib.WHITE);
+         //   Raylib.EndShaderMode();
+         //}
+         //Raylib.EndTextureMode();
 
          //////////////////////////
          // RenderTexture rendering

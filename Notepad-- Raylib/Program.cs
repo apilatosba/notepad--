@@ -40,10 +40,13 @@ namespace Notepad___Raylib {
       public static Font font;
       public static Shader flashShader;
       public static Shader bloomShader;
+      public static Shader twoPassGaussianBlur;
       public static int flashShaderTransparencyLoc;
       public static int bloomShaderTextMaskLoc;
       public static int bloomShaderResolutionLoc;
       public static int bloomShaderStrengthLoc;
+      public static int twoPassGaussianBlurShaderTextMaskLoc;
+      public static int twoPassGaussianBlurShaderHorizontalLoc;
       public static Image windowCoverImage;
       public static Texture windowCoverTexture; // Rectangle doesnt work with uv's. https://github.com/raysan5/raylib/issues/1730
       public static Texture background;
@@ -146,6 +149,10 @@ namespace Notepad___Raylib {
          bloomShaderTextMaskLoc = Raylib.GetShaderLocation(bloomShader, "textMask");
          bloomShaderResolutionLoc = Raylib.GetShaderLocation(bloomShader, "resolution");
          bloomShaderStrengthLoc = Raylib.GetShaderLocation(bloomShader, "strength");
+
+         twoPassGaussianBlur = Raylib.LoadShader(null, Path.Combine(GetShadersDirectory(), "two pass gaussian blur.frag"));
+         twoPassGaussianBlurShaderTextMaskLoc = Raylib.GetShaderLocation(twoPassGaussianBlur, "textMask");
+         twoPassGaussianBlurShaderHorizontalLoc = Raylib.GetShaderLocation(twoPassGaussianBlur, "horizontal");
 
          background = Raylib.LoadTexture(Path.Combine(GetImagesDirectory(), config.backgroundImage));
 
