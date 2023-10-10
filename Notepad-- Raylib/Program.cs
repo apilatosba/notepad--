@@ -47,6 +47,7 @@ namespace Notepad___Raylib {
       public static Image windowCoverImage;
       public static Texture windowCoverTexture; // Rectangle doesnt work with uv's. https://github.com/raysan5/raylib/issues/1730
       public static Texture background;
+      public static Texture quarterResolutionTextMask;
       public static RenderTexture textMask;
       public static Vector2 backgroundPosition;
       public static float backgroundScale;
@@ -60,7 +61,7 @@ namespace Notepad___Raylib {
 
       public static long TimeSinceLastKeyboardInput => timeSinceLastInput;
 
-      static void Main(string[] args) {
+      static unsafe void Main(string[] args) {
 #if VISUAL_STUDIO
 #else
          Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);

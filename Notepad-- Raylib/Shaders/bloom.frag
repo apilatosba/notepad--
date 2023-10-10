@@ -24,6 +24,7 @@ void main()
       for(int j = -a / 2; j < a / 2; j++) {
          vec2 currentPixel = vec2(gl_FragCoord.x + i, gl_FragCoord.y + j);
          vec4 col = texture(textMask, currentPixel / resolution);
+//         vec4 col = textureLod(textMask, currentPixel / resolution, 5);
          if(all(greaterThan(col, threshold))) {
             distanceToClosestText = min(distanceToClosestText, distance(currentPixel, gl_FragCoord.xy));
          }

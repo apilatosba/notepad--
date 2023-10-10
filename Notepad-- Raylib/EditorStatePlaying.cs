@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Linq;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Notepad___Raylib {
    internal class EditorStatePlaying : IEditorState {
@@ -46,7 +47,7 @@ namespace Notepad___Raylib {
       //         cursor.position = lastKnownCursorPosition ?? new Int2(0, 0);
       //      }
 
-      public void HandleInput() {
+      public unsafe void HandleInput() {
          Debug.Assert(!(mouseSelection != null && shiftSelection != null));
 
          string pressedKeys;
@@ -82,8 +83,6 @@ namespace Notepad___Raylib {
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
                      int previousfontSize = Program.config.fontSize;
 
-                     flashShaderTimer.Restart();
-
                      Program.WriteLinesToFile(Program.filePath, Program.lines);
 
                      if (Path.GetFileName(Program.filePath) == Program.CONFIG_FILE_NAME) {
@@ -101,6 +100,25 @@ namespace Notepad___Raylib {
                            Program.lines = Program.ReadLinesFromFile(Program.filePath);
                         }
                      }
+
+                     Raylib.BeginTextureMode(Program.textMask);
+                     {
+                        Raylib.BeginMode2D(camera);
+                        Raylib.ClearBackground(Raylib.BLANK);
+                        Program.RenderLines(Program.lines, Program.font, Raylib.WHITE);
+                        shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+                        mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+                        cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines, Raylib.WHITE);
+                        Raylib.EndMode2D();
+                     }
+                     Raylib.EndTextureMode();
+
+                     // todo resolve memory leak
+                     //Image image = Raylib.LoadImageFromTexture(Program.textMask.texture);
+                     //Raylib.ImageResize(&image, Program.textMask.texture.width / 2, Program.textMask.texture.height / 2);
+                     //Program.quarterResolutionTextMask = Raylib.LoadTextureFromImage(image);
+
+                     flashShaderTimer.Restart();
                   }
 
                   if (Raylib.IsKeyPressed(KeyboardKey.KEY_C)) {
@@ -345,7 +363,7 @@ namespace Notepad___Raylib {
                         break;
                      case KeyboardKey.KEY_RIGHT:
                         if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                        
+
                         break;
                      case KeyboardKey.KEY_LEFT:
                         if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
@@ -478,7 +496,7 @@ namespace Notepad___Raylib {
 
             Program.windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
             Program.windowCoverTexture = Raylib.LoadTextureFromImage(Program.windowCoverImage);
-
+            
             Program.textMask = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
             Raylib.SetTextureWrap(Program.textMask.texture, TextureWrap.TEXTURE_WRAP_CLAMP);
          }
@@ -519,7 +537,6 @@ namespace Notepad___Raylib {
          ////////////////////////
          Raylib.BeginMode2D(camera);
          {
-
             Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
             Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, float.MaxValue, Line.Height);
             Raylib.DrawRectangleRec(highlightLineRect, new Color(13, 13, 13, 255));
@@ -553,10 +570,14 @@ namespace Notepad___Raylib {
             }
             Raylib.EndTextureMode();
 
+
+            //fixed (Texture* texture = &Program.textMask.texture) {
+            //   Raylib.GenTextureMipmaps(texture);
+            //}
+
             Raylib.BeginShaderMode(Program.bloomShader);
             {
                Vector2 resolution = new Vector2(Program.textMask.texture.width, Program.textMask.texture.height);
-
 
                Raylib.SetShaderValueTexture(Program.bloomShader, Program.bloomShaderTextMaskLoc, Program.textMask.texture);
                Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderResolutionLoc, &resolution, ShaderUniformDataType.SHADER_UNIFORM_VEC2);
@@ -568,6 +589,26 @@ namespace Notepad___Raylib {
                                      Raylib.WHITE);
             }
             Raylib.EndShaderMode();
+
+            //RenderTexture renderTexture = Raylib.LoadRenderTexture(Program.quarterResolutionTextMask.width, Program.quarterResolutionTextMask.height);
+            //Raylib.BeginTextureMode(renderTexture);
+            //{
+            //   Raylib.BeginShaderMode(Program.bloomShader);
+            //   Vector2 resolution = new Vector2(Program.quarterResolutionTextMask.width, Program.quarterResolutionTextMask.height);
+
+            //   Raylib.SetShaderValueTexture(Program.bloomShader, Program.bloomShaderTextMaskLoc, Program.quarterResolutionTextMask);
+            //   Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderResolutionLoc, &resolution, ShaderUniformDataType.SHADER_UNIFORM_VEC2);
+            //   Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderStrengthLoc, &strength, ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
+
+            //   Raylib.DrawTextureRec(Program.windowCoverTexture,
+            //                         new Rectangle(0, 0, Program.quarterResolutionTextMask.width, -Program.quarterResolutionTextMask.height),
+            //                         new Vector2(0, 0),
+            //                         Raylib.WHITE);
+            //   Raylib.EndShaderMode();
+            //}
+            //Raylib.EndTextureMode();
+
+            //Raylib.DrawTextureEx(renderTexture.texture, new Vector2(0, 0), 0, 2, Raylib.WHITE);
          }
 
          ////////////////////////////////
@@ -589,7 +630,7 @@ namespace Notepad___Raylib {
          HandleInput();
          PostHandleInput();
 
-         if(Program.TimeSinceLastKeyboardInput < 5000 || timeSinceLastMouseInput.ElapsedMilliseconds < 5000 || windowResizeTimer.ElapsedMilliseconds < 3000) {
+         if (Program.TimeSinceLastKeyboardInput < 5000 || timeSinceLastMouseInput.ElapsedMilliseconds < 5000 || windowResizeTimer.ElapsedMilliseconds < 3000) {
             Render();
          }
       }
