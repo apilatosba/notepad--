@@ -6,7 +6,6 @@ add shortcuts
 find in file. ctrl + f
 make cursor blink. make it with a shader
 switch to window state undecorated
-a int value that holds the value of where cursor should be at when moving with up and down arrow keys. have a int value, set it to cursor.position.x every time user presses a key except when he presses up or down arrow key. i think that would work
 render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
     or the both

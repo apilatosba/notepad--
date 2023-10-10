@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Linq;
 using System.IO;
-using System.Runtime.CompilerServices;
 
 namespace Notepad___Raylib {
    internal class EditorStatePlaying : IEditorState {
@@ -409,6 +408,7 @@ namespace Notepad___Raylib {
             }
          }
 
+         // Clamp camera to text
          {
             int heightOfAllLines = Program.lines.Count * Line.Height;
             int cameraThreshold = heightOfAllLines - Line.Height;
@@ -429,6 +429,7 @@ namespace Notepad___Raylib {
                                                                                 Program.config.leftPadding,
                                                                                 Program.font,
                                                                                 mousePositionInWorldSpace);
+            cursor.exXPosition = cursor.position.x;
 
             shiftSelection = null;
             mouseSelection = new Selection(cursor.position, cursor.position);
@@ -449,6 +450,7 @@ namespace Notepad___Raylib {
                                                                                            mousePositionInWorldSpace);
 
             cursor.position = mouseSelection.EndPosition;
+            cursor.exXPosition = cursor.position.x;
          }
 
          if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) {
