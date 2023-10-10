@@ -35,7 +35,7 @@ void main()
         }
     }
     finalColor = vec4(result, 1.0);
-
+    //https://learnopengl.com/Advanced-Lighting/Bloom
 //    vec2 tex_offset = 1.0 / textureSize(image, 0); // gets size of single texel
 //    vec3 result = texture(image, TexCoords).rgb * weight[0]; // current fragment's contribution
 //    if(horizontal)
