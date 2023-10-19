@@ -7,7 +7,7 @@ namespace Notepad___Raylib {
    internal class EditorStatePaused : IEditorState {
       Rectangle window;
       Color windowColor = new Color(51, 51, 51, 255);
-      EditorStatePlaying editorStatePlaying = new EditorStatePlaying();
+      IEditorState previousState;
 
       public EditorStatePaused() {
       }
@@ -16,7 +16,7 @@ namespace Notepad___Raylib {
          if (Program.ShouldAcceptKeyboardInput(out _, out KeyboardKey specialKey)) {
             switch (specialKey) {
                case KeyboardKey.KEY_ESCAPE:
-                  SetStateTo(new EditorStatePlaying());
+                  IEditorState.SetStateTo(previousState);
                   break;
             }
          }
@@ -27,7 +27,7 @@ namespace Notepad___Raylib {
       }
 
       public void Render() {
-         editorStatePlaying.Render();
+         previousState.Render();
 
          Raylib.DrawRectangleRec(window, windowColor);
 
@@ -58,13 +58,8 @@ namespace Notepad___Raylib {
          Render();
       }
 
-      public void SetStateTo(IEditorState state) {
-         Program.editorState = state;
-         state.EnterState();
-      }
-
-      public void EnterState() {
-
+      public void EnterState(IEditorState previousState) {
+         this.previousState = previousState;
       }
    }
 }

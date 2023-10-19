@@ -4,9 +4,13 @@ namespace Notepad___Raylib {
    internal interface IEditorState {
       protected void HandleInput();
       protected void PostHandleInput();
-      protected void Render();
+      protected internal void Render();
       void Update();
-      protected void SetStateTo(IEditorState state);
-      protected internal void EnterState();
+      static void SetStateTo(IEditorState state) {
+         IEditorState previousState = Program.editorState;
+         Program.editorState = state;
+         state.EnterState(previousState);
+      }
+      protected internal void EnterState(IEditorState previousState);
    }
 }

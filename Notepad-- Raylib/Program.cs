@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 
@@ -12,7 +13,7 @@ namespace Notepad___Raylib {
       public static WindowSaveData windowSaveData = new WindowSaveData();
       public static Config config = new Config();
       public const string CONFIG_FILE_NAME = "config.xml";
-      public static IEditorState editorState = new EditorStatePlaying();
+      public static IEditorState editorState;
       /// <summary>
       /// In milliseconds.
       /// </summary>
@@ -55,6 +56,7 @@ namespace Notepad___Raylib {
       public static Vector2 backgroundPosition;
       public static float backgroundScale;
       public static string filePath;
+      public static string directoryPath;
       public static bool isQuitButtonPressed = false;
       public static Stack<UndoItem> undoHistory = new Stack<UndoItem>();
 #if VISUAL_STUDIO
@@ -88,7 +90,7 @@ namespace Notepad___Raylib {
             Console.WriteLine("Your config file was corrupt. Reverting it to previous settings now.");
             config.Serialize(GetConfigPath());
          }
-         
+
          windowSaveData = WindowSaveData.Deserialize(GetWindowSaveDataPath());
 
          // Command line arguments
@@ -107,10 +109,18 @@ namespace Notepad___Raylib {
                      return;
                   default:
                      if (File.Exists(args[i])) {
-                        if (lines == null) {
+                        if (filePath == null && directoryPath == null) {
                            filePath = args[i];
                         } else {
-                           Console.WriteLine("ERROR: Specify only one file\n");
+                           Console.WriteLine("ERROR: Specify only one file or directory\n");
+                           PrintHelp();
+                           return;
+                        }
+                     } else if (Directory.Exists(args[i])) {
+                        if (filePath == null && directoryPath == null) {
+                           directoryPath = args[i];
+                        } else {
+                           Console.WriteLine("ERROR: Specify only one directory or file\n");
                            PrintHelp();
                            return;
                         }
@@ -129,10 +139,18 @@ namespace Notepad___Raylib {
             }
          }
 
-         lines = ReadLinesFromFile(filePath);
-         lastInputTimer.Start();
+         Debug.Assert(!(filePath != null && directoryPath != null));
 
          Raylib.InitWindow(windowSaveData.size.x, windowSaveData.size.y, "Notepad--");
+
+         if (directoryPath != null) {
+            IEditorState.SetStateTo(new EditorStateDirectoryView());
+         } else if (filePath != null) {
+            IEditorState.SetStateTo(new EditorStatePlaying());
+            lines = ReadLinesFromFile(filePath);
+         }
+
+         lastInputTimer.Start();
 
          Raylib.SetTargetFPS(144); // TODO vsync?
          Raylib.SetWindowIcon(Raylib.LoadImage(Path.Combine(GetImagesDirectory(), "icon4.png")));
@@ -184,7 +202,7 @@ namespace Notepad___Raylib {
          };
 
          font = LoadFontWithAllUnicodeCharacters(GetFontFilePath(), config.fontSize);
-         
+
          while (!Raylib.WindowShouldClose() && !isQuitButtonPressed) {
             Raylib.BeginDrawing();
 
@@ -432,6 +450,52 @@ namespace Notepad___Raylib {
 
          cursor.position.y += linesToInsert.Count - 1;
          cursor.position.x = lastInsertedLine.Value.Length - textAfterCursorFirstLine.Length;
+      }
+
+      public static void HandleMouseWheelInput(float mouseWheelInput, Stopwatch timeSinceLastMouseInput, List<KeyboardKey> modifiers, ref Camera2D camera) {
+         if (mouseWheelInput != 0) {
+            timeSinceLastMouseInput.Restart();
+
+            if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+               //camera.zoom += mouseWheelInput * 0.04f;
+               if (mouseWheelInput > 0) {
+                  Program.config.fontSize++;
+                  Program.config.Serialize(Program.GetConfigPath());
+
+                  Raylib.UnloadFont(Program.font);
+                  Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+               } else if (mouseWheelInput < 0) {
+                  Program.config.fontSize--;
+                  Program.config.Serialize(Program.GetConfigPath());
+
+                  Raylib.UnloadFont(Program.font);
+                  Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+               }
+            } else {
+               camera.target.Y -= mouseWheelInput * Line.Height;
+            }
+         }
+      }
+
+      public static void HighlightLineCursorIsAt(Cursor cursor) {
+         Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
+         Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, float.MaxValue, Line.Height);
+         Raylib.DrawRectangleRec(highlightLineRect, new Color(13, 13, 13, 255));
+         Raylib.EndBlendMode();
+      }
+
+      public static void DrawBackground() {
+         int lucidity = (int)(Math.Clamp(Program.config.backgroundLucidity, 0, 1) * 255);
+         Raylib.DrawTextureEx(Program.background, Program.backgroundPosition, 0, Program.backgroundScale, new Color(lucidity, lucidity, lucidity, 255));
+      }
+
+      public static void ClampCameraToText(in List<Line> lines, ref Camera2D camera) {
+         int heightOfAllLines = lines.Count * Line.Height;
+         int cameraThreshold = heightOfAllLines - Line.Height;
+
+         if (camera.target.Y > cameraThreshold) {
+            camera.target.Y = cameraThreshold;
+         }
       }
 
       public static string GetConfigPath() {

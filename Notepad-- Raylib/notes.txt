@@ -1,6 +1,6 @@
 window stretches while resizing that is because raylib doesn't support drawing while resizing. https://github.com/raysan5/raylib/issues/1680
     update: on windows it is still true. no drawing while resizing or repositioning the window but on manjaro kde it draws normally.
-dont forget to comment out #define VISUAL_STUDIO before publishing
+dont forget to comment out #define VISUAL_STUDIO before publishing. check Program.cs and every class that inherits from IEditorState
 when building with visual studio, set output type to WinExe(windows application) to get rid of console opening when you launch new instance of notepad--.
 jpg is not supported.
 range of background lucidity is 0-1.

@@ -274,7 +274,7 @@ namespace Notepad___Raylib {
                      case KeyboardKey.KEY_ESCAPE:
                         lastKnownCursorPosition = cursor.position;
                         lastKnownCameraTarget = camera.target;
-                        SetStateTo(new EditorStatePaused());
+                        IEditorState.SetStateTo(new EditorStatePaused());
                         break;
                      case KeyboardKey.KEY_BACKSPACE:
                         if (shiftSelection != null) {
@@ -438,38 +438,32 @@ namespace Notepad___Raylib {
 
          mouseWheelInput = Raylib.GetMouseWheelMove();
 
-         if (mouseWheelInput != 0) {
-            timeSinceLastMouseInput.Restart();
+         //if (mouseWheelInput != 0) {
+         //   timeSinceLastMouseInput.Restart();
 
-            if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-               //camera.zoom += mouseWheelInput * 0.04f;
-               if (mouseWheelInput > 0) {
-                  Program.config.fontSize++;
-                  Program.config.Serialize(Program.GetConfigPath());
+         //   if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+         //      //camera.zoom += mouseWheelInput * 0.04f;
+         //      if (mouseWheelInput > 0) {
+         //         Program.config.fontSize++;
+         //         Program.config.Serialize(Program.GetConfigPath());
 
-                  Raylib.UnloadFont(Program.font);
-                  Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
-               } else if (mouseWheelInput < 0) {
-                  Program.config.fontSize--;
-                  Program.config.Serialize(Program.GetConfigPath());
+         //         Raylib.UnloadFont(Program.font);
+         //         Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+         //      } else if (mouseWheelInput < 0) {
+         //         Program.config.fontSize--;
+         //         Program.config.Serialize(Program.GetConfigPath());
 
-                  Raylib.UnloadFont(Program.font);
-                  Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
-               }
-            } else {
-               camera.target.Y -= mouseWheelInput * Line.Height;
-            }
-         }
+         //         Raylib.UnloadFont(Program.font);
+         //         Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+         //      }
+         //   } else {
+         //      camera.target.Y -= mouseWheelInput * Line.Height;
+         //   }
+         //}
 
-         // Clamp camera to text
-         {
-            int heightOfAllLines = Program.lines.Count * Line.Height;
-            int cameraThreshold = heightOfAllLines - Line.Height;
+         Program.HandleMouseWheelInput(mouseWheelInput, timeSinceLastMouseInput, modifiers, ref camera);
 
-            if (camera.target.Y > cameraThreshold) {
-               camera.target.Y = cameraThreshold;
-            }
-         }
+         Program.ClampCameraToText(Program.lines, ref camera);
 
          if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
             timeSinceLastMouseInput.Restart();
@@ -563,8 +557,7 @@ namespace Notepad___Raylib {
                }
             }
 
-            int lucidity = (int)(Math.Clamp(Program.config.backgroundLucidity, 0, 1) * 255);
-            Raylib.DrawTextureEx(Program.background, Program.backgroundPosition, 0, Program.backgroundScale, new Color(lucidity, lucidity, lucidity, 255));
+            Program.DrawBackground();
          }
 
          ////////////////////////
@@ -572,10 +565,7 @@ namespace Notepad___Raylib {
          ////////////////////////
          Raylib.BeginMode2D(camera);
          {
-            Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
-            Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, float.MaxValue, Line.Height);
-            Raylib.DrawRectangleRec(highlightLineRect, new Color(13, 13, 13, 255));
-            Raylib.EndBlendMode();
+            Program.HighlightLineCursorIsAt(cursor);
 
             Program.RenderLines(Program.lines, Program.font);
             shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
@@ -700,12 +690,7 @@ namespace Notepad___Raylib {
          }
       }
 
-      public void SetStateTo(IEditorState state) {
-         Program.editorState = state;
-         state.EnterState();
-      }
-
-      public void EnterState() {
+      public void EnterState(IEditorState _) {
          Raylib.UnloadFont(Program.font);
 
          try {
