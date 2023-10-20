@@ -19,12 +19,18 @@ namespace Notepad___Raylib {
          rotation = 0.0f,
          offset = new Vector2(0, 0),
       };
+      
       Stopwatch timeSinceLastMouseInput = new Stopwatch();
+      Image windowCoverImage;
+      Texture windowCoverTexture;
+      RenderTexture highlightedLineRenderTexture;
 
-      public void EnterState(IEditorState _) {
+      public void EnterState(IEditorState previousState) {
          directories.Clear();
          lines.Clear();
-         Directory.SetCurrentDirectory(Program.directoryPath);
+
+         if(previousState is EditorStateDirectoryView)
+            Directory.SetCurrentDirectory(Program.directoryPath);
 
          directories.Add("..");
          directories.AddRange(Directory.GetDirectories(".").ToList());
@@ -41,6 +47,9 @@ namespace Notepad___Raylib {
          }
 
          cursor = new Cursor();
+         windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
+         windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
+         highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
       }
 
       public void HandleInput() {
@@ -122,6 +131,16 @@ namespace Notepad___Raylib {
       public void PostHandleInput() {
          Program.MakeSureCameraNotBelowZeroInBothAxes(ref camera);
          Program.ClampCameraToText(lines, ref camera);
+
+         if (Raylib.IsWindowResized()) {
+            Raylib.UnloadImage(windowCoverImage);
+            Raylib.UnloadTexture(windowCoverTexture);
+            Raylib.UnloadRenderTexture(highlightedLineRenderTexture);
+
+            windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
+            windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
+            highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+         }
       }
 
       public void Render() {
@@ -143,6 +162,44 @@ namespace Notepad___Raylib {
             }
             Raylib.EndMode2D();
          }
+
+         {
+            Raylib.BeginTextureMode(highlightedLineRenderTexture);
+            {
+               Raylib.BeginMode2D(camera);
+
+               Raylib.ClearBackground(Raylib.BLANK);
+               Raylib.DrawTextEx(Program.font,
+                                 lines[cursor.position.y].Value,
+                                 new Vector2(Program.config.leftPadding, cursor.position.y * Line.Height),
+                                 Program.config.fontSize,
+                                 0,
+                                 Raylib.WHITE);
+
+               Raylib.EndMode2D();
+            }
+            Raylib.EndTextureMode();
+         }
+
+         {
+            Raylib.BeginShaderMode(Program.rainbowShader);
+            {
+               Raylib.SetShaderValue(Program.rainbowShader,
+                                     Program.rainbowShaderTimeLoc,
+                                     (float)Raylib.GetTime(),
+                                     ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
+
+               Raylib.SetShaderValueTexture(Program.rainbowShader,
+                                            Program.rainbowShaderHighlightedLineMaskLoc,
+                                            highlightedLineRenderTexture.texture);
+
+               Raylib.DrawTextureRec(windowCoverTexture,
+                                     new Rectangle(0, 0, windowCoverTexture.width, -windowCoverTexture.height),
+                                     new Vector2(0, 0),
+                                     Raylib.WHITE);
+            }
+            Raylib.EndShaderMode();
+         }
       }
 
       public void Update() {
@@ -153,7 +210,7 @@ namespace Notepad___Raylib {
 
       static bool CheckIfHasPermissionToOpenDirectory(string path) {
          try {
-            Directory.GetDirectories(path);
+             _ = Directory.GetDirectories(path);
          }
          catch (UnauthorizedAccessException) {
             return false;

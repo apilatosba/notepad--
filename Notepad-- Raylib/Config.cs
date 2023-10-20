@@ -1,4 +1,5 @@
 ﻿using Raylib_CsLo;
+using System;
 using System.IO;
 using System.Xml.Serialization;
 
@@ -36,10 +37,23 @@ namespace Notepad___Raylib {
       public void Serialize(string path) {
          XmlSerializer serializer = new XmlSerializer(typeof(Config));
 
-         if(!File.Exists(path)) File.Create(path).Close();
+         if (!File.Exists(path)) File.Create(path).Close();
 
-         using Stream writer = new FileStream(path, FileMode.Truncate);
-         serializer.Serialize(writer, this);
+         for (int i = 0, threshold = 5; ;) {
+            try {
+               using Stream writer = new FileStream(path, FileMode.Truncate);
+               serializer.Serialize(writer, this);
+               break;
+            }
+            catch (IOException e) {
+               i++;
+
+               if(i > threshold) {
+                  Console.WriteLine($"ERROR: Couldn't serialize. Tried {threshold} times. Exception message: {e.Message}");
+                  break;
+               }
+            }
+         }
       }
    }
 }

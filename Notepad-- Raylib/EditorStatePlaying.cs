@@ -19,8 +19,8 @@ namespace Notepad___Raylib {
          rotation = 0.0f,
          offset = new Vector2(0, 0),
       };
-      static Int2? lastKnownCursorPosition = null;
-      static Vector2? lastKnownCameraTarget = null;
+      internal static Int2? lastKnownCursorPosition = null;
+      internal static Vector2? lastKnownCameraTarget = null;
       float mouseWheelInput = 0;
       float flashShaderTransparency = 0.0f;
       readonly Stopwatch flashShaderTimer = new Stopwatch();
@@ -542,21 +542,6 @@ namespace Notepad___Raylib {
          // Screen space rendering (background)
          //////////////////////////////////////
          {
-            if (Raylib.IsWindowResized()) {
-               int w = Program.background.width;
-               int h = Program.background.height;
-               int sw = Raylib.GetScreenWidth();
-               int sh = Raylib.GetScreenHeight();
-
-               if (h * ((float)sw / w) >= sh) {
-                  Program.backgroundScale = (float)sw / w;
-                  Program.backgroundPosition = new Vector2(0, -((h * Program.backgroundScale - sh) / 2));
-               } else {
-                  Program.backgroundScale = (float)sh / h;
-                  Program.backgroundPosition = new Vector2(-((w * Program.backgroundScale - sw) / 2), 0);
-               }
-            }
-
             Program.DrawBackground();
          }
 

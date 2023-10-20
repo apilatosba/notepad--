@@ -42,12 +42,15 @@ namespace Notepad___Raylib {
       public static Shader flashShader;
       public static Shader bloomShader;
       public static Shader twoPassGaussianBlur;
+      public static Shader rainbowShader;
       public static int flashShaderTransparencyLoc;
       public static int bloomShaderTextMaskLoc;
       public static int bloomShaderResolutionLoc;
       public static int bloomShaderStrengthLoc;
       public static int twoPassGaussianBlurShaderTextMaskLoc;
       public static int twoPassGaussianBlurShaderHorizontalLoc;
+      public static int rainbowShaderTimeLoc;
+      public static int rainbowShaderHighlightedLineMaskLoc;
       public static Image windowCoverImage;
       public static Texture windowCoverTexture; // Rectangle doesnt work with uv's. https://github.com/raysan5/raylib/issues/1730
       public static Texture background;
@@ -178,6 +181,10 @@ namespace Notepad___Raylib {
          twoPassGaussianBlurShaderTextMaskLoc = Raylib.GetShaderLocation(twoPassGaussianBlur, "textMask");
          twoPassGaussianBlurShaderHorizontalLoc = Raylib.GetShaderLocation(twoPassGaussianBlur, "horizontal");
 
+         rainbowShader = Raylib.LoadShader(null, Path.Combine(GetShadersDirectory(), "rainbow.frag"));
+         rainbowShaderTimeLoc = Raylib.GetShaderLocation(rainbowShader, "time");
+         rainbowShaderHighlightedLineMaskLoc = Raylib.GetShaderLocation(rainbowShader, "highlightedLineMask");
+
          background = Raylib.LoadTexture(Path.Combine(GetImagesDirectory(), config.backgroundImage));
 
          {
@@ -227,6 +234,8 @@ namespace Notepad___Raylib {
          Raylib.UnloadRenderTexture(textMask);
          Raylib.UnloadShader(flashShader);
          Raylib.UnloadShader(bloomShader);
+         Raylib.UnloadShader(twoPassGaussianBlur);
+         Raylib.UnloadShader(rainbowShader);
          Raylib.UnloadFont(font);
 
          Raylib.CloseWindow();
@@ -490,6 +499,21 @@ namespace Notepad___Raylib {
       }
 
       public static void DrawBackground() {
+         if (Raylib.IsWindowResized()) {
+            int w = Program.background.width;
+            int h = Program.background.height;
+            int sw = Raylib.GetScreenWidth();
+            int sh = Raylib.GetScreenHeight();
+
+            if (h * ((float)sw / w) >= sh) {
+               Program.backgroundScale = (float)sw / w;
+               Program.backgroundPosition = new Vector2(0, -((h * Program.backgroundScale - sh) / 2));
+            } else {
+               Program.backgroundScale = (float)sh / h;
+               Program.backgroundPosition = new Vector2(-((w * Program.backgroundScale - sw) / 2), 0);
+            }
+         }
+
          int lucidity = (int)(Math.Clamp(Program.config.backgroundLucidity, 0, 1) * 255);
          Raylib.DrawTextureEx(Program.background, Program.backgroundPosition, 0, Program.backgroundScale, new Color(lucidity, lucidity, lucidity, 255));
       }

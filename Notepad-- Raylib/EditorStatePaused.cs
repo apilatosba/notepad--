@@ -35,7 +35,7 @@ namespace Notepad___Raylib {
          Rectangle settings = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y - window.height / 4, 2 * window.width / 7, 2 * window.height / 13);
          //Raylib.DrawRectangleRec(settings, Raylib.RED);
          if (RayGui.GuiButton(settings, "Edit Settings")) {
-            Process.Start(new ProcessStartInfo("notepad--", Program.CONFIG_FILE_NAME) {
+            Process.Start(new ProcessStartInfo("notepad--", $"\"{Program.GetConfigPath()}\"") { // notepad-- only works on windows. on linux it is "dotnet notepad--.dll". problem
                UseShellExecute = true,
                CreateNoWindow = true,
 #if VISUAL_STUDIO
@@ -49,6 +49,9 @@ namespace Notepad___Raylib {
             Rectangle openDirectoryRect = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y - window.height / 13, 2 * window.width / 7, 2 * window.height / 13);
 
             if(RayGui.GuiButton(openDirectoryRect, "Open Containing Folder")) {
+               EditorStatePlaying.lastKnownCursorPosition = null;
+               EditorStatePlaying.lastKnownCameraTarget = null;
+
                Program.directoryPath = Path.GetDirectoryName(Program.filePath);
                IEditorState.SetStateTo(new EditorStateDirectoryView());
             }
