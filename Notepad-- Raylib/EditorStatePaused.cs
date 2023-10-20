@@ -45,6 +45,15 @@ namespace Notepad___Raylib {
             });
          }
 
+         if(previousState is EditorStatePlaying) {
+            Rectangle openDirectoryRect = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y - window.height / 13, 2 * window.width / 7, 2 * window.height / 13);
+
+            if(RayGui.GuiButton(openDirectoryRect, "Open Containing Folder")) {
+               Program.directoryPath = Path.GetDirectoryName(Program.filePath);
+               IEditorState.SetStateTo(new EditorStateDirectoryView());
+            }
+         }
+
          Rectangle quit = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y + window.height / 4, 2 * window.width / 7, 2 * window.height / 13);
 
          if(RayGui.GuiButton(quit, "Quit")) {

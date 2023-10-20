@@ -59,8 +59,10 @@ namespace Notepad___Raylib {
       public static string directoryPath;
       public static bool isQuitButtonPressed = false;
       public static Stack<UndoItem> undoHistory = new Stack<UndoItem>();
+
 #if VISUAL_STUDIO
-      static readonly string customFontsDirectory = "Fonts";
+      static string customFontsDirectory;
+      static string appDirectory;
 #else
       static readonly string customFontsDirectory = Path.Combine(GetExecutableDirectory(), "Fonts");
 #endif
@@ -69,11 +71,13 @@ namespace Notepad___Raylib {
 
       static unsafe void Main(string[] args) {
 #if VISUAL_STUDIO
+         appDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+         appDirectory = Directory.GetParent(appDirectory).Parent.Parent.ToString();
+
+         customFontsDirectory = Path.Combine(appDirectory, "Fonts");
 #else
          Raylib.SetTraceLogLevel((int)TraceLogLevel.LOG_FATAL);
-#endif
-#if VISUAL_STUDIO
-#else
+
          string configPath = Path.Combine(GetExecutableDirectory(), CONFIG_FILE_NAME);
 
          if (!File.Exists(configPath)) {
@@ -81,6 +85,7 @@ namespace Notepad___Raylib {
             new Config().Serialize(configPath);
          }
 #endif
+
          //ScrollBar horizontalScrollBar = new ScrollBar();
 
          try {
@@ -146,8 +151,8 @@ namespace Notepad___Raylib {
          if (directoryPath != null) {
             IEditorState.SetStateTo(new EditorStateDirectoryView());
          } else if (filePath != null) {
-            IEditorState.SetStateTo(new EditorStatePlaying());
             lines = ReadLinesFromFile(filePath);
+            IEditorState.SetStateTo(new EditorStatePlaying());
          }
 
          lastInputTimer.Start();
@@ -500,7 +505,7 @@ namespace Notepad___Raylib {
 
       public static string GetConfigPath() {
 #if VISUAL_STUDIO
-         return CONFIG_FILE_NAME;
+         return Path.Combine(appDirectory, CONFIG_FILE_NAME);
 #else
          return Path.Combine(GetExecutableDirectory(), CONFIG_FILE_NAME);
 #endif
@@ -516,7 +521,7 @@ namespace Notepad___Raylib {
 
       public static string GetShadersDirectory() {
 #if VISUAL_STUDIO
-         return "Shaders";
+         return Path.Combine(appDirectory, "Shaders");
 #else
          return Path.Combine(GetExecutableDirectory(), "Shaders");
 #endif
@@ -524,7 +529,7 @@ namespace Notepad___Raylib {
 
       public static string GetImagesDirectory() {
 #if VISUAL_STUDIO
-         return "Images";
+         return Path.Combine(appDirectory, "Images");
 #else
          return Path.Combine(GetExecutableDirectory(), "Images");
 #endif
@@ -532,7 +537,7 @@ namespace Notepad___Raylib {
 
       public static string GetWindowSaveDataPath() {
 #if VISUAL_STUDIO
-         return "window.xml";
+         return Path.Combine(appDirectory, "window.xml");
 #else
          return Path.Combine(GetExecutableDirectory(), "window.xml");
 #endif

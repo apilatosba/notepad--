@@ -24,10 +24,11 @@ namespace Notepad___Raylib {
       public void EnterState(IEditorState _) {
          directories.Clear();
          lines.Clear();
+         Directory.SetCurrentDirectory(Program.directoryPath);
 
          directories.Add("..");
-         directories.AddRange(Directory.GetDirectories(Program.directoryPath).ToList());
-         files = Directory.GetFiles(Program.directoryPath).ToList();
+         directories.AddRange(Directory.GetDirectories(".").ToList());
+         files = Directory.GetFiles(".").ToList();
 
          {
             foreach (string directory in directories) {
@@ -61,6 +62,32 @@ namespace Notepad___Raylib {
                switch (specialKey) {
                   case KeyboardKey.KEY_KP_ENTER:
                   case KeyboardKey.KEY_ENTER:
+                     bool isFile;
+                     string pressedLineValue = lines[cursor.position.y].Value;
+
+                     // I can do that since directories listed first.
+                     if (cursor.position.y < directories.Count) {
+                        isFile = false;
+                     } else if (cursor.position.y < lines.Count && cursor.position.y >= directories.Count) {
+                        isFile = true;
+                     } else {
+                        Debug.Assert(false, "out of range");
+                        isFile = false; // To be able to compile
+                     }
+
+                     if (isFile) {
+                        Program.filePath = pressedLineValue;
+                        Program.lines = Program.ReadLinesFromFile(Program.filePath);
+                        IEditorState.SetStateTo(new EditorStatePlaying());
+                     } else {
+                        if (CheckIfHasPermissionToOpenDirectory(pressedLineValue)) {
+                           Program.directoryPath = pressedLineValue;
+                           IEditorState.SetStateTo(new EditorStateDirectoryView());
+                        } else {
+                           // todo some effect. screen shake? an info popup box
+                        }
+                     }
+
                      // todo
                      // open file if it is a file
                      // open directory if it is a directory
@@ -122,6 +149,17 @@ namespace Notepad___Raylib {
          HandleInput();
          PostHandleInput();
          Render();
+      }
+
+      static bool CheckIfHasPermissionToOpenDirectory(string path) {
+         try {
+            Directory.GetDirectories(path);
+         }
+         catch (UnauthorizedAccessException) {
+            return false;
+         }
+
+         return true;
       }
    }
 }
