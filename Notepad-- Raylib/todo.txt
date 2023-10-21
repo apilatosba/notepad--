@@ -1,4 +1,4 @@
---shaders
+﻿--shaders
 character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
 different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
 when you ctrl+v paste, dont shiftSelect the pasted text. highlight them instead. do it with a shader
@@ -11,9 +11,7 @@ render bloom shader at quarter resolution
     or the both
 frontend to settings
 add scrollbars
-directoryview mode add more data to each line. add file size, date modified, etc
-   add the absolute path info somewhere
-bug: cursor movement doesnt process all inputs if inputs are too fast
+bug: cursor movement doesnt process all inputs if inputs are too fast. thats a big problem Okayeg
 add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level
 config.fontname and program.font has no relationship. when i deserialize i should update the program.font
 change cursor y repositioning algorithm. only works with monospace font rn.

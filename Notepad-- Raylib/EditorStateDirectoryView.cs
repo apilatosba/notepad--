@@ -28,6 +28,8 @@ namespace Notepad___Raylib {
       ColorInt fileColor;
 
       public void EnterState(IEditorState previousState) {
+         Program.YMargin = Line.Height;
+
          directories.Clear();
          lines.Clear();
          string previousDirectoryPath = null;
@@ -57,6 +59,15 @@ namespace Notepad___Raylib {
                if (line.Value.StartsWith($".{Path.DirectorySeparatorChar}"))
                   line.RemoveTextAt(0, 2, Direction.Right);
             }
+
+            int lengthOfMostLongLine = FindLengthOfMostLongLine(files);
+
+            for(int i = directories.Count; i < lines.Count; i++) {
+               FileInfo fileInfo = new FileInfo(lines[i].Value);
+               string fileSizeText = GetFileSizeText(fileInfo.Length);
+               lines[i].Value = lines[i].Value.PadRight(lengthOfMostLongLine + 1);
+               lines[i].InsertTextAt(lines[i].Value.Length, fileSizeText);
+            }
          }
 
          MoveCursorToPreviousDirectory(previousDirectoryPath);
@@ -71,8 +82,6 @@ namespace Notepad___Raylib {
 
          directoryColor.Clamp0To255();
          fileColor.Clamp0To255();
-
-         Program.YMargin = Line.Height;
       }
 
       public void HandleInput() {
@@ -95,7 +104,13 @@ namespace Notepad___Raylib {
                   case KeyboardKey.KEY_KP_ENTER:
                   case KeyboardKey.KEY_ENTER:
                      bool isFile;
-                     string pressedLineValue = lines[cursor.position.y].Value;
+                     string pressedLineValue/* = lines[cursor.position.y].Value*/;
+
+                     if (cursor.position.y < directories.Count) {
+                        pressedLineValue = directories[cursor.position.y];
+                     } else {
+                        pressedLineValue = files[cursor.position.y - directories.Count];
+                     }
 
                      // I can do that since directories listed first.
                      if (cursor.position.y < directories.Count) {
@@ -301,9 +316,38 @@ namespace Notepad___Raylib {
                                                       Program.config.fontSize,
                                                       Program.config.leftPadding,
                                                       Program.font);
+
                break;
             }
          }
+      }
+
+      static string GetFileSizeText(long sizeInBytes) {
+         string text;
+
+         if (sizeInBytes < 1024) {
+            text = $"{sizeInBytes}";
+         } else if (sizeInBytes < 1024 * 1024) {
+            text = $"{sizeInBytes / 1024}KB";
+         } else if (sizeInBytes < 1024 * 1024 * 1024) {
+            text = $"{sizeInBytes / 1024 / 1024}MB";
+         } else {
+            text = $"{sizeInBytes / 1024 / 1024 / 1024}GB";
+         }
+
+         return text;
+      }
+
+      static int FindLengthOfMostLongLine(in List<string> lines) {
+         int maxLength = 0;
+
+         foreach (string line in lines) {
+            if (line.Length > maxLength) {
+               maxLength = line.Length;
+            }
+         }
+
+         return maxLength;
       }
    }
 }

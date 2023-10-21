@@ -9,7 +9,10 @@ namespace Notepad___Raylib {
          }
       }
 
-      public string Value => value;
+      public string Value { 
+         get => value;
+         set => this.value = value;
+      }
 
       public Line() {
          value = "";
