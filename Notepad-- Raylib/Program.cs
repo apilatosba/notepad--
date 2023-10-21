@@ -318,6 +318,12 @@ namespace Notepad___Raylib {
          }
       }
 
+      public static void RenderLines(in List<Line> lines, Font font, Color color, int yOffset) {
+         for (int i = 0; i < lines.Count; i++) {
+            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(config.leftPadding, i * (Line.Height + config.spacingBetweenLines) + yOffset), config.fontSize, 0, color);
+         }
+      }
+
       public static void InsertTextAtCursor(List<Line> lines, Cursor cursor, string text) {
          Line line = lines[cursor.position.y];
          line.InsertTextAt(cursor.position.x, text);

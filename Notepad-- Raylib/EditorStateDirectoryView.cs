@@ -12,25 +12,30 @@ namespace Notepad___Raylib {
       List<string> directories = new List<string>();
       List<string> files;
       List<Line> lines = new List<Line>();
-      Cursor cursor; // I have this cursor to use HandleArrowKeysNavigation method. I wont be rendering it.
+      internal Cursor cursor; // I have this cursor to use HandleArrowKeysNavigation method. I wont be rendering it.
       Camera2D camera = new Camera2D() {
          zoom = 1.0f,
          target = new Vector2(0, 0),
          rotation = 0.0f,
          offset = new Vector2(0, 0),
       };
-      
+
       Stopwatch timeSinceLastMouseInput = new Stopwatch();
       Image windowCoverImage;
       Texture windowCoverTexture;
       RenderTexture highlightedLineRenderTexture;
+      ColorInt directoryColor;
+      ColorInt fileColor;
 
       public void EnterState(IEditorState previousState) {
          directories.Clear();
          lines.Clear();
+         string previousDirectoryPath = null;
 
-         if(previousState is EditorStateDirectoryView)
+         if (previousState is EditorStateDirectoryView) {
+            previousDirectoryPath = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(Program.directoryPath);
+         }
 
          directories.Add("..");
          directories.AddRange(Directory.GetDirectories(".").ToList());
@@ -44,12 +49,24 @@ namespace Notepad___Raylib {
             foreach (string file in files) {
                lines.Add(new Line(file));
             }
+
+            foreach (Line line in lines) {
+               if (line.Value.StartsWith($".{Path.DirectorySeparatorChar}"))
+                  line.RemoveTextAt(0, 2, Direction.Right);
+            }
          }
 
-         cursor = new Cursor();
+         MoveCursorToPreviousDirectory(previousDirectoryPath);
+
+         cursor ??= new Cursor();
          windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
          windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
          highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+         directoryColor = Program.config.textColor - new ColorInt(40, 20, 0, 0);
+         fileColor = Program.config.textColor + new ColorInt(-10, 20, -10, 0);
+
+         directoryColor.Clamp0To255();
+         fileColor.Clamp0To255();
       }
 
       public void HandleInput() {
@@ -158,7 +175,9 @@ namespace Notepad___Raylib {
             Raylib.BeginMode2D(camera);
             {
                Program.HighlightLineCursorIsAt(cursor);
-               Program.RenderLines(lines, Program.font);
+               //Program.RenderLines(lines, Program.font);
+               Program.RenderLines(lines.GetRange(0, directories.Count), Program.font, (Color)directoryColor);
+               Program.RenderLines(lines.GetRange(directories.Count, files.Count), Program.font, (Color)fileColor, Line.Height * directories.Count);
             }
             Raylib.EndMode2D();
          }
@@ -210,13 +229,34 @@ namespace Notepad___Raylib {
 
       static bool CheckIfHasPermissionToOpenDirectory(string path) {
          try {
-             _ = Directory.GetDirectories(path);
+            _ = Directory.GetDirectories(path);
          }
          catch (UnauthorizedAccessException) {
             return false;
          }
 
          return true;
+      }
+
+      void MoveCursorToPreviousDirectory(string previousDirectoryPath) {
+         if (previousDirectoryPath == null) return;
+
+         string cwd = Directory.GetCurrentDirectory();
+
+         for (int i = 0; i < directories.Count; i++) {
+            if (Path.GetFullPath(Path.Combine(cwd, directories[i])) == Path.GetFullPath(previousDirectoryPath)) {
+               cursor = new Cursor() {
+                  position = new Int2(0, i)
+               };
+
+               cursor.MakeSureCursorIsVisibleToCamera(lines,
+                                                      ref camera,
+                                                      Program.config.fontSize,
+                                                      Program.config.leftPadding,
+                                                      Program.font);
+               break;
+            }
+         }
       }
    }
 }
