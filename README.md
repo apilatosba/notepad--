@@ -21,6 +21,6 @@ Put the contents of the publish folder (bin/Release/net7.0/publish) in a folder 
 Also you need to add [Fonts folder](https://github.com/apilatosba/notepad--/tree/main/Notepad--%20Raylib/Fonts) to the folder that you put the executable in.  
 
 ## References
-Raylib: https://www.raylib.com/ - Great library, big thumbs up.
-Bloom: https://learnopengl.com/Advanced-Lighting/Bloom
+Raylib: https://www.raylib.com/ - Great library, big thumbs up.  
+Bloom: https://learnopengl.com/Advanced-Lighting/Bloom  
 Rgb to hsv conversion: https://stackoverflow.com/questions/15095909/from-rgb-to-hsv-in-opengl-glsl
