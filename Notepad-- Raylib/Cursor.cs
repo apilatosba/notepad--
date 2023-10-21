@@ -108,14 +108,14 @@ namespace Notepad___Raylib {
       }
 
       void MakeSureCursorIsVisibleVertical(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
-         int topEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(Vector2.Zero, camera).Y;
+         int topEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(Vector2.Zero, camera).Y + Program.YMargin;
          int bottomEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(new Vector2(0, Raylib.GetScreenHeight()), camera).Y;
          bottomEdgeWorldSpacePositionY -= Line.Height;
 
          int a = cursorWorldSpacePosition.y - topEdgeWorldSpacePositionY; // Explanation: ./CursorScreenExplanation.png
          int b = cursorWorldSpacePosition.y - bottomEdgeWorldSpacePositionY; // Explanation: ./CursorScreenExplanation.png
 
-         if (Math.Abs(a) + Math.Abs(b) <= Raylib.GetScreenHeight()) return;
+         if (Math.Abs(a) + Math.Abs(b) <= Raylib.GetScreenHeight() - Program.YMargin) return;
 
          if (Math.Abs(a) < Math.Abs(b)) {
             camera.target.Y += a;
@@ -140,7 +140,7 @@ namespace Notepad___Raylib {
          string textBeforeCursor = line.Value.Substring(0, position.x);
 
          pos.x = (int)Raylib.MeasureTextEx(font, textBeforeCursor, fontSize, 0).X + leftPadding;
-         pos.y = position.y * Line.Height;
+         pos.y = position.y * Line.Height + Program.YMargin;
 
          return pos;
       }

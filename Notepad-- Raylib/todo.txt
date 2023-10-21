@@ -12,7 +12,6 @@ render bloom shader at quarter resolution
 frontend to settings
 add scrollbars
 directoryview mode add more data to each line. add file size, date modified, etc
-   give different color to directory and file
    add the absolute path info somewhere
 bug: cursor movement doesnt process all inputs if inputs are too fast
 add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level

@@ -690,6 +690,8 @@ namespace Notepad___Raylib {
 
          cursor.position = lastKnownCursorPosition ?? new Int2(0, 0);
          camera.target = lastKnownCameraTarget ?? new Vector2(0, 0);
+
+         Program.YMargin = 0;
       }
    }
 }

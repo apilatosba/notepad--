@@ -31,10 +31,13 @@ namespace Notepad___Raylib {
          directories.Clear();
          lines.Clear();
          string previousDirectoryPath = null;
+         string theFileUserWasEditing = null;
 
          if (previousState is EditorStateDirectoryView) {
             previousDirectoryPath = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(Program.directoryPath);
+         } else if (previousState is EditorStatePaused) {
+            theFileUserWasEditing = Program.filePath;
          }
 
          directories.Add("..");
@@ -57,6 +60,7 @@ namespace Notepad___Raylib {
          }
 
          MoveCursorToPreviousDirectory(previousDirectoryPath);
+         MoveCursorToLastEditedFile(theFileUserWasEditing);
 
          cursor ??= new Cursor();
          windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
@@ -67,6 +71,8 @@ namespace Notepad___Raylib {
 
          directoryColor.Clamp0To255();
          fileColor.Clamp0To255();
+
+         Program.YMargin = Line.Height;
       }
 
       public void HandleInput() {
@@ -172,14 +178,18 @@ namespace Notepad___Raylib {
          // World space rendering
          ////////////////////////
          {
+            Raylib.BeginScissorMode(0, Line.Height, Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+
             Raylib.BeginMode2D(camera);
             {
                Program.HighlightLineCursorIsAt(cursor);
                //Program.RenderLines(lines, Program.font);
-               Program.RenderLines(lines.GetRange(0, directories.Count), Program.font, (Color)directoryColor);
-               Program.RenderLines(lines.GetRange(directories.Count, files.Count), Program.font, (Color)fileColor, Line.Height * directories.Count);
+               Program.RenderLines(lines.GetRange(0, directories.Count), Program.font, (Color)directoryColor, Program.YMargin);
+               Program.RenderLines(lines.GetRange(directories.Count, files.Count), Program.font, (Color)fileColor, Line.Height * directories.Count + Program.YMargin);
             }
             Raylib.EndMode2D();
+
+            Raylib.EndScissorMode();
          }
 
          {
@@ -190,7 +200,7 @@ namespace Notepad___Raylib {
                Raylib.ClearBackground(Raylib.BLANK);
                Raylib.DrawTextEx(Program.font,
                                  lines[cursor.position.y].Value,
-                                 new Vector2(Program.config.leftPadding, cursor.position.y * Line.Height),
+                                 new Vector2(Program.config.leftPadding, cursor.position.y * Line.Height + Program.YMargin),
                                  Program.config.fontSize,
                                  0,
                                  Raylib.WHITE);
@@ -218,6 +228,22 @@ namespace Notepad___Raylib {
                                      Raylib.WHITE);
             }
             Raylib.EndShaderMode();
+         }
+
+         ////////////////////////////////
+         // Screen space rendering ie. UI
+         ////////////////////////////////
+         {
+            string currentDirectory = Directory.GetCurrentDirectory();
+            float currentDirectoryTextLength = Raylib.MeasureTextEx(Program.font, currentDirectory, Program.config.fontSize, 0).X;
+            Vector2 centeredPosition = new Vector2(Raylib.GetScreenWidth() / 2 - currentDirectoryTextLength / 2, 0);
+
+            Raylib.DrawTextEx(Program.font,
+                              currentDirectory,
+                              centeredPosition,
+                              Program.config.fontSize,
+                              0,
+                              Program.config.textColor);
          }
       }
 
@@ -247,6 +273,27 @@ namespace Notepad___Raylib {
             if (Path.GetFullPath(Path.Combine(cwd, directories[i])) == Path.GetFullPath(previousDirectoryPath)) {
                cursor = new Cursor() {
                   position = new Int2(0, i)
+               };
+
+               cursor.MakeSureCursorIsVisibleToCamera(lines,
+                                                      ref camera,
+                                                      Program.config.fontSize,
+                                                      Program.config.leftPadding,
+                                                      Program.font);
+               break;
+            }
+         }
+      }
+
+      void MoveCursorToLastEditedFile(string fileName) {
+         if (fileName == null) return;
+
+         string cwd = Directory.GetCurrentDirectory();
+
+         for (int i = 0; i < files.Count; i++) {
+            if (Path.GetFullPath(Path.Combine(cwd, files[i])) == Path.GetFullPath(fileName)) {
+               cursor = new Cursor() {
+                  position = new Int2(0, i + directories.Count)
                };
 
                cursor.MakeSureCursorIsVisibleToCamera(lines,

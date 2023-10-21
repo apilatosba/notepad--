@@ -62,6 +62,10 @@ namespace Notepad___Raylib {
       public static string directoryPath;
       public static bool isQuitButtonPressed = false;
       public static Stack<UndoItem> undoHistory = new Stack<UndoItem>();
+      /// <summary>
+      /// Vertical form of <see cref="Config.leftPadding"/>
+      /// </summary>
+      public static int YMargin;
 
 #if VISUAL_STUDIO
       static string customFontsDirectory;
@@ -151,6 +155,8 @@ namespace Notepad___Raylib {
 
          Raylib.InitWindow(windowSaveData.size.x, windowSaveData.size.y, "Notepad--");
 
+         font = LoadFontWithAllUnicodeCharacters(GetFontFilePath(), config.fontSize);
+
          if (directoryPath != null) {
             IEditorState.SetStateTo(new EditorStateDirectoryView());
          } else if (filePath != null) {
@@ -212,8 +218,6 @@ namespace Notepad___Raylib {
             rotation = 0.0f,
             offset = new Vector2(0, 0),
          };
-
-         font = LoadFontWithAllUnicodeCharacters(GetFontFilePath(), config.fontSize);
 
          while (!Raylib.WindowShouldClose() && !isQuitButtonPressed) {
             Raylib.BeginDrawing();
@@ -499,7 +503,7 @@ namespace Notepad___Raylib {
 
       public static void HighlightLineCursorIsAt(Cursor cursor) {
          Raylib.BeginBlendMode(BlendMode.BLEND_ADDITIVE);
-         Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y, float.MaxValue, Line.Height);
+         Rectangle highlightLineRect = new Rectangle(0, Line.Height * cursor.position.y + YMargin, float.MaxValue, Line.Height);
          Raylib.DrawRectangleRec(highlightLineRect, new Color(13, 13, 13, 255));
          Raylib.EndBlendMode();
       }
