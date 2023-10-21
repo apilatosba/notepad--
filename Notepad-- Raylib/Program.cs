@@ -1,4 +1,4 @@
-﻿#define VISUAL_STUDIO
+﻿//#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -160,6 +160,9 @@ namespace Notepad___Raylib {
          if (directoryPath != null) {
             IEditorState.SetStateTo(new EditorStateDirectoryView());
          } else if (filePath != null) {
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(filePath));
+            filePath = Path.GetFileName(filePath);
+
             lines = ReadLinesFromFile(filePath);
             IEditorState.SetStateTo(new EditorStatePlaying());
          }
