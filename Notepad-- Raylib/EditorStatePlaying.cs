@@ -693,5 +693,8 @@ namespace Notepad___Raylib {
 
          Program.YMargin = 0;
       }
+
+      public void ExitState() {
+      }
    }
 }

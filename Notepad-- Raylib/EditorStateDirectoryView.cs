@@ -268,6 +268,12 @@ namespace Notepad___Raylib {
          Render();
       }
 
+      public void ExitState() {
+         Raylib.UnloadImage(windowCoverImage);
+         Raylib.UnloadTexture(windowCoverTexture);
+         Raylib.UnloadRenderTexture(highlightedLineRenderTexture);
+      }
+
       static bool CheckIfHasPermissionToOpenDirectory(string path) {
          try {
             _ = Directory.GetDirectories(path);

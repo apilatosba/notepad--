@@ -3,12 +3,12 @@
   <fontSize>19</fontSize>
   <leftPadding>4</leftPadding>
   <spacingBetweenLines>0</spacingBetweenLines>
-  <tabSize>4</tabSize>
+  <tabSize>3</tabSize>
   <fontName>Inconsolata-Medium.ttf</fontName>
   <textColor>
-    <r>215</r>
-    <g>215</g>
-    <b>215</b>
+    <r>220</r>
+    <g>220</g>
+    <b>220</b>
     <a>255</a>
   </textColor>
   <backgroundColor>
@@ -24,5 +24,5 @@
     <a>255</a>
   </cursorColor>
   <backgroundImage>482950.png</backgroundImage>
-  <backgroundLucidity>0.3</backgroundLucidity>
+  <backgroundLucidity>0.33</backgroundLucidity>
 </Config>
