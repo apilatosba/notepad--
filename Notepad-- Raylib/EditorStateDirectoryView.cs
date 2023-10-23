@@ -268,8 +268,8 @@ namespace Notepad___Raylib {
             float currentDirectoryTextLength = Raylib.MeasureTextEx(Program.font, currentDirectory, Program.config.fontSize, 0).X;
             Vector2 centeredPosition = new Vector2(Raylib.GetScreenWidth() / 2 - currentDirectoryTextLength / 2, 0);
 
-            Raylib.DrawRectangleGradientH(0, Line.Height, Raylib.GetScreenWidth() / 2, 1, Raylib.BLANK, Program.config.textColor);
-            Raylib.DrawRectangleGradientH(Raylib.GetScreenWidth() / 2, Line.Height, Raylib.GetScreenWidth() / 2, 1, Raylib.WHITE, Program.config.textColor);
+            Raylib.DrawRectangleGradientH(0, Program.YMargin, Raylib.GetScreenWidth() / 2, 1, Raylib.BLANK, Program.config.textColor);
+            Raylib.DrawRectangleGradientH(Raylib.GetScreenWidth() / 2, Program.YMargin, Raylib.GetScreenWidth() / 2, 1, Program.config.textColor, Raylib.BLANK);
             //Raylib.DrawLineEx(new Vector2(0, Line.Height),
             //                  new Vector2(Raylib.GetScreenWidth(), Line.Height),
             //                  2,
