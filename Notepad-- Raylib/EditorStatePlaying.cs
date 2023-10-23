@@ -512,10 +512,9 @@ namespace Notepad___Raylib {
 
       public void PostHandleInput() {
          if (shiftSelection != null) shiftSelection.EndPosition = cursor.position;
-         Program.MakeSureCameraNotBelowZeroInBothAxes(ref camera);
-      }
 
-      public unsafe void Render() {
+         Program.MakeSureCameraNotBelowZeroInBothAxes(ref camera);
+         
          if (Raylib.IsWindowResized()) {
             windowResizeTimer.Restart();
 
@@ -529,7 +528,9 @@ namespace Notepad___Raylib {
             Program.textMask = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
             Raylib.SetTextureWrap(Program.textMask.texture, TextureWrap.TEXTURE_WRAP_CLAMP);
          }
+      }
 
+      public unsafe void Render() {
          if (flashShaderTimer.IsRunning) {
             flashShaderTransparency = MathF.Exp(-1 * 6 * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
          }
@@ -692,6 +693,7 @@ namespace Notepad___Raylib {
          camera.target = lastKnownCameraTarget ?? new Vector2(0, 0);
 
          Program.YMargin = 0;
+         windowResizeTimer.Start();
       }
 
       public void ExitState(IEditorState _) {
