@@ -6,12 +6,12 @@
       void Update();
       static void SetStateTo(IEditorState state) {
          IEditorState previousState = Program.editorState;
-         previousState?.ExitState();
+         previousState?.ExitState(state);
 
          Program.editorState = state;
          state.EnterState(previousState);
       }
       protected internal void EnterState(IEditorState previousState);
-      protected internal void ExitState();
+      protected internal void ExitState(IEditorState nextState);
    }
 }

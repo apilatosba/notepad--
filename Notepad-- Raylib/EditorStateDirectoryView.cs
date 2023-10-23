@@ -20,9 +20,9 @@ namespace Notepad___Raylib {
          offset = new Vector2(0, 0),
       };
 
-      Image windowCoverImage;
-      Texture windowCoverTexture;
-      RenderTexture highlightedLineRenderTexture;
+      Image? windowCoverImage; // IsImageReady() function doesnt exist in this nuget package so i manually set it to null 
+      Texture? windowCoverTexture; // IsTextureReady() function doesnt exist in this nuget package so i manually set it to null
+      RenderTexture? highlightedLineRenderTexture; // IsRenderTextureReady() function doesnt exist in this nuget package so i manually set it to null
       ColorInt directoryColor;
       ColorInt fileColor;
       Stopwatch lastKeyboardInputTimer = new Stopwatch();
@@ -32,7 +32,7 @@ namespace Notepad___Raylib {
          Program.YMargin = Line.Height;
          lastKeyboardInputTimer.Start();
          windowResizeTimer.Start();
-
+         
          directories.Clear();
          lines.Clear();
          string previousDirectoryPath = null;
@@ -77,9 +77,14 @@ namespace Notepad___Raylib {
          MoveCursorToLastEditedFile(theFileUserWasEditing);
 
          cursor ??= new Cursor();
-         windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
-         windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
-         highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+
+         if(windowCoverImage == null)
+            windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
+         if(windowCoverTexture == null)
+            windowCoverTexture = Raylib.LoadTextureFromImage((Image)windowCoverImage);
+         if(highlightedLineRenderTexture == null)
+            highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+
          directoryColor = Program.config.textColor - new ColorInt(40, 20, 0, 0);
          fileColor = Program.config.textColor + new ColorInt(-10, 20, -10, 0);
 
@@ -173,12 +178,12 @@ namespace Notepad___Raylib {
          Program.ClampCameraToText(lines, ref camera);
 
          if (Raylib.IsWindowResized()) {
-            Raylib.UnloadImage(windowCoverImage);
-            Raylib.UnloadTexture(windowCoverTexture);
-            Raylib.UnloadRenderTexture(highlightedLineRenderTexture);
+            Raylib.UnloadImage((Image)windowCoverImage);
+            Raylib.UnloadTexture((Texture)windowCoverTexture);
+            Raylib.UnloadRenderTexture((RenderTexture)highlightedLineRenderTexture);
 
             windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
-            windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
+            windowCoverTexture = Raylib.LoadTextureFromImage((Image)windowCoverImage);
             highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
 
             windowResizeTimer.Restart();
@@ -186,6 +191,11 @@ namespace Notepad___Raylib {
       }
 
       public void Render() {
+         if (windowCoverImage == null ||
+               windowCoverTexture == null ||
+               highlightedLineRenderTexture == null) // All this nonsense happening because IsImageReady(), IsTextureReady() and IsRenderTextureReady() functions dont exist in this nuget package
+            return;
+
          //////////////////////////////////////
          // Screen space rendering (background)
          //////////////////////////////////////
@@ -212,7 +222,7 @@ namespace Notepad___Raylib {
          }
 
          {
-            Raylib.BeginTextureMode(highlightedLineRenderTexture);
+            Raylib.BeginTextureMode((RenderTexture)highlightedLineRenderTexture);
             {
                Raylib.BeginMode2D(camera);
 
@@ -239,11 +249,11 @@ namespace Notepad___Raylib {
 
                Raylib.SetShaderValueTexture(Program.rainbowShader,
                                             Program.rainbowShaderHighlightedLineMaskLoc,
-                                            highlightedLineRenderTexture.texture);
+                                            ((RenderTexture)highlightedLineRenderTexture).texture);
 
                // Dispatch
-               Raylib.DrawTextureRec(windowCoverTexture,
-                                     new Rectangle(0, 0, windowCoverTexture.width, -windowCoverTexture.height),
+               Raylib.DrawTextureRec((Texture)windowCoverTexture,
+                                     new Rectangle(0, 0, ((Texture)windowCoverTexture).width, -((Texture)windowCoverTexture).height),
                                      new Vector2(0, 0),
                                      Raylib.WHITE);
             }
@@ -280,11 +290,16 @@ namespace Notepad___Raylib {
          Render();
       }
 
-      public void ExitState() {
-         Raylib.UnloadImage(windowCoverImage);
-         Raylib.UnloadTexture(windowCoverTexture);
-         Raylib.UnloadRenderTexture(highlightedLineRenderTexture);
-         Console.WriteLine(1);
+      public void ExitState(IEditorState nextState) {
+         if (nextState is not EditorStatePaused) {
+            Raylib.UnloadImage((Image)windowCoverImage);
+            Raylib.UnloadTexture((Texture)windowCoverTexture);
+            Raylib.UnloadRenderTexture((RenderTexture)highlightedLineRenderTexture);
+
+            windowCoverImage = null;
+            windowCoverTexture = null;
+            highlightedLineRenderTexture = null;
+         }
       }
 
       static bool CheckIfHasPermissionToOpenDirectory(string path) {

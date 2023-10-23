@@ -74,7 +74,7 @@ namespace Notepad___Raylib {
          this.previousState = previousState;
       }
 
-      public void ExitState() {
+      public void ExitState(IEditorState _) {
       }
    }
 }
