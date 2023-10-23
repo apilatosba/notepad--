@@ -461,7 +461,7 @@ namespace Notepad___Raylib {
          //   }
          //}
 
-         Program.HandleMouseWheelInput(mouseWheelInput, timeSinceLastMouseInput, modifiers, ref camera);
+         Program.HandleMouseWheelInput(mouseWheelInput, timeSinceLastMouseInput, modifiers, ref camera, this);
 
          Program.ClampCameraToText(Program.lines, ref camera);
 

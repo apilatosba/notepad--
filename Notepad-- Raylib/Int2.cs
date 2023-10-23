@@ -55,5 +55,17 @@ namespace Notepad___Raylib {
       public static bool operator !=(Int2 left, Int2 right) {
          return !(left == right);
       }
+
+      public static Int2 operator -(Int2 int2) {
+         return new Int2(-int2.x, -int2.y);
+      }
+
+      public static Int2 operator +(Int2 left, Int2 right) {
+         return new Int2(left.x + right.x, left.y + right.y);
+      }
+
+      public static Int2 operator -(Int2 left, Int2 right) {
+         return left + -right;
+      }
    }
 }

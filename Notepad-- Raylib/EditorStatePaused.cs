@@ -57,6 +57,12 @@ namespace Notepad___Raylib {
             }
          }
 
+         Rectangle minimizeWindowRect = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y + window.height / 13, 2 * window.width / 7, 2 * window.height / 13);
+
+         if(RayGui.GuiButton(minimizeWindowRect, "Minimize Window")) {
+            Raylib.MinimizeWindow();
+         }
+
          Rectangle quit = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y + window.height / 4, 2 * window.width / 7, 2 * window.height / 13);
 
          if(RayGui.GuiButton(quit, "Quit")) {

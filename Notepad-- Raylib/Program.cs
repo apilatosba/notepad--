@@ -66,6 +66,12 @@ namespace Notepad___Raylib {
       /// Vertical form of <see cref="Config.leftPadding"/>
       /// </summary>
       public static int YMargin;
+      static Int2 mousePositionLastFrame;
+      static Int2 mousePositionWhenStartedDragging;
+      static Int2 windowPositionWhenStartedDragging;
+      static Int2 mousePositionOffsetRelativeToWindow;
+      static Int2 windowSizeWhenStartedDragging;
+      public readonly static Int2 minimumWindowSize = new Int2(100, 50);
 
 #if VISUAL_STUDIO
       static string customFontsDirectory;
@@ -173,7 +179,8 @@ namespace Notepad___Raylib {
          Raylib.SetTargetFPS(144); // TODO vsync?
          Raylib.SetWindowIcon(Raylib.LoadImage(Path.Combine(GetImagesDirectory(), "icon4.png")));
          Raylib.SetWindowPosition(windowSaveData.position.x, windowSaveData.position.y);
-         Raylib.SetWindowState((windowSaveData.maximized ? ConfigFlags.FLAG_WINDOW_MAXIMIZED : 0)
+         Raylib.SetWindowState(/*(windowSaveData.maximized ? ConfigFlags.FLAG_WINDOW_MAXIMIZED : 0)*/
+                               /*|*/ ConfigFlags.FLAG_WINDOW_UNDECORATED
                                | ConfigFlags.FLAG_WINDOW_RESIZABLE
                                | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
 
@@ -226,7 +233,53 @@ namespace Notepad___Raylib {
          while (!Raylib.WindowShouldClose() && !isQuitButtonPressed) {
             Raylib.BeginDrawing();
 
+            // Window resizing and repositioning. Needs to be called before editorState.Update() because otherwise IsWindowResized() will never get triggered.
+            {
+               if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)) {
+                  Int2 mousePosition = Program.GetMousePositionInScreenSpace();
+
+                  if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
+                     mousePositionWhenStartedDragging = Program.GetMousePositionInScreenSpace();
+                     windowPositionWhenStartedDragging = (Int2)Raylib.GetWindowPosition();
+
+                     mousePositionOffsetRelativeToWindow = windowPositionWhenStartedDragging - mousePositionWhenStartedDragging;
+                  }
+
+                  if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
+                     Raylib.SetWindowPosition(mousePosition.x + mousePositionOffsetRelativeToWindow.x,
+                                              mousePosition.y + mousePositionOffsetRelativeToWindow.y);
+                  }
+
+                  if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_RIGHT)) {
+                     windowSizeWhenStartedDragging = new Int2(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+
+                     mousePositionWhenStartedDragging = Program.GetMousePositionInScreenSpace();
+                     windowPositionWhenStartedDragging = (Int2)Raylib.GetWindowPosition();
+
+                     mousePositionOffsetRelativeToWindow = windowPositionWhenStartedDragging - mousePositionWhenStartedDragging;
+                  }
+
+                  if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT)) {
+                     int width = windowSizeWhenStartedDragging.x + mousePosition.x - mousePositionWhenStartedDragging.x;
+                     int height = windowSizeWhenStartedDragging.y + mousePosition.y - mousePositionWhenStartedDragging.y;
+
+                     Raylib.SetWindowSize(width < minimumWindowSize.x ? minimumWindowSize.x : width,
+                                          height < minimumWindowSize.y ? minimumWindowSize.y : height);
+                  }
+               }
+
+               if (Raylib.IsKeyPressed(KeyboardKey.KEY_F11)) {
+                  if (Raylib.IsWindowMaximized()) {
+                     Raylib.RestoreWindow();
+                  } else {
+                     Raylib.MaximizeWindow();
+                  }
+               }
+            }
+
             editorState.Update();
+
+            mousePositionLastFrame = GetMousePositionInScreenSpace();
 
             Raylib.EndDrawing();
          }
@@ -487,7 +540,7 @@ namespace Notepad___Raylib {
          cursor.position.x = lastInsertedLine.Value.Length - textAfterCursorFirstLine.Length;
       }
 
-      public static void HandleMouseWheelInput(float mouseWheelInput, Stopwatch timeSinceLastMouseInput, List<KeyboardKey> modifiers, ref Camera2D camera) {
+      public static void HandleMouseWheelInput(float mouseWheelInput, Stopwatch timeSinceLastMouseInput, List<KeyboardKey> modifiers, ref Camera2D camera, IEditorState currentState) {
          if (mouseWheelInput != 0) {
             timeSinceLastMouseInput?.Restart();
 
@@ -499,12 +552,18 @@ namespace Notepad___Raylib {
 
                   Raylib.UnloadFont(Program.font);
                   Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+
+                  if (currentState is EditorStateDirectoryView)
+                     YMargin = Line.Height;
                } else if (mouseWheelInput < 0) {
                   Program.config.fontSize--;
                   Program.config.Serialize(Program.GetConfigPath());
 
                   Raylib.UnloadFont(Program.font);
                   Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+
+                  if (currentState is EditorStateDirectoryView)
+                     YMargin = Line.Height;
                }
             } else {
                camera.target.Y -= mouseWheelInput * Line.Height;
@@ -565,6 +624,15 @@ namespace Notepad___Raylib {
                lineTopEdgeWorldSpacePositionY > cameraBottomEdgeWorldSpacePositionY)
             return false;
          else return true;
+      }
+
+      public static Int2 GetMousePositionInScreenSpace() {
+         PublicUtility.MouseRun.Mouse.GetPosition().Deconstruct(out int x, out int y);
+         return new Int2(x, y);
+      }
+
+      public static Int2 GetMouseDelta() {
+         return GetMousePositionInScreenSpace() - mousePositionLastFrame;
       }
 
       public static string GetConfigPath() {

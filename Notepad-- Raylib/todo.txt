@@ -1,22 +1,20 @@
 --shaders
-character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
-different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
-when you ctrl+v paste, dont shiftSelect the pasted text. highlight them instead. do it with a shader
+   character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
+   different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
+   when you ctrl+v paste, dont shiftSelect the pasted text. highlight them instead. do it with a shader
+   make cursor blink. make it with a shader
+   subpixel rendering
 add shortcuts
 find in file. ctrl + f
-make cursor blink. make it with a shader
-switch to window state undecorated
 render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
     or the both
-dont render the lines that are not visible
 frontend to settings
 add scrollbars
-subpixel rendering
 bug: cursor movement doesnt process all inputs if inputs are too fast. thats a big problem Okayeg
-bug: sometimes i get blank window when deminimize. not quite sure why. i have a guess windowResizeTimer may not be working as intended. but why? idk. maybe it is working
-bug: possible memory leak when switching states from directory view state to playing state
-add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level
+bug: sometimes i get blank window when deminimize. not quite sure why. i have a guess windowResizeTimer may not be working as intended. but why? idk. maybe it is working. it is probably about windows' window manager
+a better last known window size logic. right now if you close the window when it is maximized, it will open maximized but wont remember the restored size. so when you click f11 nothing happens
+add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level. maybe not as status bar but in the EditorStatePaused
 config.fontname and program.font has no relationship. when i deserialize i should update the program.font
 change cursor y repositioning algorithm. only works with monospace font rn.
 i should look for fonts in shared fonts folder (C:\Windows\Fonts, /usr/share/fonts) and my custom fonts folder. change the GetFontPath method

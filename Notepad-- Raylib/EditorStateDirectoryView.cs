@@ -27,12 +27,12 @@ namespace Notepad___Raylib {
       ColorInt fileColor;
       Stopwatch lastKeyboardInputTimer = new Stopwatch();
       Stopwatch windowResizeTimer = new Stopwatch();
-
+      
       public void EnterState(IEditorState previousState) {
          Program.YMargin = Line.Height;
          lastKeyboardInputTimer.Start();
          windowResizeTimer.Start();
-         
+
          directories.Clear();
          lines.Clear();
          string previousDirectoryPath = null;
@@ -78,11 +78,11 @@ namespace Notepad___Raylib {
 
          cursor ??= new Cursor();
 
-         if(windowCoverImage == null)
+         if (windowCoverImage == null)
             windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
-         if(windowCoverTexture == null)
+         if (windowCoverTexture == null)
             windowCoverTexture = Raylib.LoadTextureFromImage((Image)windowCoverImage);
-         if(highlightedLineRenderTexture == null)
+         if (highlightedLineRenderTexture == null)
             highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
 
          directoryColor = Program.config.textColor - new ColorInt(40, 20, 0, 0);
@@ -170,7 +170,7 @@ namespace Notepad___Raylib {
                                              modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL));
          }
 
-         Program.HandleMouseWheelInput(Raylib.GetMouseWheelMove(), null, modifiers, ref camera);
+         Program.HandleMouseWheelInput(Raylib.GetMouseWheelMove(), null, modifiers, ref camera, this);
       }
 
       public void PostHandleInput() {

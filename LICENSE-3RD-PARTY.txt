@@ -3,7 +3,7 @@ Used fonts:
 
 Used packages:
    Raylib-CsLo Version 4.2.0.9 - https://www.nuget.org/packages/Raylib-CsLo/4.2.0.9?_src=template
-
+   PublicUtility.MouseRun Version 2.0.0 - https://github.com/lucas-fsousa/MouseRun
 
 --- Begin Inconsolata-Medium license notice ---
    Inconsolata-Medium font OFL license
@@ -110,3 +110,10 @@ Used packages:
    MPL-2.0  https://licenses.nuget.org/MPL-2.0
 
 --- End Raylib-CsLo license notice ---
+
+
+--- Begin PublicUtility.MouseRun license notice ---
+
+   MIT license  https://licenses.nuget.org/MIT
+
+--- End PublicUtility.MouseRun license notice ---
