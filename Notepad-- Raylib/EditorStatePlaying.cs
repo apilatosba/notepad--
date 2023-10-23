@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -120,7 +120,7 @@ namespace Notepad___Raylib {
                      {
                         Raylib.BeginMode2D(camera);
                         Raylib.ClearBackground(Raylib.BLANK);
-                        Program.RenderLines(Program.lines, Program.font, Raylib.WHITE);
+                        Program.RenderLines(Program.lines, Program.font, Raylib.WHITE, Program.YMargin, camera);
                         shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
                         mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
                         cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines, Raylib.WHITE);
@@ -552,7 +552,7 @@ namespace Notepad___Raylib {
          {
             Program.HighlightLineCursorIsAt(cursor);
 
-            Program.RenderLines(Program.lines, Program.font);
+            Program.RenderLines(Program.lines, Program.font, Program.config.textColor, Program.YMargin, camera);
             shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
             mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
             cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines);
@@ -602,7 +602,7 @@ namespace Notepad___Raylib {
             {
                Raylib.BeginMode2D(camera);
                Raylib.ClearBackground(Raylib.BLANK);
-               Program.RenderLines(Program.lines, Program.font, Raylib.WHITE);
+               Program.RenderLines(Program.lines, Program.font, Raylib.WHITE, Program.YMargin, camera);
                shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
                mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
                cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines, Raylib.WHITE);

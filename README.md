@@ -23,4 +23,4 @@ Also you need to add [Fonts folder](https://github.com/apilatosba/notepad--/tree
 ## References
 Raylib: https://www.raylib.com/ - Great library, big thumbs up.  
 Bloom: https://learnopengl.com/Advanced-Lighting/Bloom  
-Rgb to hsv conversion: https://stackoverflow.com/questions/15095909/from-rgb-to-hsv-in-opengl-glsl
+Rgb to hsv conversion: https://stackoverflow.com/questions/15095909/from-rgb-to-hsv-in-opengl-glsl  

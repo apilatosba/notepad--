@@ -5,8 +5,9 @@
       protected internal void Render();
       void Update();
       static void SetStateTo(IEditorState state) {
-         state.ExitState();
          IEditorState previousState = Program.editorState;
+         previousState?.ExitState();
+
          Program.editorState = state;
          state.EnterState(previousState);
       }

@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -20,15 +20,18 @@ namespace Notepad___Raylib {
          offset = new Vector2(0, 0),
       };
 
-      Stopwatch timeSinceLastMouseInput = new Stopwatch();
       Image windowCoverImage;
       Texture windowCoverTexture;
       RenderTexture highlightedLineRenderTexture;
       ColorInt directoryColor;
       ColorInt fileColor;
+      Stopwatch lastKeyboardInputTimer = new Stopwatch();
+      Stopwatch windowResizeTimer = new Stopwatch();
 
       public void EnterState(IEditorState previousState) {
          Program.YMargin = Line.Height;
+         lastKeyboardInputTimer.Start();
+         windowResizeTimer.Start();
 
          directories.Clear();
          lines.Clear();
@@ -62,7 +65,7 @@ namespace Notepad___Raylib {
 
             int lengthOfMostLongLine = FindLengthOfMostLongLine(files);
 
-            for(int i = directories.Count; i < lines.Count; i++) {
+            for (int i = directories.Count; i < lines.Count; i++) {
                FileInfo fileInfo = new FileInfo(lines[i].Value);
                string fileSizeText = GetFileSizeText(fileInfo.Length);
                lines[i].Value = lines[i].Value.PadRight(lengthOfMostLongLine + 1);
@@ -100,11 +103,13 @@ namespace Notepad___Raylib {
 #if VISUAL_STUDIO
                Console.WriteLine(specialKey);
 #endif
+               lastKeyboardInputTimer.Restart();
+
                switch (specialKey) {
                   case KeyboardKey.KEY_KP_ENTER:
                   case KeyboardKey.KEY_ENTER:
                      bool isFile;
-                     string pressedLineValue/* = lines[cursor.position.y].Value*/;
+                     string pressedLineValue;
 
                      if (cursor.position.y < directories.Count) {
                         pressedLineValue = directories[cursor.position.y];
@@ -119,7 +124,7 @@ namespace Notepad___Raylib {
                         isFile = true;
                      } else {
                         Debug.Assert(false, "out of range");
-                        isFile = false; // To be able to compile
+                        throw new IndexOutOfRangeException();
                      }
 
                      if (isFile) {
@@ -135,9 +140,6 @@ namespace Notepad___Raylib {
                         }
                      }
 
-                     // todo
-                     // open file if it is a file
-                     // open directory if it is a directory
                      break;
                   case KeyboardKey.KEY_ESCAPE:
                      IEditorState.SetStateTo(new EditorStatePaused());
@@ -163,7 +165,7 @@ namespace Notepad___Raylib {
                                              modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL));
          }
 
-         Program.HandleMouseWheelInput(Raylib.GetMouseWheelMove(), timeSinceLastMouseInput, modifiers, ref camera);
+         Program.HandleMouseWheelInput(Raylib.GetMouseWheelMove(), null, modifiers, ref camera);
       }
 
       public void PostHandleInput() {
@@ -178,6 +180,8 @@ namespace Notepad___Raylib {
             windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
             windowCoverTexture = Raylib.LoadTextureFromImage(windowCoverImage);
             highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+
+            windowResizeTimer.Restart();
          }
       }
 
@@ -199,8 +203,8 @@ namespace Notepad___Raylib {
             {
                Program.HighlightLineCursorIsAt(cursor);
                //Program.RenderLines(lines, Program.font);
-               Program.RenderLines(lines.GetRange(0, directories.Count), Program.font, (Color)directoryColor, Program.YMargin);
-               Program.RenderLines(lines.GetRange(directories.Count, files.Count), Program.font, (Color)fileColor, Line.Height * directories.Count + Program.YMargin);
+               Program.RenderLines(lines.GetRange(0, directories.Count), Program.font, (Color)directoryColor, Program.YMargin, camera);
+               Program.RenderLines(lines.GetRange(directories.Count, files.Count), Program.font, (Color)fileColor, Line.Height * directories.Count + Program.YMargin, camera);
             }
             Raylib.EndMode2D();
 
@@ -237,6 +241,7 @@ namespace Notepad___Raylib {
                                             Program.rainbowShaderHighlightedLineMaskLoc,
                                             highlightedLineRenderTexture.texture);
 
+               // Dispatch
                Raylib.DrawTextureRec(windowCoverTexture,
                                      new Rectangle(0, 0, windowCoverTexture.width, -windowCoverTexture.height),
                                      new Vector2(0, 0),
@@ -252,6 +257,13 @@ namespace Notepad___Raylib {
             string currentDirectory = Directory.GetCurrentDirectory();
             float currentDirectoryTextLength = Raylib.MeasureTextEx(Program.font, currentDirectory, Program.config.fontSize, 0).X;
             Vector2 centeredPosition = new Vector2(Raylib.GetScreenWidth() / 2 - currentDirectoryTextLength / 2, 0);
+
+            Raylib.DrawRectangleGradientH(0, Line.Height, Raylib.GetScreenWidth() / 2, 1, Raylib.BLANK, Program.config.textColor);
+            Raylib.DrawRectangleGradientH(Raylib.GetScreenWidth() / 2, Line.Height, Raylib.GetScreenWidth() / 2, 1, Raylib.WHITE, Program.config.textColor);
+            //Raylib.DrawLineEx(new Vector2(0, Line.Height),
+            //                  new Vector2(Raylib.GetScreenWidth(), Line.Height),
+            //                  2,
+            //                  Program.config.textColor);
 
             Raylib.DrawTextEx(Program.font,
                               currentDirectory,
@@ -272,6 +284,7 @@ namespace Notepad___Raylib {
          Raylib.UnloadImage(windowCoverImage);
          Raylib.UnloadTexture(windowCoverTexture);
          Raylib.UnloadRenderTexture(highlightedLineRenderTexture);
+         Console.WriteLine(1);
       }
 
       static bool CheckIfHasPermissionToOpenDirectory(string path) {

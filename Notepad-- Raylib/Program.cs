@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -313,21 +313,25 @@ namespace Notepad___Raylib {
 #endif
       }
 
-      public static void RenderLines(in List<Line> lines, Font font) {
+      [Obsolete("Use the other overload that takes Camera2D as an argument")]
+      public static void RenderLines(in List<Line> lines, in Font font) {
          for (int i = 0; i < lines.Count; i++) {
             Raylib.DrawTextEx(font, lines[i].Value, new Vector2(config.leftPadding, i * (Line.Height + config.spacingBetweenLines)), config.fontSize, 0, config.textColor);
          }
       }
 
-      public static void RenderLines(in List<Line> lines, Font font, Color color) {
+      [Obsolete("Use the other overload that takes Camera2D as an argument")]
+      public static void RenderLines(in List<Line> lines, in Font font, in Color color) {
          for (int i = 0; i < lines.Count; i++) {
             Raylib.DrawTextEx(font, lines[i].Value, new Vector2(config.leftPadding, i * (Line.Height + config.spacingBetweenLines)), config.fontSize, 0, color);
          }
       }
 
-      public static void RenderLines(in List<Line> lines, Font font, Color color, int yOffset) {
+      public static void RenderLines(in List<Line> lines, in Font font, in Color color, int yOffset, in Camera2D camera) {
          for (int i = 0; i < lines.Count; i++) {
-            Raylib.DrawTextEx(font, lines[i].Value, new Vector2(config.leftPadding, i * (Line.Height + config.spacingBetweenLines) + yOffset), config.fontSize, 0, color);
+            if (IsLineIsInBoundsOfCamera(i, camera, yOffset)) {
+               Raylib.DrawTextEx(font, lines[i].Value, new Vector2(config.leftPadding, i * (Line.Height + config.spacingBetweenLines) + yOffset), config.fontSize, 0, color);
+            }
          }
       }
 
@@ -457,7 +461,10 @@ namespace Notepad___Raylib {
                fontChars[i] = startCodePoint + i;
             }
 
-            return Raylib.LoadFontEx(path, fontSize, fontChars, glyphCount); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+            Font font = Raylib.LoadFontEx(path, fontSize, fontChars, glyphCount); // Raylib.LoadFont() has rendering problems if font size is not 32. https://github.com/raysan5/raylib/issues/323
+            Raylib.SetTextureFilter(font.texture, TextureFilter.TEXTURE_FILTER_POINT);
+
+            return font;
          }
       }
 
@@ -481,7 +488,7 @@ namespace Notepad___Raylib {
 
       public static void HandleMouseWheelInput(float mouseWheelInput, Stopwatch timeSinceLastMouseInput, List<KeyboardKey> modifiers, ref Camera2D camera) {
          if (mouseWheelInput != 0) {
-            timeSinceLastMouseInput.Restart();
+            timeSinceLastMouseInput?.Restart();
 
             if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                //camera.zoom += mouseWheelInput * 0.04f;
@@ -538,6 +545,25 @@ namespace Notepad___Raylib {
          if (camera.target.Y > cameraThreshold) {
             camera.target.Y = cameraThreshold;
          }
+      }
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="lineIndex"></param>
+      /// <param name="camera"></param>
+      /// <param name="linesYOffset"><see cref="Program.YMargin"/> is included even though it is global</param>
+      /// <returns></returns>
+      static bool IsLineIsInBoundsOfCamera(int lineIndex, in Camera2D camera, int linesYOffset) {
+         int lineTopEdgeWorldSpacePositionY = lineIndex * Line.Height + linesYOffset;
+         int lineBottomEdgeWorldSpacePositionY = lineTopEdgeWorldSpacePositionY + Line.Height;
+
+         int cameraTopEdgeWorldSpacePositionY = (int)camera.target.Y;
+         int cameraBottomEdgeWorldSpacePositionY = (int)camera.target.Y + Raylib.GetScreenHeight();
+
+         if (lineBottomEdgeWorldSpacePositionY < cameraTopEdgeWorldSpacePositionY ||
+               lineTopEdgeWorldSpacePositionY > cameraBottomEdgeWorldSpacePositionY)
+            return false;
+         else return true;
       }
 
       public static string GetConfigPath() {
