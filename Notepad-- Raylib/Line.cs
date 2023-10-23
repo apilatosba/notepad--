@@ -1,4 +1,5 @@
 ﻿using Raylib_CsLo;
+using System.Text.RegularExpressions;
 
 namespace Notepad___Raylib {
    internal class Line {
@@ -9,7 +10,7 @@ namespace Notepad___Raylib {
          }
       }
 
-      public string Value { 
+      public string Value {
          get => value;
          set => this.value = value;
       }
@@ -51,6 +52,19 @@ namespace Notepad___Raylib {
 
       public static int GetLineHeight(Font font, int fontSize) {
          return MeasureTextHeight(font, "A", fontSize);
+      }
+
+      public int[] Find(Regex regex) {
+         regex = new Regex(regex.ToString(), RegexOptions.IgnoreCase);
+
+         MatchCollection matches = regex.Matches(value);
+         int[] indices = new int[matches.Count];
+
+         for (int i = 0; i < matches.Count; i++) {
+            indices[i] = matches[i].Index;
+         }
+
+         return indices;
       }
    }
 }
