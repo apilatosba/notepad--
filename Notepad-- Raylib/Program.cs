@@ -108,9 +108,10 @@ namespace Notepad___Raylib {
          // Command line arguments
          {
             if (args.Length == 0) {
-               Console.WriteLine("ERROR: No file specified\n");
-               PrintHelp();
-               return;
+               //Console.WriteLine("ERROR: No file specified\n");
+               //PrintHelp();
+               //return;
+               directoryPath = Directory.GetCurrentDirectory();
             }
 
             for (int i = 0; i < args.Length; i++) {
