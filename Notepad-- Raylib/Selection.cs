@@ -1,5 +1,4 @@
 ﻿using Raylib_CsLo;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -165,9 +164,18 @@ namespace Notepad___Raylib {
 
          switch (linesInRange.Length) {
             case 1:
+               Program.undoHistory.Push(new List<UndoItem>() {
+                  new UndoItem(new Line(linesInRange[0]), lines.IndexOf(linesInRange[0]), UndeReason.Deletion, cursor.position, UndoAction.Replace)
+               });
+
                linesInRange[0].RemoveTextAt(left.x, right.x - left.x, Direction.Right);
                break;
             case 2:
+               Program.undoHistory.Push(new List<UndoItem>() {
+                  new UndoItem(new Line(linesInRange[0]), lines.IndexOf(linesInRange[0]), UndeReason.Deletion, cursor.position, UndoAction.Replace),
+                  new UndoItem(new Line(linesInRange[1]), lines.IndexOf(linesInRange[1]), UndeReason.Deletion, cursor.position, UndoAction.Insert)
+               });
+
                linesInRange[0].RemoveTextAt(left.x, linesInRange[0].Value.Length - left.x, Direction.Right);
                linesInRange[1].RemoveTextAt(0, right.x, Direction.Right);
 
@@ -177,11 +185,21 @@ namespace Notepad___Raylib {
 
                break;
             default:
+               List<UndoItem> undoItems = new List<UndoItem>();
+
+               undoItems.Add(new UndoItem(new Line(linesInRange[0]), lines.IndexOf(linesInRange[0]), UndeReason.Deletion, cursor.position, UndoAction.Replace));
+
                linesInRange[0].RemoveTextAt(left.x, linesInRange[0].Value.Length - left.x, Direction.Right);
 
                for (int i = left.y + 1; i < right.y; i++) {
+                  undoItems.Add(new UndoItem(new Line(linesInRange[i - left.y]), lines.IndexOf(linesInRange[0]) + i - left.y, UndeReason.Deletion, cursor.position, UndoAction.Insert));
+
                   lines.RemoveAt(left.y + 1);
                }
+
+               undoItems.Add(new UndoItem(new Line(linesInRange[linesInRange.Length - 1]), lines.IndexOf(linesInRange[0]) + linesInRange.Length - 1, UndeReason.Deletion, cursor.position, UndoAction.Insert));
+
+               Program.undoHistory.Push(undoItems);
 
                linesInRange[linesInRange.Length - 1].RemoveTextAt(0, right.x, Direction.Right);
 

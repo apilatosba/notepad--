@@ -63,7 +63,8 @@ namespace Notepad___Raylib {
       public static string directoryPath;
       public static bool isQuitButtonPressed = false;
       public static bool isDraggingWindow = false;
-      public static Stack<UndoItem> undoHistory = new Stack<UndoItem>();
+      public const int MAX_UNDO_HISTORY = 128;
+      public static Stack<List<UndoItem>> undoHistory = new Stack<List<UndoItem>>(MAX_UNDO_HISTORY);
       /// <summary>
       /// Vertical form of <see cref="Config.leftPadding"/>
       /// </summary>
@@ -422,15 +423,15 @@ namespace Notepad___Raylib {
 
       public static void InsertTextAtCursor(List<Line> lines, Cursor cursor, string text) {
          Line line = lines[cursor.position.y];
-         line.InsertTextAt(cursor.position.x, text);
+         line.InsertTextAt(cursor.position.x, text, cursor);
 
          cursor.position.x += text.Length;
       }
 
       public static void RemoveTextAtCursor(List<Line> lines, Cursor cursor, int count, Direction direction = Direction.Left) {
          Line line = lines[cursor.position.y];
-         line.RemoveTextAt(cursor.position.x, count, direction);
-         cursor.position.x += direction == Direction.Left ? -count : 0;
+         line.RemoveTextAt(cursor.position.x, count, cursor, direction);
+         //cursor.position.x += direction == Direction.Left ? -count : 0; // Use this when you use the obsolete RemoveTextAt() method.
       }
 
       public static bool ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey) {
@@ -556,13 +557,22 @@ namespace Notepad___Raylib {
       public static void InsertLinesAtCursor(List<Line> lines, Cursor cursor, in List<Line> linesToInsert) {
          Line line = lines[cursor.position.y];
          string textAfterCursorFirstLine = line.Value.Substring(cursor.position.x);
+
+         List<UndoItem> undoItems = new List<UndoItem>();
+
+         undoItems.Add(new UndoItem(new Line(line), cursor.position.y, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace));
+
          line.RemoveTextAt(cursor.position.x, line.Value.Length - cursor.position.x, Direction.Right);
 
          line.InsertTextAt(cursor.position.x, linesToInsert[0].Value);
 
          for (int i = 1; i < linesToInsert.Count; i++) {
+            undoItems.Add(new UndoItem(null, cursor.position.y + 1, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Remove));
+
             lines.Insert(cursor.position.y + i, linesToInsert[i]);
          }
+
+         undoHistory.Push(undoItems);
 
          Line lastInsertedLine = lines[cursor.position.y + linesToInsert.Count - 1];
          lastInsertedLine.InsertTextAt(lastInsertedLine.Value.Length, textAfterCursorFirstLine);

@@ -82,24 +82,50 @@ namespace Notepad___Raylib {
 
             switch (internalState) {
                case InternalState.Normal:
-            ///////////////////////////////////////////
-            // Handling key presses that have modifiers
-            ///////////////////////////////////////////
+                  ///////////////////////////////////////////
+                  // Handling key presses that have modifiers
+                  ///////////////////////////////////////////
                   {
                      if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_Z)) {
-                           UndoItem undoItem;
+                           List<UndoItem> undoItems;
 
                            try {
-                              undoItem = Program.undoHistory.Pop();
-                              Program.lines[undoItem.lineNumber] = undoItem.line;
-                              cursor.position = undoItem.cursorPosition;
-                              cursor.exXPosition = cursor.position.x;
+                              undoItems = Program.undoHistory.Pop();
+
+                              //for(int i = undoItems.Count - 1; i >= 0; i--) {
+                              //   Program.lines[undoItems[i].lineNumber] = undoItems[i].line;
+                              //   cursor.position = undoItems[i].cursorPosition;
+                              //   cursor.exXPosition = cursor.position.x;
+                              //}
+
+                              foreach(UndoItem undoItem in undoItems) {
+                                 switch (undoItem.action) {
+                                    case UndoAction.Replace:
+                                       Program.lines[undoItem.lineNumber] = undoItem.line;
+                                       cursor.position = undoItem.cursorPosition;
+                                       break;
+                                    case UndoAction.Insert:
+                                       Program.lines.Insert(undoItem.lineNumber, undoItem.line);
+                                       cursor.position = undoItem.cursorPosition;
+                                       break;
+                                    case UndoAction.Remove:
+                                       Program.lines.RemoveAt(undoItem.lineNumber);
+                                       cursor.position = undoItem.cursorPosition;
+                                       break;
+                                 }
+                              }
                            }
                            catch (InvalidOperationException) {
                               // stack is empty
                               // todo some shader effect? 
                            }
+
+                           cursor.MakeSureCursorIsVisibleToCamera(Program.lines,
+                                                                  ref camera,
+                                                                  Program.config.fontSize,
+                                                                  Program.config.leftPadding,
+                                                                  Program.font);
                         }
 
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) {
@@ -167,7 +193,8 @@ namespace Notepad___Raylib {
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
                            mouseSelection?.Delete(Program.lines, cursor);
                            shiftSelection?.Delete(Program.lines, cursor);
-                           shiftSelection = new Selection() {
+                           
+                           Selection selection = new Selection() {
                               StartPosition = cursor.position
                            };
 
@@ -175,16 +202,14 @@ namespace Notepad___Raylib {
                            List<Line> clipboard = Program.ReadLinesFromString(clipboardText);
                            Program.InsertLinesAtCursor(Program.lines, cursor, clipboard);
 
-                           shiftSelection.EndPosition = cursor.position;
+                           selection.EndPosition = cursor.position;
 
-                           controlVPasteHighlightRects = shiftSelection.GetRectanglesInWorldSpace(Program.lines,
-                                                                                                  Program.config.fontSize,
-                                                                                                  Program.config.leftPadding,
-                                                                                                  Program.font);
+                           controlVPasteHighlightRects = selection.GetRectanglesInWorldSpace(Program.lines,
+                                                                                             Program.config.fontSize,
+                                                                                             Program.config.leftPadding,
+                                                                                             Program.font);
 
                            controlVPasteHighlightTimer.Restart();
-
-                           shiftSelection = null;
 
                            cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                            cursor.exXPosition = cursor.position.x;
@@ -241,21 +266,23 @@ namespace Notepad___Raylib {
                      }
                   }
 
-            ////////////////////////////////////////////////////////////////////////
-            // Handling key presses that don't have modifiers ie. normal key presses
-            ////////////////////////////////////////////////////////////////////////
-            {
+                  ////////////////////////////////////////////////////////////////////////
+                  // Handling key presses that don't have modifiers ie. normal key presses
+                  ////////////////////////////////////////////////////////////////////////
+                  {
                      if (pressedKeys != null) {
 #if VISUAL_STUDIO
                         Program.PrintPressedKeys(pressedKeys);
 #endif
-                        Program.undoHistory.Push(new UndoItem(new Line(Program.lines[cursor.position.y]),
-                                                              cursor.position.y,
-                                                              UndeReason.NormalKeyStroke,
-                                                              cursor.position));
-
+                        
                         shiftSelection?.Delete(Program.lines, cursor);
                         shiftSelection = null;
+
+                        Line currentLine = Program.lines[cursor.position.y];
+
+                        Program.undoHistory.Push(new List<UndoItem>() {
+                           new UndoItem(new Line(currentLine), cursor.position.y, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace)
+                        });
 
                         Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
@@ -263,10 +290,10 @@ namespace Notepad___Raylib {
                      }
                   }
 
-            /////////////////////////////////////////////////////////
-            // Handling special keys, both with and without modifiers
-            /////////////////////////////////////////////////////////
-            {
+                  /////////////////////////////////////////////////////////
+                  // Handling special keys, both with and without modifiers
+                  /////////////////////////////////////////////////////////
+                  {
                      if (specialKey != KeyboardKey.KEY_NULL) {
 #if VISUAL_STUDIO
                         Console.WriteLine(specialKey);
@@ -318,21 +345,25 @@ namespace Notepad___Raylib {
                               if (cursor.IsCursorAtBeginningOfFile()) break;
 
                               if (cursor.IsCursorAtBeginningOfLine()) {
-                                 Line currentLine = Program.lines[cursor.position.y];
-                                 Line lineAbove = Program.lines[cursor.position.y - 1];
+                                 //Line currentLine = Program.lines[cursor.position.y];
+                                 //Line lineAbove = Program.lines[cursor.position.y - 1];
 
-                                 cursor.position.x = lineAbove.Value.Length;
+                                 //cursor.position.x = lineAbove.Value.Length;
 
-                                 lineAbove.InsertTextAt(lineAbove.Value.Length, currentLine.Value);
-                                 Program.lines.RemoveAt(cursor.position.y);
+                                 //lineAbove.InsertTextAt(lineAbove.Value.Length, currentLine.Value);
+                                 //Program.lines.RemoveAt(cursor.position.y);
 
-                                 cursor.position.y--;
+                                 //cursor.position.y--;
 
+                                 // Utilizing the undo implementation of Selection.Delete()
+                                 new Selection(cursor.position, new Int2(Program.lines[cursor.position.y - 1].Value.Length, cursor.position.y - 1)).Delete(Program.lines, cursor);
                               } else {
-                                 Program.undoHistory.Push(new UndoItem(new Line(Program.lines[cursor.position.y]),
-                                                                                   cursor.position.y,
-                                                                                   UndeReason.Deletion,
-                                                                                   cursor.position));
+                                 //Program.undoHistory.Push(new List<UndoItem>() {
+                                 //new UndoItem(new Line(Program.lines[cursor.position.y]),
+                                 //             cursor.position.y,
+                                 //             UndeReason.Deletion,
+                                 //             cursor.position)});
+
 
                                  if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                                     int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Left);
@@ -355,8 +386,17 @@ namespace Notepad___Raylib {
                                  Line newLine = new Line(textAfterCursor);
 
                                  if (cursor.IsCursorAtEndOfFile(Program.lines)) {
+                                    Program.undoHistory.Push(new List<UndoItem>() {
+                                       new UndoItem(null, Program.lines.Count, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Remove)
+                                    });
+
                                     Program.lines.Add(newLine);
                                  } else {
+                                    Program.undoHistory.Push(new List<UndoItem>() {
+                                       new UndoItem(new Line(currentLine), cursor.position.y, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace),
+                                       new UndoItem(null, cursor.position.y + 1, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Remove)
+                                    });
+
                                     Program.lines.Insert(Program.lines.IndexOf(currentLine) + 1, newLine);
                                  }
 
@@ -373,9 +413,15 @@ namespace Notepad___Raylib {
                               if (shiftSelection != null) {
                                  Line[] linesInRange = shiftSelection.GetLinesInRange(Program.lines).ToArray();
 
+                                 List<UndoItem> undoItems = new List<UndoItem>();
+
                                  foreach (Line line in linesInRange) {
-                                    line.InsertTextAt(0, new string(' ', Program.config.tabSize));
+                                    undoItems.Add(new UndoItem(new Line(line), Program.lines.IndexOf(line), UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace));
+
+                                    line.InsertTextAt(0, new string(' ', Program.config.tabSize)); // Stick to obsolete one. I don't want to push this to the undo stack once more
                                  }
+
+                                 Program.undoHistory.Push(undoItems);
 
                                  shiftSelection.StartPosition = new Int2(shiftSelection.StartPosition.x + Program.config.tabSize, shiftSelection.StartPosition.y);
                                  cursor.position.x += Program.config.tabSize;
@@ -385,11 +431,6 @@ namespace Notepad___Raylib {
 
                                  break;
                               }
-
-                              Program.undoHistory.Push(new UndoItem(new Line(Program.lines[cursor.position.y]),
-                                                                    cursor.position.y,
-                                                                    UndeReason.NormalKeyStroke,
-                                                                    cursor.position));
 
                               Program.InsertTextAtCursor(Program.lines, cursor, new string(' ', Program.config.tabSize));
 
@@ -404,19 +445,15 @@ namespace Notepad___Raylib {
                               }
 
                               if (cursor.IsCursorAtEndOfLine(Program.lines)) {
-                                 Line currentLine = Program.lines[cursor.position.y];
-                                 Line lineBelow = Program.lines[cursor.position.y + 1];
+                                 //Line currentLine = Program.lines[cursor.position.y];
+                                 //Line lineBelow = Program.lines[cursor.position.y + 1];
 
-                                 currentLine.InsertTextAt(currentLine.Value.Length, lineBelow.Value);
+                                 //currentLine.InsertTextAt(currentLine.Value.Length, lineBelow.Value);
 
-                                 Program.lines.RemoveAt(cursor.position.y + 1);
+                                 //Program.lines.RemoveAt(cursor.position.y + 1);
 
+                                 new Selection(cursor.position, new Int2(0, cursor.position.y + 1)).Delete(Program.lines, cursor);
                               } else {
-                                 Program.undoHistory.Push(new UndoItem(new Line(Program.lines[cursor.position.y]),
-                                                                       cursor.position.y,
-                                                                       UndeReason.Deletion,
-                                                                       cursor.position));
-
                                  if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                                     int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Right);
                                     Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump, Direction.Right);
@@ -849,9 +886,9 @@ namespace Notepad___Raylib {
          HandleInput();
          PostHandleInput();
 
-         if (Program.TimeSinceLastKeyboardInput < 5000 || 
-               timeSinceLastMouseInput.ElapsedMilliseconds < 5000 || 
-               windowResizeTimer.ElapsedMilliseconds < 3000 || 
+         if (Program.TimeSinceLastKeyboardInput < 5000 ||
+               timeSinceLastMouseInput.ElapsedMilliseconds < 5000 ||
+               windowResizeTimer.ElapsedMilliseconds < 3000 ||
                normalKeyPressesWithModifiersLastInputTimer.ElapsedMilliseconds < 5000) {
             Render();
          }

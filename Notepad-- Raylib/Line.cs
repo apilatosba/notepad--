@@ -1,4 +1,5 @@
 ﻿using Raylib_CsLo;
+using System;
 using System.Text.RegularExpressions;
 
 namespace Notepad___Raylib {
@@ -31,10 +32,33 @@ namespace Notepad___Raylib {
          this.value = line.value;
       }
 
+      [Obsolete("Use the other overload that takes a Cursor as a parameter if you want to push it to the undo stack")]
       public void InsertTextAt(int index, string c) {
          value = value.Insert(index, c);
       }
 
+      public void InsertTextAt(int index, string c, Cursor cursor) {
+         Program.undoHistory.Push(new System.Collections.Generic.List<UndoItem>() {
+            new UndoItem(new Line(this), Program.lines.IndexOf(this), UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace)
+         });
+
+         value = value.Insert(index, c);
+      }
+
+      public void RemoveTextAt(int index, int count, Cursor cursor, Direction direction = Direction.Left) {
+         int yPosition = Program.lines.IndexOf(this);
+
+         switch (direction) {
+            case Direction.Left:
+               new Selection(new Int2(index, yPosition), new Int2(index - count, yPosition)).Delete(Program.lines, cursor);
+               break;
+            case Direction.Right:
+               new Selection(new Int2(index, yPosition), new Int2(index + count, yPosition)).Delete(Program.lines, cursor);
+               break;
+         }
+      }
+
+      [Obsolete("Use the other overload that takes a Cursor as a parameter if you want to push it to the undo stack")]
       public void RemoveTextAt(int index, int count, Direction direction = Direction.Left) {
          switch (direction) {
             case Direction.Left:
