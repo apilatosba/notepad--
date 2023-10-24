@@ -1,19 +1,22 @@
+[]bug: cursor movement doesnt process all inputs if inputs are too fast. thats a big problem Okayeg
 --shaders
    character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
    different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
-   when you ctrl+v paste, dont shiftSelect the pasted text. highlight them instead. do it with a shader
    make cursor blink. make it with a shader
    subpixel rendering
 add shortcuts
    --find in file. ctrl + f
       shift+enter to go back
-   --undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state
+   []--undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state
 render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
     or the both
+sfx
+   when in controlF pressing enter. it says fichuw fichuw or don don every time you press
+ctrl+enter
+show images when hovered over on directory view state
 frontend to settings
 add scrollbars
-bug: cursor movement doesnt process all inputs if inputs are too fast. thats a big problem Okayeg
 a better last known window size logic. right now if you close the window when it is maximized, it will open maximized but wont remember the restored size. so when you click f11 nothing happens
 when pressed minimize window button also set state to whatever the previus state was.
 add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level. maybe not as status bar but in the EditorStatePaused

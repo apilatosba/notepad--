@@ -28,6 +28,8 @@ namespace Notepad___Raylib {
       readonly Stopwatch timeSinceLastMouseInput = new Stopwatch();
       readonly Stopwatch windowResizeTimer = new Stopwatch(); // This gets triggered even when window de-minimized which is what i am using it for.
       readonly Stopwatch controlFHighlightMatchTimer = new Stopwatch();
+      readonly Stopwatch controlVPasteHighlightTimer = new Stopwatch();
+      readonly Stopwatch normalKeyPressesWithModifiersLastInputTimer = new Stopwatch();
       string missedKeyPressesBetweenFrames = string.Empty;
       string controlFBuffer = "";
       string submittedControlFBuffer = "";
@@ -35,6 +37,7 @@ namespace Notepad___Raylib {
       List<ControlFMatchLine> controlFMatches = new List<ControlFMatchLine>();
       ControlFMatch currentControlFMatch;
       Rectangle controlFHighlightMatchRect;
+      Rectangle[] controlVPasteHighlightRects;
 
       // this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib.
       // if you have static variables of classes that belongs other assemblies it becomes problematic.
@@ -70,6 +73,8 @@ namespace Notepad___Raylib {
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
+         if (modifiers.Count > 0) normalKeyPressesWithModifiersLastInputTimer.Restart();
+
          // Keyboard input handling
          if (Program.ShouldAcceptKeyboardInput(out pressedKeys, out KeyboardKey specialKey)) {
             pressedKeys = missedKeyPressesBetweenFrames + pressedKeys;
@@ -80,7 +85,7 @@ namespace Notepad___Raylib {
             ///////////////////////////////////////////
             // Handling key presses that have modifiers
             ///////////////////////////////////////////
-            {
+                  {
                      if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_Z)) {
                            UndoItem undoItem;
@@ -171,6 +176,15 @@ namespace Notepad___Raylib {
                            Program.InsertLinesAtCursor(Program.lines, cursor, clipboard);
 
                            shiftSelection.EndPosition = cursor.position;
+
+                           controlVPasteHighlightRects = shiftSelection.GetRectanglesInWorldSpace(Program.lines,
+                                                                                                  Program.config.fontSize,
+                                                                                                  Program.config.leftPadding,
+                                                                                                  Program.font);
+
+                           controlVPasteHighlightTimer.Restart();
+
+                           shiftSelection = null;
 
                            cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                            cursor.exXPosition = cursor.position.x;
@@ -473,7 +487,7 @@ namespace Notepad___Raylib {
                               break;
                            case KeyboardKey.KEY_KP_ENTER:
                            case KeyboardKey.KEY_ENTER:
-                              if(submittedControlFBuffer == "" && controlFBuffer == "") break;
+                              if (submittedControlFBuffer == "" && controlFBuffer == "") break;
 
                               if (submittedControlFBuffer == controlFBuffer) {
                                  IncreaseControlFMatchByOne();
@@ -484,12 +498,12 @@ namespace Notepad___Raylib {
                                  for (int i = 0; i < Program.lines.Count; i++) {
                                     int[] indices = Program.lines[i].Find(new Regex(controlFBuffer));
 
-                                    if(indices.Length > 0) {
+                                    if (indices.Length > 0) {
                                        controlFMatches.Add(new ControlFMatchLine(i, indices));
                                     }
                                  }
 
-                                 if(controlFMatches.Count > 0)
+                                 if (controlFMatches.Count > 0)
                                     currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0);
                               }
 
@@ -578,7 +592,7 @@ namespace Notepad___Raylib {
 
             if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
                //Debug.Assert(mouseSelection != null);
-               if(mouseSelection != null) {
+               if (mouseSelection != null) {
                   timeSinceLastMouseInput.Restart();
 
                   Vector2 mousePosition = Raylib.GetMousePosition();
@@ -662,7 +676,7 @@ namespace Notepad___Raylib {
                   }
                }
 
-               if(controlFHighlightMatchTimer.ElapsedMilliseconds < 1500) {
+               if (controlFHighlightMatchTimer.ElapsedMilliseconds < 1500) {
                   int alpha = (int)(MathF.Exp(-1 * 6 * (controlFHighlightMatchTimer.ElapsedMilliseconds / 1000.0f)) * 255);
                   Raylib.DrawRectangleRec(controlFHighlightMatchRect, new Color(255, 255, 255, alpha));
                }
@@ -672,6 +686,14 @@ namespace Notepad___Raylib {
             shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
             mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font);
             cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines);
+
+            if (controlVPasteHighlightTimer.ElapsedMilliseconds < 1500 && controlVPasteHighlightRects != null) {
+               int alpha = (int)(MathF.Exp(-1 * 9 * (controlVPasteHighlightTimer.ElapsedMilliseconds / 1000.0f)) * 255);
+
+               foreach (Rectangle rectangle in controlVPasteHighlightRects) {
+                  Raylib.DrawRectangleRec(rectangle, new Color(255, 255, 255, alpha));
+               }
+            }
          }
          Raylib.EndMode2D();
 
@@ -789,7 +811,7 @@ namespace Notepad___Raylib {
                Vector2 regexLabelLength = Raylib.MeasureTextEx(Program.font, regexLabel, Program.config.fontSize, 0);
                Vector2 regexLabelOffset = new Vector2(10, Line.Height);
 
-               if(textPosition.X + textLength.x + 2 * horizontalSpace > Raylib.GetScreenWidth()) {
+               if (textPosition.X + textLength.x + 2 * horizontalSpace > Raylib.GetScreenWidth()) {
                   textPosition.X = Raylib.GetScreenWidth() - textLength.x - 2 * horizontalSpace;
                }
 
@@ -827,7 +849,10 @@ namespace Notepad___Raylib {
          HandleInput();
          PostHandleInput();
 
-         if (Program.TimeSinceLastKeyboardInput < 5000 || timeSinceLastMouseInput.ElapsedMilliseconds < 5000 || windowResizeTimer.ElapsedMilliseconds < 3000) {
+         if (Program.TimeSinceLastKeyboardInput < 5000 || 
+               timeSinceLastMouseInput.ElapsedMilliseconds < 5000 || 
+               windowResizeTimer.ElapsedMilliseconds < 3000 || 
+               normalKeyPressesWithModifiersLastInputTimer.ElapsedMilliseconds < 5000) {
             Render();
          }
       }
@@ -850,6 +875,9 @@ namespace Notepad___Raylib {
 
          Program.YMargin = 0;
          windowResizeTimer.Start();
+         controlFHighlightMatchTimer.Start();
+         controlVPasteHighlightTimer.Start();
+         normalKeyPressesWithModifiersLastInputTimer.Start();
       }
 
       public void ExitState(IEditorState _) {
@@ -860,7 +888,7 @@ namespace Notepad___Raylib {
 
          ControlFMatchLine line = currentControlFMatch.line;
 
-         if(line.matchIndices.Length > currentControlFMatch.index + 1) {
+         if (line.matchIndices.Length > currentControlFMatch.index + 1) {
             currentControlFMatch.index++;
          } else {
             ControlFMatchLine nextLine;

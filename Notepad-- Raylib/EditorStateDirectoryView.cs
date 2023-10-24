@@ -292,7 +292,7 @@ namespace Notepad___Raylib {
                                                                                      Program.config.fontSize,
                                                                                      Program.config.leftPadding,
                                                                                      Program.font,
-                                                                                     mousePosition).y;
+                                                                                     mousePositionInWorldSpace).y;
             }
          }
 

@@ -1,4 +1,5 @@
 ﻿using Raylib_CsLo;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace Notepad___Raylib {
          this.endPosition = endPosition;
       }
 
-      public void Render(List<Line> lines, int fontSize, int leftPadding, Font font) { 
+      public void Render(List<Line> lines, int fontSize, int leftPadding, Font font) {
          GetRightAndLeft(out Int2 left, out Int2 right);
 
          Line[] linesInRange = GetLinesInRange(lines).ToArray();
@@ -209,7 +210,7 @@ namespace Notepad___Raylib {
             default:
                text = linesInRange[0].Value.Substring(left.x, linesInRange[0].Value.Length - left.x);
 
-               for(int i = 1; i < linesInRange.Length - 1; i++) {
+               for (int i = 1; i < linesInRange.Length - 1; i++) {
                   text += "\n" + linesInRange[i].Value;
                }
 
@@ -255,6 +256,43 @@ namespace Notepad___Raylib {
 
          text += textToAppend;
          Raylib.SetClipboardText(text);
+      }
+
+      public Rectangle[] GetRectanglesInWorldSpace(List<Line> lines, int fontSize, int leftPadding, Font font) {
+         GetRightAndLeft(out Int2 left, out Int2 right);
+
+         Line[] linesInRange = GetLinesInRange(lines).ToArray();
+
+         switch (linesInRange.Length) {
+            case 1:
+               return new Rectangle[] { GetRectangleLine(left, right) };
+            case 2:
+               return new Rectangle[] { GetRectangleLine(left, new Int2(linesInRange[0].Value.Length, left.y)), GetRectangleLine(new Int2(0, right.y), right) };
+            default:
+               Rectangle[] rectangles = new Rectangle[linesInRange.Length];
+
+               rectangles[0] = GetRectangleLine(left, new Int2(linesInRange[0].Value.Length, left.y));
+
+               for (int i = left.y + 1; i < right.y; i++) {
+                  rectangles[i - left.y] = GetRectangleLine(new Int2(0, i), new Int2(linesInRange[i - left.y].Value.Length, i));
+               }
+
+               rectangles[rectangles.Length - 1] = GetRectangleLine(new Int2(0, right.y), right);
+
+               return rectangles;
+         }
+
+         Rectangle GetRectangleLine(Int2 start, Int2 end) {
+            Debug.Assert(start.y == end.y);
+
+            Int2 left = start.x <= end.x ? start : end;
+            Int2 right = start.x <= end.x ? end : start;
+
+            Int2 leftWorldSpacePosition = GetWorldSpacePosition(left, lines, fontSize, leftPadding, font);
+            Int2 rightWorldSpacePosition = GetWorldSpacePosition(right, lines, fontSize, leftPadding, font);
+
+            return new Rectangle(leftWorldSpacePosition.x, leftWorldSpacePosition.y, rightWorldSpacePosition.x - leftWorldSpacePosition.x, Line.Height);
+         }
       }
    }
 }

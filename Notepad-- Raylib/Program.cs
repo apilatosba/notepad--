@@ -82,6 +82,9 @@ namespace Notepad___Raylib {
       static readonly string customFontsDirectory = Path.Combine(GetExecutableDirectory(), "Fonts");
 #endif
 
+      /// <summary>
+      /// This doesn't include normal key presses that have modifiers.
+      /// </summary>
       public static long TimeSinceLastKeyboardInput => timeSinceLastInput;
 
       static unsafe void Main(string[] args) {
@@ -376,7 +379,20 @@ namespace Notepad___Raylib {
             linesToFile[i] = lines[i].Value;
          }
 
-         File.WriteAllLines(path, linesToFile);
+         for(int i = 0; ;) {
+            try {
+               File.WriteAllLines(path, linesToFile);
+               break;
+            }
+            catch (IOException) {
+               i++;
+
+               if(i > 5) {
+                  Console.WriteLine("Failed to save file.");
+                  return;
+               }
+            }
+         }
 #if VISUAL_STUDIO
          Console.WriteLine($"Saved to {path}");
 #endif
