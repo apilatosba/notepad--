@@ -138,7 +138,6 @@ namespace Notepad___Raylib {
                            }
                            Raylib.EndTextureMode();
 
-                           // todo resolve memory leak
                            //Image image = Raylib.LoadImageFromTexture(Program.textMask.texture);
                            //Raylib.ImageResize(&image, Program.textMask.texture.width / 2, Program.textMask.texture.height / 2);
                            //Program.quarterResolutionTextMask = Raylib.LoadTextureFromImage(image);

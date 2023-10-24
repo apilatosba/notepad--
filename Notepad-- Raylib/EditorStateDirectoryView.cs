@@ -283,15 +283,17 @@ namespace Notepad___Raylib {
             }
          }
 
-         if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
-            Vector2 mousePosition = Raylib.GetMousePosition();
-            Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera); 
+         if (!Program.isDraggingWindow) {
+            if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
+               Vector2 mousePosition = Raylib.GetMousePosition();
+               Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera); 
 
-            cursor.position.y = cursor.CalculatePositionFromWorldSpaceCoordinates(lines,
-                                                                                  Program.config.fontSize,
-                                                                                  Program.config.leftPadding,
-                                                                                  Program.font,
-                                                                                  mousePosition).y;
+               cursor.position.y = cursor.CalculatePositionFromWorldSpaceCoordinates(lines,
+                                                                                     Program.config.fontSize,
+                                                                                     Program.config.leftPadding,
+                                                                                     Program.font,
+                                                                                     mousePosition).y;
+            }
          }
 
          Program.HandleMouseWheelInput(Raylib.GetMouseWheelMove(), null, modifiers, ref camera, this);

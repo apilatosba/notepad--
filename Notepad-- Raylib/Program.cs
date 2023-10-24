@@ -179,13 +179,13 @@ namespace Notepad___Raylib {
 
          lastInputTimer.Start();
 
-         Raylib.SetTargetFPS(144); // TODO vsync?
          Raylib.SetWindowIcon(Raylib.LoadImage(Path.Combine(GetImagesDirectory(), "icon4.png")));
          Raylib.SetWindowPosition(windowSaveData.position.x, windowSaveData.position.y);
          Raylib.SetWindowState(/*(windowSaveData.maximized ? ConfigFlags.FLAG_WINDOW_MAXIMIZED : 0)*/
                                /*|*/ ConfigFlags.FLAG_WINDOW_UNDECORATED
                                | ConfigFlags.FLAG_WINDOW_RESIZABLE
-                               | ConfigFlags.FLAG_WINDOW_TRANSPARENT);
+                               | ConfigFlags.FLAG_WINDOW_TRANSPARENT
+                               | ConfigFlags.FLAG_VSYNC_HINT);
 
          flashShader = Raylib.LoadShader(null, Path.Combine(GetShadersDirectory(), "flash.frag"));
          flashShaderTransparencyLoc = Raylib.GetShaderLocation(flashShader, "transparency");
