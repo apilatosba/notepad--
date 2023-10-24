@@ -369,31 +369,42 @@ namespace Notepad___Raylib {
                                  shiftSelection?.Delete(Program.lines, cursor);
                                  shiftSelection = null;
 
-                                 Line currentLine = Program.lines[cursor.position.y];
-                                 string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
-
-                                 Line newLine = new Line(textAfterCursor);
-
-                                 if (cursor.IsCursorAtEndOfFile(Program.lines)) {
+                                 if(modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                                     Program.undoHistory.Push(new List<UndoItem>() {
-                                       new UndoItem(null, Program.lines.Count, cursor.position, UndoAction.Remove)
+                                       new UndoItem(null, cursor.position.y, cursor.position, UndoAction.Remove)
                                     });
 
-                                    Program.lines.Add(newLine);
+                                    Program.lines.Insert(cursor.position.y, new Line());
+
+                                    cursor.position.x = 0;
+                                    cursor.exXPosition = cursor.position.x;
                                  } else {
-                                    Program.undoHistory.Push(new List<UndoItem>() {
-                                       new UndoItem(new Line(currentLine), cursor.position.y, cursor.position, UndoAction.Replace),
-                                       new UndoItem(null, cursor.position.y + 1, cursor.position, UndoAction.Remove)
-                                    });
+                                    Line currentLine = Program.lines[cursor.position.y];
+                                    string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
 
-                                    Program.lines.Insert(Program.lines.IndexOf(currentLine) + 1, newLine);
+                                    Line newLine = new Line(textAfterCursor);
+
+                                    if (cursor.IsCursorAtEndOfFile(Program.lines)) {
+                                       Program.undoHistory.Push(new List<UndoItem>() {
+                                          new UndoItem(null, Program.lines.Count, cursor.position, UndoAction.Remove)
+                                       });
+
+                                       Program.lines.Add(newLine);
+                                    } else {
+                                       Program.undoHistory.Push(new List<UndoItem>() {
+                                          new UndoItem(new Line(currentLine), cursor.position.y, cursor.position, UndoAction.Replace),
+                                          new UndoItem(null, cursor.position.y + 1, cursor.position, UndoAction.Remove)
+                                       });
+
+                                       Program.lines.Insert(Program.lines.IndexOf(currentLine) + 1, newLine);
+                                    }
+
+                                    currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
+
+                                    cursor.position.x = 0;
+                                    cursor.position.y++;
+                                    cursor.exXPosition = cursor.position.x;
                                  }
-
-                                 currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
-
-                                 cursor.position.x = 0;
-                                 cursor.position.y++;
-                                 cursor.exXPosition = cursor.position.x;
                               }
 
                               cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
