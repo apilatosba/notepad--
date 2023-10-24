@@ -148,7 +148,7 @@ namespace Notepad___Raylib {
       public Int2 CalculatePositionFromWorldSpaceCoordinates(in List<Line> lines, int fontSize, int leftPadding, Font font, Int2 worldSpaceCoordinates) {
          Int2 pos = new Int2();
 
-         pos.y = worldSpaceCoordinates.y / Line.Height;
+         pos.y = (worldSpaceCoordinates.y - Program.YMargin) / Line.Height;
 
          if(pos.y > lines.Count - 1) pos.y = lines.Count - 1;
 

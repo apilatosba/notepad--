@@ -130,6 +130,26 @@ namespace Notepad___Raylib {
                      lastKeyboardInputTimer.Restart();
 
                      switch (specialKey) {
+                        case KeyboardKey.KEY_HOME:
+                           cursor.position.y = 0;
+
+                           cursor.MakeSureCursorIsVisibleToCamera(lines,
+                                                                  ref camera,
+                                                                  Program.config.fontSize,
+                                                                  Program.config.leftPadding,
+                                                                  Program.font);
+
+                           break;
+                        case KeyboardKey.KEY_END:
+                           cursor.position.y = lines.Count - 1;
+
+                           cursor.MakeSureCursorIsVisibleToCamera(lines,
+                                                                  ref camera,
+                                                                  Program.config.fontSize,
+                                                                  Program.config.leftPadding,
+                                                                  Program.font);
+
+                           break;
                         case KeyboardKey.KEY_KP_ENTER:
                         case KeyboardKey.KEY_ENTER:
                            bool isFile;
@@ -235,7 +255,7 @@ namespace Notepad___Raylib {
                            }
 
                            if (currentControlFMatch != null) {
-                              cursor.position = new Int2(currentControlFMatch.line.matchIndices[currentControlFMatch.index], currentControlFMatch.line.lineNumber);
+                              cursor.position.y = currentControlFMatch.line.lineNumber;
 
                               Vector2 highlightedTextLength = Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0);
                               int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font,
@@ -263,7 +283,16 @@ namespace Notepad___Raylib {
             }
          }
 
+         if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
+            Vector2 mousePosition = Raylib.GetMousePosition();
+            Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera); 
 
+            cursor.position.y = cursor.CalculatePositionFromWorldSpaceCoordinates(lines,
+                                                                                  Program.config.fontSize,
+                                                                                  Program.config.leftPadding,
+                                                                                  Program.font,
+                                                                                  mousePosition).y;
+         }
 
          Program.HandleMouseWheelInput(Raylib.GetMouseWheelMove(), null, modifiers, ref camera, this);
       }
