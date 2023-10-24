@@ -641,13 +641,13 @@ namespace Notepad___Raylib {
       }
 
       public unsafe void Render() {
-         if (flashShaderTimer.IsRunning) {
-            flashShaderTransparency = MathF.Exp(-1 * 6 * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
-         }
+         //if (flashShaderTimer.IsRunning) {
+         //   flashShaderTransparency = MathF.Exp(-1 * 6 * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
+         //}
 
-         fixed (float* value = &flashShaderTransparency) {
-            Raylib.SetShaderValue(Program.flashShader, Program.flashShaderTransparencyLoc, value, ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
-         }
+         //fixed (float* value = &flashShaderTransparency) {
+         //   Raylib.SetShaderValue(Program.flashShader, Program.flashShaderTransparencyLoc, value, ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
+         //}
 
          //////////////////////////////////////
          // Screen space rendering (background)
@@ -730,12 +730,12 @@ namespace Notepad___Raylib {
          //////////////////////////
          // RenderTexture rendering
          //////////////////////////
-         float strength = 0.0f;
-         if (flashShaderTimer.IsRunning) {
-            strength = MathF.Exp(-1 * 2.5f * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
-         }
+         if (flashShaderTimer.ElapsedMilliseconds < 1500) {
+            float strength = 0.0f;
+            if (flashShaderTimer.IsRunning) {
+               strength = MathF.Exp(-1 * 2.5f * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
+            }
 
-         if (strength > 0.001f) {
             Raylib.BeginTextureMode(Program.textMask);
             {
                Raylib.BeginMode2D(camera);
