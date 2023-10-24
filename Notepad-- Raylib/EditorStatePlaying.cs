@@ -99,7 +99,7 @@ namespace Notepad___Raylib {
                               //   cursor.exXPosition = cursor.position.x;
                               //}
 
-                              foreach(UndoItem undoItem in undoItems) {
+                              foreach (UndoItem undoItem in undoItems) {
                                  switch (undoItem.action) {
                                     case UndoAction.Replace:
                                        Program.lines[undoItem.lineNumber] = undoItem.line;
@@ -193,7 +193,7 @@ namespace Notepad___Raylib {
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
                            mouseSelection?.Delete(Program.lines, cursor);
                            shiftSelection?.Delete(Program.lines, cursor);
-                           
+
                            Selection selection = new Selection() {
                               StartPosition = cursor.position
                            };
@@ -274,7 +274,7 @@ namespace Notepad___Raylib {
 #if VISUAL_STUDIO
                         Program.PrintPressedKeys(pressedKeys);
 #endif
-                        
+
                         shiftSelection?.Delete(Program.lines, cursor);
                         shiftSelection = null;
 
@@ -369,7 +369,7 @@ namespace Notepad___Raylib {
                                  shiftSelection?.Delete(Program.lines, cursor);
                                  shiftSelection = null;
 
-                                 if(modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                 if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                                     Program.undoHistory.Push(new List<UndoItem>() {
                                        new UndoItem(null, cursor.position.y, cursor.position, UndoAction.Remove)
                                     });
@@ -514,6 +514,16 @@ namespace Notepad___Raylib {
                         Console.WriteLine($"{specialKey} (ctrl+f)");
 #endif
                         switch (specialKey) {
+                           case KeyboardKey.KEY_UP:
+                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                 camera.target.Y -= Line.Height;
+                              }
+                              break;
+                           case KeyboardKey.KEY_DOWN:
+                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                 camera.target.Y += Line.Height;
+                              }
+                              break;
                            case KeyboardKey.KEY_ESCAPE:
                               internalState = InternalState.Normal;
                               break;

@@ -224,6 +224,16 @@ namespace Notepad___Raylib {
                      Console.WriteLine($"{specialKey} (ctrl+f)");
 #endif
                      switch (specialKey) {
+                        case KeyboardKey.KEY_UP:
+                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                              camera.target.Y -= Line.Height;
+                           }
+                           break;
+                        case KeyboardKey.KEY_DOWN:
+                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                              camera.target.Y += Line.Height;
+                           }
+                           break;
                         case KeyboardKey.KEY_ESCAPE:
                            internalState = InternalState.Normal;
                            break;
