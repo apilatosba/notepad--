@@ -5,15 +5,14 @@
    make cursor blink. make it with a shader
    subpixel rendering
 add shortcuts
-   --find in file. ctrl + f
-      shift+enter to go back
-   []--undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state
-      shiftSelect ctrl+z if inserts new text
+   shift+enter to go back
+   shiftSelect ctrl+z if inserts new text
 render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
     or the both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
+ctrl + arrow key scroll on controlF internal state
 ctrl+enter
 show images when hovered over on directory view state
 frontend to settings

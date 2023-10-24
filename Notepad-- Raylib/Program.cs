@@ -560,14 +560,14 @@ namespace Notepad___Raylib {
 
          List<UndoItem> undoItems = new List<UndoItem>();
 
-         undoItems.Add(new UndoItem(new Line(line), cursor.position.y, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace));
+         undoItems.Add(new UndoItem(new Line(line), cursor.position.y, cursor.position, UndoAction.Replace));
 
          line.RemoveTextAt(cursor.position.x, line.Value.Length - cursor.position.x, Direction.Right);
 
          line.InsertTextAt(cursor.position.x, linesToInsert[0].Value);
 
          for (int i = 1; i < linesToInsert.Count; i++) {
-            undoItems.Add(new UndoItem(null, cursor.position.y + 1, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Remove));
+            undoItems.Add(new UndoItem(null, cursor.position.y + 1, cursor.position, UndoAction.Remove));
 
             lines.Insert(cursor.position.y + i, linesToInsert[i]);
          }

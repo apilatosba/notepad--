@@ -280,10 +280,6 @@ namespace Notepad___Raylib {
 
                         Line currentLine = Program.lines[cursor.position.y];
 
-                        Program.undoHistory.Push(new List<UndoItem>() {
-                           new UndoItem(new Line(currentLine), cursor.position.y, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace)
-                        });
-
                         Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                         cursor.exXPosition = cursor.position.x;
@@ -358,13 +354,6 @@ namespace Notepad___Raylib {
                                  // Utilizing the undo implementation of Selection.Delete()
                                  new Selection(cursor.position, new Int2(Program.lines[cursor.position.y - 1].Value.Length, cursor.position.y - 1)).Delete(Program.lines, cursor);
                               } else {
-                                 //Program.undoHistory.Push(new List<UndoItem>() {
-                                 //new UndoItem(new Line(Program.lines[cursor.position.y]),
-                                 //             cursor.position.y,
-                                 //             UndeReason.Deletion,
-                                 //             cursor.position)});
-
-
                                  if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                                     int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Left);
                                     Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump);
@@ -387,14 +376,14 @@ namespace Notepad___Raylib {
 
                                  if (cursor.IsCursorAtEndOfFile(Program.lines)) {
                                     Program.undoHistory.Push(new List<UndoItem>() {
-                                       new UndoItem(null, Program.lines.Count, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Remove)
+                                       new UndoItem(null, Program.lines.Count, cursor.position, UndoAction.Remove)
                                     });
 
                                     Program.lines.Add(newLine);
                                  } else {
                                     Program.undoHistory.Push(new List<UndoItem>() {
-                                       new UndoItem(new Line(currentLine), cursor.position.y, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace),
-                                       new UndoItem(null, cursor.position.y + 1, UndeReason.NormalKeyStroke, cursor.position, UndoAction.Remove)
+                                       new UndoItem(new Line(currentLine), cursor.position.y, cursor.position, UndoAction.Replace),
+                                       new UndoItem(null, cursor.position.y + 1, cursor.position, UndoAction.Remove)
                                     });
 
                                     Program.lines.Insert(Program.lines.IndexOf(currentLine) + 1, newLine);
@@ -416,7 +405,7 @@ namespace Notepad___Raylib {
                                  List<UndoItem> undoItems = new List<UndoItem>();
 
                                  foreach (Line line in linesInRange) {
-                                    undoItems.Add(new UndoItem(new Line(line), Program.lines.IndexOf(line), UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace));
+                                    undoItems.Add(new UndoItem(new Line(line), Program.lines.IndexOf(line), cursor.position, UndoAction.Replace));
 
                                     line.InsertTextAt(0, new string(' ', Program.config.tabSize)); // Stick to obsolete one. I don't want to push this to the undo stack once more
                                  }

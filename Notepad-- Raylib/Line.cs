@@ -39,7 +39,7 @@ namespace Notepad___Raylib {
 
       public void InsertTextAt(int index, string c, Cursor cursor) {
          Program.undoHistory.Push(new System.Collections.Generic.List<UndoItem>() {
-            new UndoItem(new Line(this), Program.lines.IndexOf(this), UndeReason.NormalKeyStroke, cursor.position, UndoAction.Replace)
+            new UndoItem(new Line(this), Program.lines.IndexOf(this), cursor.position, UndoAction.Replace)
          });
 
          value = value.Insert(index, c);
