@@ -362,11 +362,11 @@ namespace Notepad___Raylib {
          if (sizeInBytes < 1024) {
             text = $"{sizeInBytes}";
          } else if (sizeInBytes < 1024 * 1024) {
-            text = $"{sizeInBytes / 1024}KB";
+            text = $"{(double)sizeInBytes / 1024:n2}KB";
          } else if (sizeInBytes < 1024 * 1024 * 1024) {
-            text = $"{sizeInBytes / 1024 / 1024}MB";
+            text = $"{(double)sizeInBytes / 1024 / 1024:n2}MB";
          } else {
-            text = $"{sizeInBytes / 1024 / 1024 / 1024}GB";
+            text = $"{(double)sizeInBytes / 1024 / 1024 / 1024:n2}GB";
          }
 
          return text;
