@@ -5,7 +5,8 @@
    make cursor blink. make it with a shader
    subpixel rendering
 add shortcuts
-find in file. ctrl + f
+   --find in file. ctrl + f
+   --undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state
 render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
     or the both
@@ -18,4 +19,3 @@ add a status bar at bottom shows the line and column number of cursor and shows 
 config.fontname and program.font has no relationship. when i deserialize i should update the program.font
 change cursor y repositioning algorithm. only works with monospace font rn.
 i should look for fonts in shared fonts folder (C:\Windows\Fonts, /usr/share/fonts) and my custom fonts folder. change the GetFontPath method
---undo implementation by saving states. i should save not the whole text but only the edited lines. so when user undos, i just swap the lines in the current buffer with the lines in the previous state

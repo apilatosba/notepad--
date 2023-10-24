@@ -54,6 +54,11 @@ namespace Notepad___Raylib {
          return MeasureTextHeight(font, "A", fontSize);
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="regex"></param>
+      /// <returns>Empty array if no match is found</returns>
       public int[] Find(Regex regex) {
          regex = new Regex(regex.ToString(), RegexOptions.IgnoreCase);
 

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WindowSaveData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <position>
-    <x>282</x>
-    <y>243</y>
-    <Column>282</Column>
-    <Row>243</Row>
+    <x>109</x>
+    <y>80</y>
+    <Column>109</Column>
+    <Row>80</Row>
   </position>
   <size>
-    <x>1276</x>
-    <y>587</y>
-    <Column>1276</Column>
-    <Row>587</Row>
+    <x>1635</x>
+    <y>866</y>
+    <Column>1635</Column>
+    <Row>866</Row>
   </size>
   <maximized>false</maximized>
 </WindowSaveData>

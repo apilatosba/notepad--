@@ -62,6 +62,7 @@ namespace Notepad___Raylib {
       public static string filePath;
       public static string directoryPath;
       public static bool isQuitButtonPressed = false;
+      public static bool isDraggingWindow = false;
       public static Stack<UndoItem> undoHistory = new Stack<UndoItem>();
       /// <summary>
       /// Vertical form of <see cref="Config.leftPadding"/>
@@ -168,7 +169,8 @@ namespace Notepad___Raylib {
          if (directoryPath != null) {
             IEditorState.SetStateTo(new EditorStateDirectoryView());
          } else if (filePath != null) {
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(filePath));
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Path.Combine(Directory.GetCurrentDirectory(),
+                                                                             filePath)));
             filePath = Path.GetFileName(filePath);
 
             lines = ReadLinesFromFile(filePath);
@@ -244,6 +246,8 @@ namespace Notepad___Raylib {
                      windowPositionWhenStartedDragging = (Int2)Raylib.GetWindowPosition();
 
                      mousePositionOffsetRelativeToWindow = windowPositionWhenStartedDragging - mousePositionWhenStartedDragging;
+
+                     isDraggingWindow = true;
                   }
 
                   if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
@@ -258,6 +262,8 @@ namespace Notepad___Raylib {
                      windowPositionWhenStartedDragging = (Int2)Raylib.GetWindowPosition();
 
                      mousePositionOffsetRelativeToWindow = windowPositionWhenStartedDragging - mousePositionWhenStartedDragging;
+
+                     isDraggingWindow = true;
                   }
 
                   if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT)) {
@@ -266,6 +272,14 @@ namespace Notepad___Raylib {
 
                      Raylib.SetWindowSize(width < minimumWindowSize.x ? minimumWindowSize.x : width,
                                           height < minimumWindowSize.y ? minimumWindowSize.y : height);
+                  }
+               }
+
+               if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_CONTROL)) {
+                  isDraggingWindow = false;
+               } else {
+                  if (Raylib.IsMouseButtonUp(MouseButton.MOUSE_BUTTON_LEFT) && Raylib.IsMouseButtonUp(MouseButton.MOUSE_BUTTON_RIGHT)) {
+                     isDraggingWindow = false;
                   }
                }
 

@@ -27,11 +27,14 @@ namespace Notepad___Raylib {
       readonly Stopwatch flashShaderTimer = new Stopwatch();
       readonly Stopwatch timeSinceLastMouseInput = new Stopwatch();
       readonly Stopwatch windowResizeTimer = new Stopwatch(); // This gets triggered even when window de-minimized which is what i am using it for.
+      readonly Stopwatch controlFHighlightMatchTimer = new Stopwatch();
       string missedKeyPressesBetweenFrames = string.Empty;
       string controlFBuffer = "";
       string submittedControlFBuffer = "";
       InternalState internalState = InternalState.Normal;
-      List<ControlFMatch> controlFMatches;
+      List<ControlFMatchLine> controlFMatches = new List<ControlFMatchLine>();
+      ControlFMatch currentControlFMatch;
+      Rectangle controlFHighlightMatchRect;
 
       // this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib.
       // if you have static variables of classes that belongs other assemblies it becomes problematic.
@@ -214,7 +217,8 @@ namespace Notepad___Raylib {
 
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
                            internalState = InternalState.ControlF;
-                           controlFMatches = new List<ControlFMatch>();
+                           //controlFMatches = new List<ControlFMatchLine>();
+                           //submittedControlFBuffer = "";
                         }
                      }
 
@@ -447,7 +451,7 @@ namespace Notepad___Raylib {
                case InternalState.ControlF: {
                      if (pressedKeys != null) {
 #if VISUAL_STUDIO
-                        Program.PrintPressedKeys(pressedKeys);
+                        Program.PrintPressedKeys($"{pressedKeys} (ctrl+f)");
 #endif
 
                         //Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
@@ -456,7 +460,7 @@ namespace Notepad___Raylib {
 
                      if (specialKey != KeyboardKey.KEY_NULL) {
 #if VISUAL_STUDIO
-                        Console.WriteLine(specialKey);
+                        Console.WriteLine($"{specialKey} (ctrl+f)");
 #endif
                         switch (specialKey) {
                            case KeyboardKey.KEY_ESCAPE:
@@ -468,14 +472,48 @@ namespace Notepad___Raylib {
                               }
                               break;
                            case KeyboardKey.KEY_ENTER:
-                              controlFMatches.Clear();
-                              submittedControlFBuffer = controlFBuffer;
+                              if(submittedControlFBuffer == "" && controlFBuffer == "") break;
 
-                              for (int i = 0; i < Program.lines.Count; i++) {
-                                 int[] indices = Program.lines[i].Find(new Regex(controlFBuffer));
+                              if (submittedControlFBuffer == controlFBuffer) {
+                                 IncreaseControlFMatchByOne();
+                              } else {
+                                 controlFMatches.Clear();
+                                 submittedControlFBuffer = controlFBuffer;
 
-                                 controlFMatches.Add(new ControlFMatch(i, indices));
+                                 for (int i = 0; i < Program.lines.Count; i++) {
+                                    int[] indices = Program.lines[i].Find(new Regex(controlFBuffer));
+
+                                    if(indices.Length > 0) {
+                                       controlFMatches.Add(new ControlFMatchLine(i, indices));
+                                    }
+                                 }
+
+                                 if(controlFMatches.Count > 0)
+                                    currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0);
                               }
+
+                              if (currentControlFMatch != null) {
+                                 cursor.position = new Int2(currentControlFMatch.line.matchIndices[currentControlFMatch.index], currentControlFMatch.line.lineNumber);
+
+                                 Vector2 highlightedTextLength = Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0);
+                                 int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font,
+                                                                                                              Program.lines[currentControlFMatch.line.lineNumber].Value.Substring(0, currentControlFMatch.line.matchIndices[currentControlFMatch.index]),
+                                                                                                              Program.config.fontSize,
+                                                                                                              0).X;
+
+                                 controlFHighlightMatchRect = new Rectangle(rectangleStartX,
+                                                                            cursor.position.y * Line.Height + Program.YMargin,
+                                                                            highlightedTextLength.X,
+                                                                            highlightedTextLength.Y);
+
+                                 controlFHighlightMatchTimer.Restart();
+                              }
+
+                              cursor.MakeSureCursorIsVisibleToCamera(Program.lines,
+                                                                     ref camera,
+                                                                     Program.config.fontSize,
+                                                                     Program.config.leftPadding,
+                                                                     Program.font);
                               break;
                         }
                      }
@@ -519,46 +557,49 @@ namespace Notepad___Raylib {
 
          Program.ClampCameraToText(Program.lines, ref camera);
 
-         if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
-            timeSinceLastMouseInput.Restart();
+         if (!Program.isDraggingWindow) {
+            if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)) {
+               timeSinceLastMouseInput.Restart();
 
-            Vector2 mousePosition = Raylib.GetMousePosition();
-            Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
+               Vector2 mousePosition = Raylib.GetMousePosition();
+               Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-            cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines,
-                                                                                Program.config.fontSize,
-                                                                                Program.config.leftPadding,
-                                                                                Program.font,
-                                                                                mousePositionInWorldSpace);
-            cursor.exXPosition = cursor.position.x;
+               cursor.position = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines,
+                                                                                   Program.config.fontSize,
+                                                                                   Program.config.leftPadding,
+                                                                                   Program.font,
+                                                                                   mousePositionInWorldSpace);
+               cursor.exXPosition = cursor.position.x;
 
-            shiftSelection = null;
-            mouseSelection = new Selection(cursor.position, cursor.position);
-         }
+               shiftSelection = null;
+               mouseSelection = new Selection(cursor.position, cursor.position);
+            }
 
-         if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
-            Debug.Assert(mouseSelection != null);
+            if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
+               //Debug.Assert(mouseSelection != null);
+               if(mouseSelection != null) {
+                  timeSinceLastMouseInput.Restart();
 
-            timeSinceLastMouseInput.Restart();
+                  Vector2 mousePosition = Raylib.GetMousePosition();
+                  Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
-            Vector2 mousePosition = Raylib.GetMousePosition();
-            Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
+                  mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines,
+                                                                                                 Program.config.fontSize,
+                                                                                                 Program.config.leftPadding,
+                                                                                                 Program.font,
+                                                                                                 mousePositionInWorldSpace);
 
-            mouseSelection.EndPosition = cursor.CalculatePositionFromWorldSpaceCoordinates(Program.lines,
-                                                                                           Program.config.fontSize,
-                                                                                           Program.config.leftPadding,
-                                                                                           Program.font,
-                                                                                           mousePositionInWorldSpace);
+                  cursor.position = mouseSelection.EndPosition;
+                  cursor.exXPosition = cursor.position.x;
+               }
+            }
 
-            cursor.position = mouseSelection.EndPosition;
-            cursor.exXPosition = cursor.position.x;
-         }
+            if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) {
+               timeSinceLastMouseInput.Restart();
 
-         if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) {
-            timeSinceLastMouseInput.Restart();
-
-            shiftSelection = mouseSelection;
-            mouseSelection = null;
+               shiftSelection = mouseSelection;
+               mouseSelection = null;
+            }
          }
 
          //horizontalScrollBar.UpdateHorizontal(ref camera, FindDistanceToRightMostChar(Program.lines, font), Raylib.GetScreenWidth());
@@ -618,6 +659,11 @@ namespace Notepad___Raylib {
 
                      Raylib.DrawRectangleLines(rectangleStartX, Line.Height * controlFMatches[i].lineNumber, rectangleLength, Line.Height, Raylib.RED);
                   }
+               }
+
+               if(controlFHighlightMatchTimer.ElapsedMilliseconds < 1500) {
+                  int alpha = (int)(MathF.Exp(-1 * 6 * (controlFHighlightMatchTimer.ElapsedMilliseconds / 1000.0f)) * 255);
+                  Raylib.DrawRectangleRec(controlFHighlightMatchRect, new Color(255, 255, 255, alpha));
                }
             }
 
@@ -738,14 +784,40 @@ namespace Notepad___Raylib {
                Int2 textLength = (Int2)Raylib.MeasureTextEx(Program.font, controlFBuffer, Program.config.fontSize, 0);
                int horizontalSpace = 5;
                int verticalSpace = 2;
+               string regexLabel = "REGEX";
+               Vector2 regexLabelLength = Raylib.MeasureTextEx(Program.font, regexLabel, Program.config.fontSize, 0);
+               Vector2 regexLabelOffset = new Vector2(10, Line.Height);
+
+               if(textPosition.X + textLength.x + 2 * horizontalSpace > Raylib.GetScreenWidth()) {
+                  textPosition.X = Raylib.GetScreenWidth() - textLength.x - 2 * horizontalSpace;
+               }
 
                Rectangle rectangle = new Rectangle(textPosition.X - horizontalSpace,
                                                    textPosition.Y - verticalSpace,
                                                    2 * horizontalSpace + textLength.x,
                                                    2 * verticalSpace + textLength.y);
 
+               Rectangle regexLabelRect = new Rectangle(rectangle.x + regexLabelOffset.X,
+                                                        rectangle.y + regexLabelOffset.Y,
+                                                        regexLabelLength.X + 2 * horizontalSpace,
+                                                        regexLabelLength.Y + 2 * verticalSpace);
+
                Raylib.DrawRectangleRounded(rectangle, 0.5f, 8, new Color(50, 50, 50, 255));
-               Raylib.DrawTextEx(Program.font, controlFBuffer, textPosition, Program.config.fontSize, 0, Program.config.textColor);
+               Raylib.DrawRectangleRounded(regexLabelRect, 0.5f, 8, new Color(50, 50, 50, 255));
+
+               Raylib.DrawTextEx(Program.font,
+                                 controlFBuffer,
+                                 textPosition,
+                                 Program.config.fontSize,
+                                 0,
+                                 Program.config.textColor);
+
+               Raylib.DrawTextEx(Program.font,
+                                 regexLabel,
+                                 textPosition + regexLabelOffset,
+                                 Program.config.fontSize,
+                                 0,
+                                 Program.config.textColor);
             }
          }
       }
@@ -780,6 +852,26 @@ namespace Notepad___Raylib {
       }
 
       public void ExitState(IEditorState _) {
+      }
+
+      void IncreaseControlFMatchByOne() {
+         if (currentControlFMatch == null) return;
+
+         ControlFMatchLine line = currentControlFMatch.line;
+
+         if(line.matchIndices.Length > currentControlFMatch.index + 1) {
+            currentControlFMatch.index++;
+         } else {
+            ControlFMatchLine nextLine;
+            try {
+               nextLine = controlFMatches[currentControlFMatch.indexOfLineInMatchBuffer + 1];
+               currentControlFMatch = new ControlFMatch(nextLine, 0, currentControlFMatch.indexOfLineInMatchBuffer + 1);
+            }
+            catch (ArgumentOutOfRangeException) {
+               nextLine = controlFMatches[0];
+               currentControlFMatch = new ControlFMatch(nextLine, 0, 0);
+            }
+         }
       }
    }
 }
