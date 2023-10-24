@@ -2,7 +2,6 @@
   "profiles": {
     "Notepad-- Raylib": {
       "commandName": "Project",
-      "commandLineArgs": "test.txt",
       "workingDirectory": "C:\\Users\\abdul\\source\\repos\\Notepad-- Raylib\\Notepad-- Raylib"
     }
   }

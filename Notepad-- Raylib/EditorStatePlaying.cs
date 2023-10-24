@@ -217,8 +217,9 @@ namespace Notepad___Raylib {
 
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
                            internalState = InternalState.ControlF;
-                           //controlFMatches = new List<ControlFMatchLine>();
-                           //submittedControlFBuffer = "";
+                           mouseSelection = null;
+                           shiftSelection = null;
+                           break;
                         }
                      }
 
@@ -471,6 +472,7 @@ namespace Notepad___Raylib {
                                  controlFBuffer = controlFBuffer.Remove(controlFBuffer.Length - 1);
                               }
                               break;
+                           case KeyboardKey.KEY_KP_ENTER:
                            case KeyboardKey.KEY_ENTER:
                               if(submittedControlFBuffer == "" && controlFBuffer == "") break;
 
@@ -657,7 +659,7 @@ namespace Notepad___Raylib {
                      int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font, Program.lines[controlFMatches[i].lineNumber].Value.Substring(0, match), Program.config.fontSize, 0).X;
                      int rectangleLength = (int)Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0).X;
 
-                     Raylib.DrawRectangleLines(rectangleStartX, Line.Height * controlFMatches[i].lineNumber, rectangleLength, Line.Height, Raylib.RED);
+                     Raylib.DrawRectangleLines(rectangleStartX, Line.Height * controlFMatches[i].lineNumber + Program.YMargin, rectangleLength, Line.Height, new Color(255, 0, 0, 150));
                   }
                }
 

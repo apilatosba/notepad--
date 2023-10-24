@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Notepad___Raylib {
    internal class EditorStateDirectoryView : IEditorState {
@@ -25,9 +26,16 @@ namespace Notepad___Raylib {
       RenderTexture? highlightedLineRenderTexture; // IsRenderTextureReady() function doesnt exist in this nuget package so i manually set it to null
       ColorInt directoryColor;
       ColorInt fileColor;
-      Stopwatch lastKeyboardInputTimer = new Stopwatch();
-      Stopwatch windowResizeTimer = new Stopwatch();
-      
+      readonly Stopwatch lastKeyboardInputTimer = new Stopwatch();
+      readonly Stopwatch windowResizeTimer = new Stopwatch();
+      readonly Stopwatch controlFHighlightMatchTimer = new Stopwatch();
+      InternalState internalState = InternalState.Normal;
+      List<ControlFMatchLine> controlFMatches = new List<ControlFMatchLine>();
+      ControlFMatch currentControlFMatch;
+      string controlFBuffer = "";
+      string submittedControlFBuffer = "";
+      Rectangle controlFHighlightMatchRect;
+
       public void EnterState(IEditorState previousState) {
          Program.YMargin = Line.Height;
          lastKeyboardInputTimer.Start();
@@ -103,72 +111,159 @@ namespace Notepad___Raylib {
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_ALT)) modifiers.Add(KeyboardKey.KEY_RIGHT_ALT);
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_SUPER)) modifiers.Add(KeyboardKey.KEY_RIGHT_SUPER);
 
+
          if (Program.ShouldAcceptKeyboardInput(out string pressedKeys, out KeyboardKey specialKey)) {
-            if (specialKey != KeyboardKey.KEY_NULL) {
+
+            switch (internalState) {
+               case InternalState.Normal:
+
+                  if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
+                        internalState = InternalState.ControlF;
+                     }
+                  }
+
+                  if (specialKey != KeyboardKey.KEY_NULL) {
 #if VISUAL_STUDIO
-               Console.WriteLine(specialKey);
+                     Console.WriteLine(specialKey);
 #endif
-               lastKeyboardInputTimer.Restart();
+                     lastKeyboardInputTimer.Restart();
 
-               switch (specialKey) {
-                  case KeyboardKey.KEY_KP_ENTER:
-                  case KeyboardKey.KEY_ENTER:
-                     bool isFile;
-                     string pressedLineValue;
+                     switch (specialKey) {
+                        case KeyboardKey.KEY_KP_ENTER:
+                        case KeyboardKey.KEY_ENTER:
+                           bool isFile;
+                           string pressedLineValue;
 
-                     if (cursor.position.y < directories.Count) {
-                        pressedLineValue = directories[cursor.position.y];
-                     } else {
-                        pressedLineValue = files[cursor.position.y - directories.Count];
-                     }
+                           if (cursor.position.y < directories.Count) {
+                              pressedLineValue = directories[cursor.position.y];
+                           } else {
+                              pressedLineValue = files[cursor.position.y - directories.Count];
+                           }
 
-                     // I can do that since directories listed first.
-                     if (cursor.position.y < directories.Count) {
-                        isFile = false;
-                     } else if (cursor.position.y < lines.Count && cursor.position.y >= directories.Count) {
-                        isFile = true;
-                     } else {
-                        Debug.Assert(false, "out of range");
-                        throw new IndexOutOfRangeException();
-                     }
+                           // I can do that since directories listed first.
+                           if (cursor.position.y < directories.Count) {
+                              isFile = false;
+                           } else if (cursor.position.y < lines.Count && cursor.position.y >= directories.Count) {
+                              isFile = true;
+                           } else {
+                              Debug.Assert(false, "out of range");
+                              throw new IndexOutOfRangeException();
+                           }
 
-                     if (isFile) {
-                        Program.filePath = pressedLineValue;
-                        Program.lines = Program.ReadLinesFromFile(Program.filePath);
-                        IEditorState.SetStateTo(new EditorStatePlaying());
-                     } else {
-                        if (CheckIfHasPermissionToOpenDirectory(pressedLineValue)) {
-                           Program.directoryPath = pressedLineValue;
-                           IEditorState.SetStateTo(new EditorStateDirectoryView());
-                        } else {
-                           // todo some effect. screen shake? an info popup box
-                        }
-                     }
+                           if (isFile) {
+                              Program.filePath = pressedLineValue;
+                              Program.lines = Program.ReadLinesFromFile(Program.filePath);
+                              IEditorState.SetStateTo(new EditorStatePlaying());
+                           } else {
+                              if (CheckIfHasPermissionToOpenDirectory(pressedLineValue)) {
+                                 Program.directoryPath = pressedLineValue;
+                                 IEditorState.SetStateTo(new EditorStateDirectoryView());
+                              } else {
+                                 // todo some effect. screen shake? an info popup box
+                              }
+                           }
 
-                     break;
-                  case KeyboardKey.KEY_ESCAPE:
-                     IEditorState.SetStateTo(new EditorStatePaused());
-                     break;
-                  case KeyboardKey.KEY_UP:
-                     if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                        camera.target.Y -= Line.Height;
+                           break;
+                        case KeyboardKey.KEY_ESCAPE:
+                           IEditorState.SetStateTo(new EditorStatePaused());
+                           break;
+                        case KeyboardKey.KEY_UP:
+                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                              camera.target.Y -= Line.Height;
+                           }
+                           break;
+                        case KeyboardKey.KEY_DOWN:
+                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                              camera.target.Y += Line.Height;
+                           }
+                           break;
                      }
-                     break;
-                  case KeyboardKey.KEY_DOWN:
-                     if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                        camera.target.Y += Line.Height;
+                  }
+
+                  cursor.HandleArrowKeysNavigation(lines,
+                                                   ref camera,
+                                                   Program.config.fontSize,
+                                                   Program.config.leftPadding,
+                                                   Program.font,
+                                                   modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL));
+                  break;
+
+               case InternalState.ControlF:
+                  if (pressedKeys != null) {
+#if VISUAL_STUDIO
+                     Program.PrintPressedKeys($"{pressedKeys} (ctrl+f)");
+#endif
+
+                     //Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
+                     controlFBuffer += pressedKeys;
+                  }
+
+                  if (specialKey != KeyboardKey.KEY_NULL) {
+#if VISUAL_STUDIO
+                     Console.WriteLine($"{specialKey} (ctrl+f)");
+#endif
+                     switch (specialKey) {
+                        case KeyboardKey.KEY_ESCAPE:
+                           internalState = InternalState.Normal;
+                           break;
+                        case KeyboardKey.KEY_BACKSPACE:
+                           if (controlFBuffer.Length > 0) {
+                              controlFBuffer = controlFBuffer.Remove(controlFBuffer.Length - 1);
+                           }
+                           break;
+                        case KeyboardKey.KEY_KP_ENTER:
+                        case KeyboardKey.KEY_ENTER:
+                           if (submittedControlFBuffer == "" && controlFBuffer == "") break;
+
+                           if (submittedControlFBuffer == controlFBuffer) {
+                              IncreaseControlFMatchByOne();
+                           } else {
+                              controlFMatches.Clear();
+                              submittedControlFBuffer = controlFBuffer;
+
+                              for (int i = 0; i < lines.Count; i++) {
+                                 int[] indices = lines[i].Find(new Regex(controlFBuffer));
+
+                                 if (indices.Length > 0) {
+                                    controlFMatches.Add(new ControlFMatchLine(i, indices));
+                                 }
+                              }
+
+                              if (controlFMatches.Count > 0)
+                                 currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0);
+                           }
+
+                           if (currentControlFMatch != null) {
+                              cursor.position = new Int2(currentControlFMatch.line.matchIndices[currentControlFMatch.index], currentControlFMatch.line.lineNumber);
+
+                              Vector2 highlightedTextLength = Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0);
+                              int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font,
+                                                                                                           lines[currentControlFMatch.line.lineNumber].Value.Substring(0, currentControlFMatch.line.matchIndices[currentControlFMatch.index]),
+                                                                                                           Program.config.fontSize,
+                                                                                                           0).X;
+
+                              controlFHighlightMatchRect = new Rectangle(rectangleStartX,
+                                                                         cursor.position.y * Line.Height + Program.YMargin,
+                                                                         highlightedTextLength.X,
+                                                                         highlightedTextLength.Y);
+
+                              controlFHighlightMatchTimer.Restart();
+                           }
+
+                           cursor.MakeSureCursorIsVisibleToCamera(lines,
+                                                                  ref camera,
+                                                                  Program.config.fontSize,
+                                                                  Program.config.leftPadding,
+                                                                  Program.font);
+                           break;
                      }
-                     break;
-               }
+                  }
+                  break;
             }
-
-            cursor.HandleArrowKeysNavigation(lines,
-                                             ref camera,
-                                             Program.config.fontSize,
-                                             Program.config.leftPadding,
-                                             Program.font,
-                                             modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL));
          }
+
+
 
          Program.HandleMouseWheelInput(Raylib.GetMouseWheelMove(), null, modifiers, ref camera, this);
       }
@@ -212,7 +307,26 @@ namespace Notepad___Raylib {
             Raylib.BeginMode2D(camera);
             {
                Program.HighlightLineCursorIsAt(cursor);
-               //Program.RenderLines(lines, Program.font);
+
+               if (internalState == InternalState.ControlF) {
+                  for (int i = 0; i < controlFMatches.Count; i++) {
+                     int[] matches = controlFMatches[i].matchIndices;
+
+                     for (int j = 0; j < matches.Length; j++) {
+                        int match = matches[j];
+                        int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font, lines[controlFMatches[i].lineNumber].Value.Substring(0, match), Program.config.fontSize, 0).X;
+                        int rectangleLength = (int)Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0).X;
+
+                        Raylib.DrawRectangleLines(rectangleStartX, Line.Height * controlFMatches[i].lineNumber + Program.YMargin, rectangleLength, Line.Height, new Color(255, 0, 0, 150));
+                     }
+                  }
+
+                  if (controlFHighlightMatchTimer.ElapsedMilliseconds < 1500) {
+                     int alpha = (int)(MathF.Exp(-1 * 6 * (controlFHighlightMatchTimer.ElapsedMilliseconds / 1000.0f)) * 255);
+                     Raylib.DrawRectangleRec(controlFHighlightMatchRect, new Color(255, 255, 255, alpha));
+                  }
+               }
+
                Program.RenderLines(lines.GetRange(0, directories.Count), Program.font, (Color)directoryColor, Program.YMargin, camera);
                Program.RenderLines(lines.GetRange(directories.Count, files.Count), Program.font, (Color)fileColor, Line.Height * directories.Count + Program.YMargin, camera);
             }
@@ -281,6 +395,47 @@ namespace Notepad___Raylib {
                               Program.config.fontSize,
                               0,
                               Program.config.textColor);
+
+            if (internalState == InternalState.ControlF) {
+               Vector2 textPosition = new Vector2(Raylib.GetScreenWidth() - 150, Program.YMargin + 10);
+               Int2 textLength = (Int2)Raylib.MeasureTextEx(Program.font, controlFBuffer, Program.config.fontSize, 0);
+               int horizontalSpace = 5;
+               int verticalSpace = 2;
+               string regexLabel = "REGEX";
+               Vector2 regexLabelLength = Raylib.MeasureTextEx(Program.font, regexLabel, Program.config.fontSize, 0);
+               Vector2 regexLabelOffset = new Vector2(10, Line.Height);
+
+               if (textPosition.X + textLength.x + 2 * horizontalSpace > Raylib.GetScreenWidth()) {
+                  textPosition.X = Raylib.GetScreenWidth() - textLength.x - 2 * horizontalSpace;
+               }
+
+               Rectangle rectangle = new Rectangle(textPosition.X - horizontalSpace,
+                                                   textPosition.Y - verticalSpace,
+                                                   2 * horizontalSpace + textLength.x,
+                                                   2 * verticalSpace + textLength.y);
+
+               Rectangle regexLabelRect = new Rectangle(rectangle.x + regexLabelOffset.X,
+                                                        rectangle.y + regexLabelOffset.Y,
+                                                        regexLabelLength.X + 2 * horizontalSpace,
+                                                        regexLabelLength.Y + 2 * verticalSpace);
+
+               Raylib.DrawRectangleRounded(rectangle, 0.5f, 8, new Color(50, 50, 50, 255));
+               Raylib.DrawRectangleRounded(regexLabelRect, 0.5f, 8, new Color(50, 50, 50, 255));
+
+               Raylib.DrawTextEx(Program.font,
+                                 controlFBuffer,
+                                 textPosition,
+                                 Program.config.fontSize,
+                                 0,
+                                 Program.config.textColor);
+
+               Raylib.DrawTextEx(Program.font,
+                                 regexLabel,
+                                 textPosition + regexLabelOffset,
+                                 Program.config.fontSize,
+                                 0,
+                                 Program.config.textColor);
+            }
          }
       }
 
@@ -382,6 +537,26 @@ namespace Notepad___Raylib {
          }
 
          return maxLength;
+      }
+
+      void IncreaseControlFMatchByOne() {
+         if (currentControlFMatch == null) return;
+
+         ControlFMatchLine line = currentControlFMatch.line;
+
+         if (line.matchIndices.Length > currentControlFMatch.index + 1) {
+            currentControlFMatch.index++;
+         } else {
+            ControlFMatchLine nextLine;
+            try {
+               nextLine = controlFMatches[currentControlFMatch.indexOfLineInMatchBuffer + 1];
+               currentControlFMatch = new ControlFMatch(nextLine, 0, currentControlFMatch.indexOfLineInMatchBuffer + 1);
+            }
+            catch (ArgumentOutOfRangeException) {
+               nextLine = controlFMatches[0];
+               currentControlFMatch = new ControlFMatch(nextLine, 0, 0);
+            }
+         }
       }
    }
 }
