@@ -9,6 +9,14 @@ notepad-- [file | directory]
 ```
 Or double click to the executable.
 
+
+
+https://github.com/apilatosba/notepad--/assets/104633944/d2b99722-4167-4866-bd0b-8c31fe6c2a7f  
+
+
+
+
+[keystroke visualizer](https://github.com/mulaRahul/keyviz)
 ## How to Build/Download 
 Get binaries from [release section](https://github.com/apilatosba/notepad--/releases).  
 Put the contents of the zip file in a folder that is in your PATH environment variable.  
