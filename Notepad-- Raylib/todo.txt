@@ -1,3 +1,5 @@
+bug: i dont resize the rendertextures in editorview state. thats why bloom shader fucks up
+bug: when you click with mouse it creates shiftSelection and it doesnt get destroyed and that causes problems. if shift selection start and end position is same then set it null. i could do that every frame or only when clicked with mouse
 shaders
    character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
    different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
