@@ -1,5 +1,7 @@
 # Notepad--
-It is gonna be like microsoft notepad but with shaders and stuff.  
+<p align="center">
+  <img src="https://github.com/apilatosba/notepad--/assets/104633944/56c027f8-8a44-4055-9644-2ed75d00664d)" />
+</p>  
 
 ## How to Use
 ```cmd
