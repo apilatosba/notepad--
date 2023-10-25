@@ -12,6 +12,7 @@ render bloom shader at quarter resolution
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
 when escape is pressed deselect shiftSelection if there is one, dont switch to paused state immediaetly
+abstract out controlF rendering. same code in playing state and directory view state
 implement redo, un-undo
 show images when hovered over on directory view state
 frontend to settings

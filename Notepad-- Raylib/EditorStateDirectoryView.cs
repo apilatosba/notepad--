@@ -82,17 +82,14 @@ namespace Notepad___Raylib {
             }
          }
 
-         MoveCursorToPreviousDirectory(previousDirectoryPath);
-         MoveCursorToLastEditedFile(theFileUserWasEditing);
+         MoveCursorToPreviousDirectoryIfPreviousDirectoryExists(previousDirectoryPath);
+         MoveCursorToLastEditedFileIfPreviousFileExists(theFileUserWasEditing);
 
          cursor ??= new Cursor();
 
-         if (windowCoverImage == null)
-            windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
-         if (windowCoverTexture == null)
-            windowCoverTexture = Raylib.LoadTextureFromImage((Image)windowCoverImage);
-         if (highlightedLineRenderTexture == null)
-            highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+         windowCoverImage ??= Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
+         windowCoverTexture ??= Raylib.LoadTextureFromImage((Image)windowCoverImage);
+         highlightedLineRenderTexture ??= Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
 
          directoryColor = Program.config.textColor - new ColorInt(40, 20, 0, 0);
          fileColor = Program.config.textColor + new ColorInt(-10, 20, -10, 0);
@@ -207,7 +204,8 @@ namespace Notepad___Raylib {
                                                    Program.config.fontSize,
                                                    Program.config.leftPadding,
                                                    Program.font,
-                                                   modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL));
+                                                   modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL),
+                                                   specialKey);
                   break;
 
                case InternalState.ControlF:
@@ -216,7 +214,6 @@ namespace Notepad___Raylib {
                      Program.PrintPressedKeys($"{pressedKeys} (ctrl+f)");
 #endif
 
-                     //Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
                      controlFBuffer += pressedKeys;
                   }
 
@@ -428,11 +425,7 @@ namespace Notepad___Raylib {
 
             Raylib.DrawRectangleGradientH(0, Program.YMargin, Raylib.GetScreenWidth() / 2, 1, Raylib.BLANK, Program.config.textColor);
             Raylib.DrawRectangleGradientH(Raylib.GetScreenWidth() / 2, Program.YMargin, Raylib.GetScreenWidth() / 2, 1, Program.config.textColor, Raylib.BLANK);
-            //Raylib.DrawLineEx(new Vector2(0, Line.Height),
-            //                  new Vector2(Raylib.GetScreenWidth(), Line.Height),
-            //                  2,
-            //                  Program.config.textColor);
-
+            
             Raylib.DrawTextEx(Program.font,
                               currentDirectory,
                               centeredPosition,
@@ -441,13 +434,13 @@ namespace Notepad___Raylib {
                               Program.config.textColor);
 
             if (internalState == InternalState.ControlF) {
-               Vector2 textPosition = new Vector2(Raylib.GetScreenWidth() - 150, Program.YMargin + 10);
+               Vector2 textPosition = new Vector2(Raylib.GetScreenWidth() - 150, Program.YMargin + 50);
                Int2 textLength = (Int2)Raylib.MeasureTextEx(Program.font, controlFBuffer, Program.config.fontSize, 0);
                int horizontalSpace = 5;
                int verticalSpace = 2;
                string regexLabel = "REGEX";
                Vector2 regexLabelLength = Raylib.MeasureTextEx(Program.font, regexLabel, Program.config.fontSize, 0);
-               Vector2 regexLabelOffset = new Vector2(10, Line.Height);
+               Vector2 regexLabelOffset = new Vector2(7, Line.Height);
 
                if (textPosition.X + textLength.x + 2 * horizontalSpace > Raylib.GetScreenWidth()) {
                   textPosition.X = Raylib.GetScreenWidth() - textLength.x - 2 * horizontalSpace;
@@ -512,7 +505,7 @@ namespace Notepad___Raylib {
          return true;
       }
 
-      void MoveCursorToPreviousDirectory(string previousDirectoryPath) {
+      void MoveCursorToPreviousDirectoryIfPreviousDirectoryExists(string previousDirectoryPath) {
          if (previousDirectoryPath == null) return;
 
          string cwd = Directory.GetCurrentDirectory();
@@ -533,7 +526,7 @@ namespace Notepad___Raylib {
          }
       }
 
-      void MoveCursorToLastEditedFile(string fileName) {
+      void MoveCursorToLastEditedFileIfPreviousFileExists(string fileName) {
          if (fileName == null) return;
 
          string cwd = Directory.GetCurrentDirectory();

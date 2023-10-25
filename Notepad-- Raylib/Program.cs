@@ -4,10 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace Notepad___Raylib {
    internal class Program {
@@ -473,65 +471,6 @@ namespace Notepad___Raylib {
          return true;
       }
 
-      //public static bool ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey) {
-      //   //specialKeys = new List<KeyboardKey>();
-
-      //   //timeSinceLastInput = lastInputTimer.ElapsedMilliseconds;
-
-      //   //if (((pressedChars = GetPressedCharsAsString()) != null) || IsSpecialKeyPressed(out specialKeys)) {
-      //   //   if (timeSinceLastInput < inputDelay) {
-      //   //      if (pressedChars?[^1] == lastPressedKey || specialKeys[^1] == lastPressedSpecialKey)
-      //   //         return false;
-      //   //   }
-
-      //   //   lastPressedKey = pressedChars?[^1] ?? lastPressedKey;
-      //   //   lastPressedSpecialKey = specialKeys.Count == 0 ? lastPressedSpecialKey : specialKeys[^1];
-
-      //   //   keyHoldTimer.Start();
-
-      //   //   if (inputRushCounter > 0 && keyHoldTimer.ElapsedMilliseconds < waitTimeBeforeRapidInputRush) return false;
-
-      //   //   inputRushCounter++;
-
-      //   //   lastInputTimer.Restart();
-      //   //   return true;
-      //   //}
-
-      //   //keyHoldTimer.Stop();
-      //   //keyHoldTimer.Reset();
-      //   //inputRushCounter = 0;
-      //   //return true;
-
-      //   specialKey = KeyboardKey.KEY_NULL;
-
-      //   timeSinceLastInput = lastInputTimer.ElapsedMilliseconds;
-
-      //   if (((pressedChars = GetPressedCharsAsString()) != null) || IsSpecialKeyPressed(out specialKey)) {
-      //      if(specialKey != lastPressedSpecialKey) {
-      //         lastInputTimer.Restart();
-      //         return true;
-      //      }
-      //      if(timeSinceLastInput < inputDelay) {
-      //         if ()
-      //      } else {
-      //         lastPressedKey = pressedChars?[^1] ?? lastPressedKey;
-      //         lastPressedSpecialKey = specialKeys.Count == 0 ? lastPressedSpecialKey : specialKeys[^1];
-
-
-      //         keyHoldTimer.Start();
-
-      //         if(inputRushCounter > 0 && keyHoldTimer.ElapsedMilliseconds < waitTimeBeforeRapidInputRush) return false;
-
-      //         return true;
-      //      }
-      //   } else {
-      //      keyHoldTimer.Stop();
-      //      keyHoldTimer.Reset();
-      //      inputRushCounter = 0;
-      //      return true;
-      //   }
-      //}
-
       /// <summary>
       /// 
       /// </summary>
@@ -771,23 +710,6 @@ namespace Notepad___Raylib {
       public static Int2 GetMouseDelta() {
          return GetMousePositionInScreenSpace() - mousePositionLastFrame;
       }
-
-      //public static void UndoHistoryPush(List<UndoItem> undoItems, Stack<List<UndoItem>> undoHistory) {
-      //   if(undoHistory.Count < MAX_UNDO_HISTORY)
-      //      undoHistory.Push(undoItems);
-      //   else {
-      //      UndoHistoryDequeue(ref undoHistory);
-      //      undoHistory.Push(undoItems);
-      //   }
-      //}
-
-      //public static T UndoHistoryDequeue<T>(ref Stack<T> undoHistory) {
-      //   undoHistory = new Stack<T>(undoHistory); // Reverse stack
-      //   T oldestElement = undoHistory.Pop();
-      //   undoHistory = new Stack<T>(undoHistory); // Reverse stack
-
-      //   return oldestElement;
-      //}
 
       public static string GetConfigPath() {
 #if VISUAL_STUDIO

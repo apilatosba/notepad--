@@ -85,60 +85,63 @@ namespace Notepad___Raylib {
          }
       }
 
-      public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, bool isControlKeyDown, /*in List<KeyboardKey> specialKeys*/ KeyboardKey specialKey) {
-         if (/*specialKeys.Contains(KeyboardKey.KEY_RIGHT)*/ specialKey == KeyboardKey.KEY_RIGHT) {
-            if (IsCursorAtEndOfFile(lines)) return;
+      public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, bool isControlKeyDown, KeyboardKey specialKey) {
+         switch (specialKey) {
+            case KeyboardKey.KEY_RIGHT:
+               if (IsCursorAtEndOfFile(lines)) return;
 
-            if (IsCursorAtEndOfLine(lines)) {
-               position.x = 0;
+               if (IsCursorAtEndOfLine(lines)) {
+                  position.x = 0;
+                  position.y++;
+               } else {
+                  if (isControlKeyDown) {
+                     position.x += CalculateHowManyCharactersToJump(lines, Direction.Right);
+                  } else {
+                     position.x++;
+                  }
+               }
+
+               MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+               exXPosition = position.x;
+
+               break;
+            case KeyboardKey.KEY_LEFT:
+               if (IsCursorAtBeginningOfFile()) return;
+
+               if (IsCursorAtBeginningOfLine()) {
+                  position.x = lines[--position.y].Value.Length;
+               } else {
+                  if (isControlKeyDown) {
+                     position.x -= CalculateHowManyCharactersToJump(lines, Direction.Left);
+                  } else {
+                     position.x--;
+                  }
+               }
+
+               MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+               exXPosition = position.x;
+
+               break;
+            case KeyboardKey.KEY_UP:
+               if (isControlKeyDown) return;
+               if (IsCursorAtFirstLine()) return;
+
+               position.y--;
+               position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
+
+               MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+
+               break;
+            case KeyboardKey.KEY_DOWN:
+               if (isControlKeyDown) return;
+               if (IsCursorAtLastLine(lines)) return;
+
                position.y++;
-            } else {
-               if (isControlKeyDown) {
-                  position.x += CalculateHowManyCharactersToJump(lines, Direction.Right);
-               } else {
-                  position.x++;
-               }
-            }
+               position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
 
-            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
-            exXPosition = position.x;
+               MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
-         }
-         if (/*specialKeys.Contains(KeyboardKey.KEY_LEFT)*/ specialKey == KeyboardKey.KEY_LEFT) {
-            if (IsCursorAtBeginningOfFile()) return;
-
-            if (IsCursorAtBeginningOfLine()) {
-               position.x = lines[--position.y].Value.Length;
-            } else {
-               if (isControlKeyDown) {
-                  position.x -= CalculateHowManyCharactersToJump(lines, Direction.Left);
-               } else {
-                  position.x--;
-               }
-            }
-
-            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
-            exXPosition = position.x;
-
-         }
-         if (/*specialKeys.Contains(KeyboardKey.KEY_UP)*/ specialKey == KeyboardKey.KEY_UP) {
-            if (isControlKeyDown) return;
-            if (IsCursorAtFirstLine()) return;
-
-            position.y--;
-            position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
-
-            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
-
-         }
-         if (/*specialKeys.Contains(KeyboardKey.KEY_DOWN)*/ specialKey == KeyboardKey.KEY_DOWN) {
-            if (isControlKeyDown) return;
-            if (IsCursorAtLastLine(lines)) return;
-
-            position.y++;
-            position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
-
-            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+               break;
          }
       }
 

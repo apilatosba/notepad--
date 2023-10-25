@@ -6,6 +6,8 @@ namespace Notepad___Raylib {
       LinkedList<T> undoStack;
       readonly int MAX_SIZE;
 
+      public int Count => undoStack.Count;
+
       public UndoHistory(int maxSize = 128) {
          MAX_SIZE = maxSize;
          undoStack = new LinkedList<T>();

@@ -6,3 +6,9 @@ when building with visual studio, set output type to WinExe(windows application)
 jpg is not supported.
 range of background lucidity is 0-1.
 on linux it works with "dotnet notepad--.dll file"
+what i liked about the notepad-- project so far:
+   Selection implementation is good.
+   Undo implementation is good.
+what i didn't like about the notepad-- project so far:
+   Using state pattern. I should have gone with enum + switch instead. It creates more problems than it actually solves. The only good thing about state pattern is that it makes easier to add new states, you just create a new class and implement the interface but other than that thumbs down.
+   Unoptimized shaders
