@@ -1,4 +1,4 @@
-﻿#define VISUAL_STUDIO
+﻿//#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -100,6 +100,11 @@ namespace Notepad___Raylib {
             File.Create(configPath).Close();
             new Config().Serialize(configPath);
          }
+
+         if (!File.Exists(GetWindowSaveDataPath())) {
+            File.Create(GetWindowSaveDataPath()).Close();
+            new WindowSaveData().Serialize(GetWindowSaveDataPath());
+         }
 #endif
 
          //ScrollBar horizontalScrollBar = new ScrollBar();
@@ -112,7 +117,12 @@ namespace Notepad___Raylib {
             config.Serialize(GetConfigPath());
          }
 
-         windowSaveData = WindowSaveData.Deserialize(GetWindowSaveDataPath());
+         try {
+            windowSaveData = WindowSaveData.Deserialize(GetWindowSaveDataPath());
+         }
+         catch (InvalidOperationException) {
+            windowSaveData.Serialize(GetWindowSaveDataPath());
+         }
 
          // Command line arguments
          {
@@ -560,7 +570,7 @@ namespace Notepad___Raylib {
       public static string GetExecutableDirectory() {
          Assembly entryAssembly = Assembly.GetEntryAssembly();
          string executableDirectory = Path.GetDirectoryName(entryAssembly.Location);
-
+         
          return executableDirectory;
       }
 

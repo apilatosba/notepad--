@@ -16,6 +16,7 @@ abstract out controlF rendering. same code in playing state and directory view s
 implement redo, un-undo
 show images when hovered over on directory view state
 frontend to settings
+bug: sometimes ctrl+s bloom shader positions wrong. it looks like it is rendering previous window sized rendertexture
 add scrollbars
 a better last known window size logic. right now if you close the window when it is maximized, it will open maximized but wont remember the restored size. so when you click f11 nothing happens
 when pressed minimize window button also set state to whatever the previus state was.
