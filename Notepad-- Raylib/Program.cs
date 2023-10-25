@@ -63,8 +63,7 @@ namespace Notepad___Raylib {
       public static string directoryPath;
       public static bool isQuitButtonPressed = false;
       public static bool isDraggingWindow = false;
-      public const int MAX_UNDO_HISTORY = 128;
-      public static Stack<List<UndoItem>> undoHistory = new Stack<List<UndoItem>>(MAX_UNDO_HISTORY);
+      public static UndoHistory<List<UndoItem>> undoHistory = new UndoHistory<List<UndoItem>>(512);
       /// <summary>
       /// Vertical form of <see cref="Config.leftPadding"/>
       /// </summary>
@@ -675,6 +674,23 @@ namespace Notepad___Raylib {
       public static Int2 GetMouseDelta() {
          return GetMousePositionInScreenSpace() - mousePositionLastFrame;
       }
+
+      //public static void UndoHistoryPush(List<UndoItem> undoItems, Stack<List<UndoItem>> undoHistory) {
+      //   if(undoHistory.Count < MAX_UNDO_HISTORY)
+      //      undoHistory.Push(undoItems);
+      //   else {
+      //      UndoHistoryDequeue(ref undoHistory);
+      //      undoHistory.Push(undoItems);
+      //   }
+      //}
+
+      //public static T UndoHistoryDequeue<T>(ref Stack<T> undoHistory) {
+      //   undoHistory = new Stack<T>(undoHistory); // Reverse stack
+      //   T oldestElement = undoHistory.Pop();
+      //   undoHistory = new Stack<T>(undoHistory); // Reverse stack
+
+      //   return oldestElement;
+      //}
 
       public static string GetConfigPath() {
 #if VISUAL_STUDIO
