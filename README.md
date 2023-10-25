@@ -16,7 +16,14 @@ https://github.com/apilatosba/notepad--/assets/104633944/d2b99722-4167-4866-bd0b
 
 
 
-[keystroke visualizer](https://github.com/mulaRahul/keyviz)
+[keystroke visualizer](https://github.com/mulaRahul/keyviz)  
+  
+### Keybindings
+ctrl + m1 -> reposition window  
+ctrl + m2 -> resize window  
+touchpad support  
+rest is usual.
+
 ## How to Build/Download 
 Get binaries from [release section](https://github.com/apilatosba/notepad--/releases).  
 Put the contents of the zip file in a folder that is in your PATH environment variable.  
