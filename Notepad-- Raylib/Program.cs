@@ -439,9 +439,19 @@ namespace Notepad___Raylib {
          timeSinceLastInput = lastInputTimer.ElapsedMilliseconds;
 
          if ((pressedChars = GetPressedCharsAsString()) != null || IsSpecialKeyPressed(out specialKey)) {
+            if (specialKey != lastPressedSpecialKey) {
+               lastInputTimer.Restart();
+               lastPressedSpecialKey = specialKey;
+               inputRushCounter++;
+               keyHoldTimer.Stop();
+               keyHoldTimer.Reset();
+               return true;
+            }
+
             if (timeSinceLastInput < inputDelay) {
-               if (pressedChars?[^1] == lastPressedKey || specialKey == lastPressedSpecialKey)
+               if (pressedChars?[^1] == lastPressedKey || specialKey == lastPressedSpecialKey) {
                   return false;
+               }
             }
 
             lastPressedKey = pressedChars?[^1] ?? lastPressedKey;
@@ -462,6 +472,65 @@ namespace Notepad___Raylib {
          inputRushCounter = 0;
          return true;
       }
+
+      //public static bool ShouldAcceptKeyboardInput(out string pressedChars, out KeyboardKey specialKey) {
+      //   //specialKeys = new List<KeyboardKey>();
+
+      //   //timeSinceLastInput = lastInputTimer.ElapsedMilliseconds;
+
+      //   //if (((pressedChars = GetPressedCharsAsString()) != null) || IsSpecialKeyPressed(out specialKeys)) {
+      //   //   if (timeSinceLastInput < inputDelay) {
+      //   //      if (pressedChars?[^1] == lastPressedKey || specialKeys[^1] == lastPressedSpecialKey)
+      //   //         return false;
+      //   //   }
+
+      //   //   lastPressedKey = pressedChars?[^1] ?? lastPressedKey;
+      //   //   lastPressedSpecialKey = specialKeys.Count == 0 ? lastPressedSpecialKey : specialKeys[^1];
+
+      //   //   keyHoldTimer.Start();
+
+      //   //   if (inputRushCounter > 0 && keyHoldTimer.ElapsedMilliseconds < waitTimeBeforeRapidInputRush) return false;
+
+      //   //   inputRushCounter++;
+
+      //   //   lastInputTimer.Restart();
+      //   //   return true;
+      //   //}
+
+      //   //keyHoldTimer.Stop();
+      //   //keyHoldTimer.Reset();
+      //   //inputRushCounter = 0;
+      //   //return true;
+
+      //   specialKey = KeyboardKey.KEY_NULL;
+
+      //   timeSinceLastInput = lastInputTimer.ElapsedMilliseconds;
+
+      //   if (((pressedChars = GetPressedCharsAsString()) != null) || IsSpecialKeyPressed(out specialKey)) {
+      //      if(specialKey != lastPressedSpecialKey) {
+      //         lastInputTimer.Restart();
+      //         return true;
+      //      }
+      //      if(timeSinceLastInput < inputDelay) {
+      //         if ()
+      //      } else {
+      //         lastPressedKey = pressedChars?[^1] ?? lastPressedKey;
+      //         lastPressedSpecialKey = specialKeys.Count == 0 ? lastPressedSpecialKey : specialKeys[^1];
+
+
+      //         keyHoldTimer.Start();
+
+      //         if(inputRushCounter > 0 && keyHoldTimer.ElapsedMilliseconds < waitTimeBeforeRapidInputRush) return false;
+
+      //         return true;
+      //      }
+      //   } else {
+      //      keyHoldTimer.Stop();
+      //      keyHoldTimer.Reset();
+      //      inputRushCounter = 0;
+      //      return true;
+      //   }
+      //}
 
       /// <summary>
       /// 
@@ -493,6 +562,34 @@ namespace Notepad___Raylib {
          }
 
          return false;
+      }
+
+      static bool IsSpecialKeyPressed(out List<KeyboardKey> pressedSpecialKeys) {
+         pressedSpecialKeys = new List<KeyboardKey>();
+         bool isKeyPressed = false;
+
+         KeyboardKey[] specialKeys = new KeyboardKey[] {
+            KeyboardKey.KEY_HOME,
+            KeyboardKey.KEY_END,
+            KeyboardKey.KEY_ESCAPE,
+            KeyboardKey.KEY_DELETE,
+            KeyboardKey.KEY_TAB,
+            KeyboardKey.KEY_ENTER,
+            KeyboardKey.KEY_BACKSPACE,
+            KeyboardKey.KEY_UP,
+            KeyboardKey.KEY_DOWN,
+            KeyboardKey.KEY_RIGHT,
+            KeyboardKey.KEY_LEFT,
+         };
+
+         foreach(var key in specialKeys) {
+            if (Raylib.IsKeyDown(key)) {
+               pressedSpecialKeys.Add(key);
+               isKeyPressed = true;
+            }
+         }
+
+         return isKeyPressed;
       }
 
       /// <summary>

@@ -30,6 +30,7 @@ namespace Notepad___Raylib {
       readonly Stopwatch controlFHighlightMatchTimer = new Stopwatch();
       readonly Stopwatch controlVPasteHighlightTimer = new Stopwatch();
       readonly Stopwatch normalKeyPressesWithModifiersLastInputTimer = new Stopwatch();
+      //List<KeyboardKey> missedSpecialKeyPressesBetweenFrames = new List<KeyboardKey>();
       string missedKeyPressesBetweenFrames = string.Empty;
       string controlFBuffer = "";
       string submittedControlFBuffer = "";
@@ -79,6 +80,8 @@ namespace Notepad___Raylib {
          if (Program.ShouldAcceptKeyboardInput(out pressedKeys, out KeyboardKey specialKey)) {
             pressedKeys = missedKeyPressesBetweenFrames + pressedKeys;
             pressedKeys = pressedKeys == string.Empty ? null : pressedKeys;
+
+            //specialKeys.InsertRange(0, missedSpecialKeyPressesBetweenFrames);
 
             switch (internalState) {
                case InternalState.Normal:
@@ -290,213 +293,215 @@ namespace Notepad___Raylib {
                   // Handling special keys, both with and without modifiers
                   /////////////////////////////////////////////////////////
                   {
-                     if (specialKey != KeyboardKey.KEY_NULL) {
+                     if (specialKey != KeyboardKey.KEY_NULL /*specialKeys.Count > 0*/) {
+                        //foreach (KeyboardKey specialKey in specialKeys) {
 #if VISUAL_STUDIO
-                        Console.WriteLine(specialKey);
+                           Console.WriteLine(specialKey);
 #endif
-                        switch (specialKey) {
-                           case KeyboardKey.KEY_HOME:
-                              if (!(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT))) {
-                                 if (shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
-                              }
-
-                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                 cursor.position.y = 0;
-                              }
-
-                              cursor.position.x = 0;
-                              cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
-                              cursor.exXPosition = cursor.position.x;
-                              break;
-                           case KeyboardKey.KEY_END: {
+                           switch (specialKey) {
+                              case KeyboardKey.KEY_HOME:
                                  if (!(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT))) {
                                     if (shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
                                  }
 
                                  if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                    cursor.position.y = Program.lines.Count - 1;
+                                    cursor.position.y = 0;
                                  }
 
-                                 Line currentLine = Program.lines[cursor.position.y];
-
-                                 cursor.position.x = currentLine.Value.Length;
-                                 cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
-                                 cursor.exXPosition = cursor.position.x;
-                              }
-                              break;
-                           case KeyboardKey.KEY_ESCAPE:
-                              lastKnownCursorPosition = cursor.position;
-                              lastKnownCameraTarget = camera.target;
-                              IEditorState.SetStateTo(new EditorStatePaused());
-                              break;
-                           case KeyboardKey.KEY_BACKSPACE:
-                              if (shiftSelection != null) {
-                                 shiftSelection.Delete(Program.lines, cursor);
-                                 shiftSelection = null;
+                                 cursor.position.x = 0;
                                  cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                                  cursor.exXPosition = cursor.position.x;
                                  break;
-                              }
+                              case KeyboardKey.KEY_END: {
+                                    if (!(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT))) {
+                                       if (shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
+                                    }
 
-                              if (cursor.IsCursorAtBeginningOfFile()) break;
+                                    if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                       cursor.position.y = Program.lines.Count - 1;
+                                    }
 
-                              if (cursor.IsCursorAtBeginningOfLine()) {
-                                 //Line currentLine = Program.lines[cursor.position.y];
-                                 //Line lineAbove = Program.lines[cursor.position.y - 1];
+                                    Line currentLine = Program.lines[cursor.position.y];
 
-                                 //cursor.position.x = lineAbove.Value.Length;
-
-                                 //lineAbove.InsertTextAt(lineAbove.Value.Length, currentLine.Value);
-                                 //Program.lines.RemoveAt(cursor.position.y);
-
-                                 //cursor.position.y--;
-
-                                 // Utilizing the undo implementation of Selection.Delete()
-                                 new Selection(cursor.position, new Int2(Program.lines[cursor.position.y - 1].Value.Length, cursor.position.y - 1)).Delete(Program.lines, cursor);
-                              } else {
-                                 if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                    int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Left);
-                                    Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump);
-                                 } else {
-                                    Program.RemoveTextAtCursor(Program.lines, cursor, 1);
+                                    cursor.position.x = currentLine.Value.Length;
+                                    cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                                    cursor.exXPosition = cursor.position.x;
                                  }
-                              }
+                                 break;
+                              case KeyboardKey.KEY_ESCAPE:
+                                 lastKnownCursorPosition = cursor.position;
+                                 lastKnownCameraTarget = camera.target;
+                                 IEditorState.SetStateTo(new EditorStatePaused());
+                                 break;
+                              case KeyboardKey.KEY_BACKSPACE:
+                                 if (shiftSelection != null) {
+                                    shiftSelection.Delete(Program.lines, cursor);
+                                    shiftSelection = null;
+                                    cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                                    cursor.exXPosition = cursor.position.x;
+                                    break;
+                                 }
 
-                              cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
-                              cursor.exXPosition = cursor.position.x;
-                              break;
-                           case KeyboardKey.KEY_ENTER: {
-                                 shiftSelection?.Delete(Program.lines, cursor);
-                                 shiftSelection = null;
+                                 if (cursor.IsCursorAtBeginningOfFile()) break;
 
-                                 if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                    Program.undoHistory.Push(new List<UndoItem>() {
+                                 if (cursor.IsCursorAtBeginningOfLine()) {
+                                    //Line currentLine = Program.lines[cursor.position.y];
+                                    //Line lineAbove = Program.lines[cursor.position.y - 1];
+
+                                    //cursor.position.x = lineAbove.Value.Length;
+
+                                    //lineAbove.InsertTextAt(lineAbove.Value.Length, currentLine.Value);
+                                    //Program.lines.RemoveAt(cursor.position.y);
+
+                                    //cursor.position.y--;
+
+                                    // Utilizing the undo implementation of Selection.Delete()
+                                    new Selection(cursor.position, new Int2(Program.lines[cursor.position.y - 1].Value.Length, cursor.position.y - 1)).Delete(Program.lines, cursor);
+                                 } else {
+                                    if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                       int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Left);
+                                       Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump);
+                                    } else {
+                                       Program.RemoveTextAtCursor(Program.lines, cursor, 1);
+                                    }
+                                 }
+
+                                 cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                                 cursor.exXPosition = cursor.position.x;
+                                 break;
+                              case KeyboardKey.KEY_ENTER: {
+                                    shiftSelection?.Delete(Program.lines, cursor);
+                                    shiftSelection = null;
+
+                                    if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                       Program.undoHistory.Push(new List<UndoItem>() {
                                        new UndoItem(null, cursor.position.y, cursor.position, UndoAction.Remove)
                                     });
 
-                                    Program.lines.Insert(cursor.position.y, new Line());
+                                       Program.lines.Insert(cursor.position.y, new Line());
 
-                                    cursor.position.x = 0;
-                                    cursor.exXPosition = cursor.position.x;
-                                 } else {
-                                    Line currentLine = Program.lines[cursor.position.y];
-                                    string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
+                                       cursor.position.x = 0;
+                                       cursor.exXPosition = cursor.position.x;
+                                    } else {
+                                       Line currentLine = Program.lines[cursor.position.y];
+                                       string textAfterCursor = currentLine.Value.Substring(cursor.position.x);
 
-                                    Line newLine = new Line(textAfterCursor);
+                                       Line newLine = new Line(textAfterCursor);
 
-                                    if (cursor.IsCursorAtEndOfFile(Program.lines)) {
-                                       Program.undoHistory.Push(new List<UndoItem>() {
+                                       if (cursor.IsCursorAtEndOfFile(Program.lines)) {
+                                          Program.undoHistory.Push(new List<UndoItem>() {
                                           new UndoItem(null, Program.lines.Count, cursor.position, UndoAction.Remove)
                                        });
 
-                                       Program.lines.Add(newLine);
-                                    } else {
-                                       Program.undoHistory.Push(new List<UndoItem>() {
+                                          Program.lines.Add(newLine);
+                                       } else {
+                                          Program.undoHistory.Push(new List<UndoItem>() {
                                           new UndoItem(new Line(currentLine), cursor.position.y, cursor.position, UndoAction.Replace),
                                           new UndoItem(null, cursor.position.y + 1, cursor.position, UndoAction.Remove)
                                        });
 
-                                       Program.lines.Insert(Program.lines.IndexOf(currentLine) + 1, newLine);
+                                          Program.lines.Insert(Program.lines.IndexOf(currentLine) + 1, newLine);
+                                       }
+
+                                       currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
+
+                                       cursor.position.x = 0;
+                                       cursor.position.y++;
+                                       cursor.exXPosition = cursor.position.x;
+                                    }
+                                 }
+
+                                 cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
+                                 break;
+                              case KeyboardKey.KEY_TAB:
+                                 if (shiftSelection != null) {
+                                    Line[] linesInRange = shiftSelection.GetLinesInRange(Program.lines).ToArray();
+
+                                    List<UndoItem> undoItems = new List<UndoItem>();
+
+                                    foreach (Line line in linesInRange) {
+                                       undoItems.Add(new UndoItem(new Line(line), Program.lines.IndexOf(line), cursor.position, UndoAction.Replace));
+
+                                       line.InsertTextAt(0, new string(' ', Program.config.tabSize)); // Stick to obsolete one. I don't want to push this to the undo stack once more
                                     }
 
-                                    currentLine.RemoveTextAt(cursor.position.x, currentLine.Value.Length - cursor.position.x, Direction.Right);
+                                    Program.undoHistory.Push(undoItems);
 
-                                    cursor.position.x = 0;
-                                    cursor.position.y++;
+                                    shiftSelection.StartPosition = new Int2(shiftSelection.StartPosition.x + Program.config.tabSize, shiftSelection.StartPosition.y);
+                                    cursor.position.x += Program.config.tabSize;
+
+                                    cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                                     cursor.exXPosition = cursor.position.x;
-                                 }
-                              }
 
-                              cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
-                              break;
-                           case KeyboardKey.KEY_TAB:
-                              if (shiftSelection != null) {
-                                 Line[] linesInRange = shiftSelection.GetLinesInRange(Program.lines).ToArray();
-
-                                 List<UndoItem> undoItems = new List<UndoItem>();
-
-                                 foreach (Line line in linesInRange) {
-                                    undoItems.Add(new UndoItem(new Line(line), Program.lines.IndexOf(line), cursor.position, UndoAction.Replace));
-
-                                    line.InsertTextAt(0, new string(' ', Program.config.tabSize)); // Stick to obsolete one. I don't want to push this to the undo stack once more
+                                    break;
                                  }
 
-                                 Program.undoHistory.Push(undoItems);
-
-                                 shiftSelection.StartPosition = new Int2(shiftSelection.StartPosition.x + Program.config.tabSize, shiftSelection.StartPosition.y);
-                                 cursor.position.x += Program.config.tabSize;
+                                 Program.InsertTextAtCursor(Program.lines, cursor, new string(' ', Program.config.tabSize));
 
                                  cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                                  cursor.exXPosition = cursor.position.x;
-
                                  break;
-                              }
-
-                              Program.InsertTextAtCursor(Program.lines, cursor, new string(' ', Program.config.tabSize));
-
-                              cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
-                              cursor.exXPosition = cursor.position.x;
-                              break;
-                           case KeyboardKey.KEY_DELETE:
-                              if (shiftSelection != null) {
-                                 shiftSelection.Delete(Program.lines, cursor);
-                                 shiftSelection = null;
-                                 break;
-                              }
-
-                              if (cursor.IsCursorAtEndOfLine(Program.lines)) {
-                                 //Line currentLine = Program.lines[cursor.position.y];
-                                 //Line lineBelow = Program.lines[cursor.position.y + 1];
-
-                                 //currentLine.InsertTextAt(currentLine.Value.Length, lineBelow.Value);
-
-                                 //Program.lines.RemoveAt(cursor.position.y + 1);
-
-                                 new Selection(cursor.position, new Int2(0, cursor.position.y + 1)).Delete(Program.lines, cursor);
-                              } else {
-                                 if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                    int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Right);
-                                    Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump, Direction.Right);
-                                 } else {
-                                    Program.RemoveTextAtCursor(Program.lines, cursor, 1, Direction.Right);
+                              case KeyboardKey.KEY_DELETE:
+                                 if (shiftSelection != null) {
+                                    shiftSelection.Delete(Program.lines, cursor);
+                                    shiftSelection = null;
+                                    break;
                                  }
-                              }
 
-                              break;
-                           case KeyboardKey.KEY_RIGHT:
-                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
+                                 if (cursor.IsCursorAtEndOfLine(Program.lines)) {
+                                    //Line currentLine = Program.lines[cursor.position.y];
+                                    //Line lineBelow = Program.lines[cursor.position.y + 1];
 
-                              break;
-                           case KeyboardKey.KEY_LEFT:
-                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                              //camera.target.X -= 10;
-                              break;
-                           case KeyboardKey.KEY_UP:
-                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                 camera.target.Y -= Line.Height;
-                              } else {
+                                    //currentLine.InsertTextAt(currentLine.Value.Length, lineBelow.Value);
+
+                                    //Program.lines.RemoveAt(cursor.position.y + 1);
+
+                                    new Selection(cursor.position, new Int2(0, cursor.position.y + 1)).Delete(Program.lines, cursor);
+                                 } else {
+                                    if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                       int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Right);
+                                       Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump, Direction.Right);
+                                    } else {
+                                       Program.RemoveTextAtCursor(Program.lines, cursor, 1, Direction.Right);
+                                    }
+                                 }
+
+                                 break;
+                              case KeyboardKey.KEY_RIGHT:
                                  if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                              }
-                              //camera.target.Y -= 10;
-                              break;
-                           case KeyboardKey.KEY_DOWN:
-                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                 camera.target.Y += Line.Height;
-                              } else {
+
+                                 break;
+                              case KeyboardKey.KEY_LEFT:
                                  if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                              }
-                              //camera.target.Y += 10;
-                              break;
+                                 //camera.target.X -= 10;
+                                 break;
+                              case KeyboardKey.KEY_UP:
+                                 if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                    camera.target.Y -= Line.Height;
+                                 } else {
+                                    if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
+                                 }
+                                 //camera.target.Y -= 10;
+                                 break;
+                              case KeyboardKey.KEY_DOWN:
+                                 if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                    camera.target.Y += Line.Height;
+                                 } else {
+                                    if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
+                                 }
+                                 //camera.target.Y += 10;
+                                 break;
+                           }
+                           cursor.HandleArrowKeysNavigation(Program.lines,
+                                                            ref camera,
+                                                            Program.config.fontSize,
+                                                            Program.config.leftPadding,
+                                                            Program.font,
+                                                            modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL),
+                                                            specialKey);
                         }
-                     }
+                     //}
                   }
-
-                  cursor.HandleArrowKeysNavigation(Program.lines,
-                                                   ref camera,
-                                                   Program.config.fontSize,
-                                                   Program.config.leftPadding,
-                                                   Program.font,
-                                                   modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL));
 
                   break;
                case InternalState.ControlF: {
@@ -509,85 +514,89 @@ namespace Notepad___Raylib {
                         controlFBuffer += pressedKeys;
                      }
 
-                     if (specialKey != KeyboardKey.KEY_NULL) {
+                     if (specialKey != KeyboardKey.KEY_NULL /*specialKeys.Count > 0*/) {
+                        //foreach (KeyboardKey specialKey in specialKeys) {
 #if VISUAL_STUDIO
-                        Console.WriteLine($"{specialKey} (ctrl+f)");
+                           Console.WriteLine($"{specialKey} (ctrl+f)");
 #endif
-                        switch (specialKey) {
-                           case KeyboardKey.KEY_UP:
-                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                 camera.target.Y -= Line.Height;
-                              }
-                              break;
-                           case KeyboardKey.KEY_DOWN:
-                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                 camera.target.Y += Line.Height;
-                              }
-                              break;
-                           case KeyboardKey.KEY_ESCAPE:
-                              internalState = InternalState.Normal;
-                              break;
-                           case KeyboardKey.KEY_BACKSPACE:
-                              if (controlFBuffer.Length > 0) {
-                                 controlFBuffer = controlFBuffer.Remove(controlFBuffer.Length - 1);
-                              }
-                              break;
-                           case KeyboardKey.KEY_KP_ENTER:
-                           case KeyboardKey.KEY_ENTER:
-                              if (controlFBuffer == "") break;
+                           switch (specialKey) {
+                              case KeyboardKey.KEY_UP:
+                                 if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                    camera.target.Y -= Line.Height;
+                                 }
+                                 break;
+                              case KeyboardKey.KEY_DOWN:
+                                 if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                                    camera.target.Y += Line.Height;
+                                 }
+                                 break;
+                              case KeyboardKey.KEY_ESCAPE:
+                                 internalState = InternalState.Normal;
+                                 break;
+                              case KeyboardKey.KEY_BACKSPACE:
+                                 if (controlFBuffer.Length > 0) {
+                                    controlFBuffer = controlFBuffer.Remove(controlFBuffer.Length - 1);
+                                 }
+                                 break;
+                              case KeyboardKey.KEY_KP_ENTER:
+                              case KeyboardKey.KEY_ENTER:
+                                 if (controlFBuffer == "") break;
 
-                              if (submittedControlFBuffer == controlFBuffer) {
-                                 IncreaseControlFMatchByOne();
-                              } else {
-                                 controlFMatches.Clear();
-                                 submittedControlFBuffer = controlFBuffer;
+                                 if (submittedControlFBuffer == controlFBuffer) {
+                                    IncreaseControlFMatchByOne();
+                                 } else {
+                                    controlFMatches.Clear();
+                                    submittedControlFBuffer = controlFBuffer;
 
-                                 for (int i = 0; i < Program.lines.Count; i++) {
-                                    int[] indices = Program.lines[i].Find(new Regex(controlFBuffer));
+                                    for (int i = 0; i < Program.lines.Count; i++) {
+                                       int[] indices = Program.lines[i].Find(new Regex(controlFBuffer));
 
-                                    if (indices.Length > 0) {
-                                       controlFMatches.Add(new ControlFMatchLine(i, indices));
+                                       if (indices.Length > 0) {
+                                          controlFMatches.Add(new ControlFMatchLine(i, indices));
+                                       }
                                     }
+
+                                    if (controlFMatches.Count > 0)
+                                       currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0);
+                                    else
+                                       currentControlFMatch = null;
                                  }
 
-                                 if (controlFMatches.Count > 0)
-                                    currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0);
-                                 else
-                                    currentControlFMatch = null;
-                              }
+                                 if (currentControlFMatch != null) {
+                                    cursor.position = new Int2(currentControlFMatch.line.matchIndices[currentControlFMatch.index], currentControlFMatch.line.lineNumber);
 
-                              if (currentControlFMatch != null) {
-                                 cursor.position = new Int2(currentControlFMatch.line.matchIndices[currentControlFMatch.index], currentControlFMatch.line.lineNumber);
+                                    Vector2 highlightedTextLength = Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0);
+                                    int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font,
+                                                                                                                 Program.lines[currentControlFMatch.line.lineNumber].Value.Substring(0, currentControlFMatch.line.matchIndices[currentControlFMatch.index]),
+                                                                                                                 Program.config.fontSize,
+                                                                                                                 0).X;
 
-                                 Vector2 highlightedTextLength = Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0);
-                                 int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font,
-                                                                                                              Program.lines[currentControlFMatch.line.lineNumber].Value.Substring(0, currentControlFMatch.line.matchIndices[currentControlFMatch.index]),
-                                                                                                              Program.config.fontSize,
-                                                                                                              0).X;
+                                    controlFHighlightMatchRect = new Rectangle(rectangleStartX,
+                                                                               cursor.position.y * Line.Height + Program.YMargin,
+                                                                               highlightedTextLength.X,
+                                                                               highlightedTextLength.Y);
 
-                                 controlFHighlightMatchRect = new Rectangle(rectangleStartX,
-                                                                            cursor.position.y * Line.Height + Program.YMargin,
-                                                                            highlightedTextLength.X,
-                                                                            highlightedTextLength.Y);
+                                    controlFHighlightMatchTimer.Restart();
+                                 }
 
-                                 controlFHighlightMatchTimer.Restart();
-                              }
-
-                              cursor.MakeSureCursorIsVisibleToCamera(Program.lines,
-                                                                     ref camera,
-                                                                     Program.config.fontSize,
-                                                                     Program.config.leftPadding,
-                                                                     Program.font);
-                              break;
-                        }
+                                 cursor.MakeSureCursorIsVisibleToCamera(Program.lines,
+                                                                        ref camera,
+                                                                        Program.config.fontSize,
+                                                                        Program.config.leftPadding,
+                                                                        Program.font);
+                                 break;
+                           }
+                        //}
                      }
                   }
                   break;
             }
 
             missedKeyPressesBetweenFrames = string.Empty;
+            //missedSpecialKeyPressesBetweenFrames.Clear();
          } else {
             missedKeyPressesBetweenFrames += pressedKeys;
+            //missedSpecialKeyPressesBetweenFrames.AddRange(specialKeys);
          } // End of keyboard input handling
 
 

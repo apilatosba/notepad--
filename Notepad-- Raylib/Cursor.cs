@@ -27,6 +27,7 @@ namespace Notepad___Raylib {
          Raylib.DrawRectangle(distance, position.y * Line.Height, 1, Line.Height, color);
       }
 
+      [Obsolete("Use the other this misses some key presses if they are too quick")]
       public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, bool isControlKeyDown) {
          if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT)) {
             if (IsCursorAtEndOfFile(lines)) return;
@@ -45,7 +46,8 @@ namespace Notepad___Raylib {
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
             exXPosition = position.x;
 
-         } else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT)) {
+         }
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT)) {
             if (IsCursorAtBeginningOfFile()) return;
 
             if (IsCursorAtBeginningOfLine()) {
@@ -61,7 +63,8 @@ namespace Notepad___Raylib {
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
             exXPosition = position.x;
 
-         } else if (Raylib.IsKeyDown(KeyboardKey.KEY_UP)) {
+         }
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_UP)) {
             if (isControlKeyDown) return;
             if (IsCursorAtFirstLine()) return;
 
@@ -70,7 +73,65 @@ namespace Notepad___Raylib {
 
             MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
-         } else if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN)) {
+         }
+         if (Raylib.IsKeyDown(KeyboardKey.KEY_DOWN)) {
+            if (isControlKeyDown) return;
+            if (IsCursorAtLastLine(lines)) return;
+
+            position.y++;
+            position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
+
+            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+         }
+      }
+
+      public void HandleArrowKeysNavigation(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, bool isControlKeyDown, /*in List<KeyboardKey> specialKeys*/ KeyboardKey specialKey) {
+         if (/*specialKeys.Contains(KeyboardKey.KEY_RIGHT)*/ specialKey == KeyboardKey.KEY_RIGHT) {
+            if (IsCursorAtEndOfFile(lines)) return;
+
+            if (IsCursorAtEndOfLine(lines)) {
+               position.x = 0;
+               position.y++;
+            } else {
+               if (isControlKeyDown) {
+                  position.x += CalculateHowManyCharactersToJump(lines, Direction.Right);
+               } else {
+                  position.x++;
+               }
+            }
+
+            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+            exXPosition = position.x;
+
+         }
+         if (/*specialKeys.Contains(KeyboardKey.KEY_LEFT)*/ specialKey == KeyboardKey.KEY_LEFT) {
+            if (IsCursorAtBeginningOfFile()) return;
+
+            if (IsCursorAtBeginningOfLine()) {
+               position.x = lines[--position.y].Value.Length;
+            } else {
+               if (isControlKeyDown) {
+                  position.x -= CalculateHowManyCharactersToJump(lines, Direction.Left);
+               } else {
+                  position.x--;
+               }
+            }
+
+            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+            exXPosition = position.x;
+
+         }
+         if (/*specialKeys.Contains(KeyboardKey.KEY_UP)*/ specialKey == KeyboardKey.KEY_UP) {
+            if (isControlKeyDown) return;
+            if (IsCursorAtFirstLine()) return;
+
+            position.y--;
+            position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
+
+            MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
+
+         }
+         if (/*specialKeys.Contains(KeyboardKey.KEY_DOWN)*/ specialKey == KeyboardKey.KEY_DOWN) {
             if (isControlKeyDown) return;
             if (IsCursorAtLastLine(lines)) return;
 
@@ -150,7 +211,7 @@ namespace Notepad___Raylib {
 
          pos.y = (worldSpaceCoordinates.y - Program.YMargin) / Line.Height;
 
-         if(pos.y > lines.Count - 1) pos.y = lines.Count - 1;
+         if (pos.y > lines.Count - 1) pos.y = lines.Count - 1;
 
          Line line = lines[pos.y];
          string text = line.Value;
