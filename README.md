@@ -24,7 +24,7 @@ ctrl + m2 -> resize window
 touchpad support  
 rest is usual.
 
-## How to Build/Download 
+## How to Download 
 Get binaries from [release section](https://github.com/apilatosba/notepad--/releases).  
 Put the contents of the zip file in a folder that is in your PATH environment variable.  
 
