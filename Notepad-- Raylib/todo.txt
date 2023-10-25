@@ -1,5 +1,4 @@
 []bug: cursor movement doesnt process all inputs if inputs are too fast. thats a big problem Okayeg
-[]bug: if there is no match in controlF it crashes
 shaders
    character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
    different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.

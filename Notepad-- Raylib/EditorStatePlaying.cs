@@ -534,7 +534,7 @@ namespace Notepad___Raylib {
                               break;
                            case KeyboardKey.KEY_KP_ENTER:
                            case KeyboardKey.KEY_ENTER:
-                              if (submittedControlFBuffer == "" && controlFBuffer == "") break;
+                              if (controlFBuffer == "") break;
 
                               if (submittedControlFBuffer == controlFBuffer) {
                                  IncreaseControlFMatchByOne();
@@ -552,6 +552,8 @@ namespace Notepad___Raylib {
 
                                  if (controlFMatches.Count > 0)
                                     currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0);
+                                 else
+                                    currentControlFMatch = null;
                               }
 
                               if (currentControlFMatch != null) {
