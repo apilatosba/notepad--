@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Notepad___Raylib {
-   internal class UndoHistory<T> {
+   public class UndoHistory<T> {
       LinkedList<T> undoStack;
       readonly int MAX_SIZE;
 
@@ -13,7 +13,7 @@ namespace Notepad___Raylib {
 
       public void Push(T item) {
          if(undoStack.Count == MAX_SIZE) 
-            Dequeue();
+            _ = Dequeue();
          undoStack.AddLast(item);
       }
 
@@ -31,6 +31,10 @@ namespace Notepad___Raylib {
          T item = undoStack.First.Value;
          undoStack.RemoveFirst();
          return item;
+      }
+
+      public void Clear() {
+         undoStack.Clear();
       }
    }
 }

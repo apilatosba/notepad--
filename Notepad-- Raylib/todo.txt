@@ -1,13 +1,13 @@
 []bug: cursor movement doesnt process all inputs if inputs are too fast. thats a big problem Okayeg
 []bug: if there is no match in controlF it crashes
---shaders
+shaders
    character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
    different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
    make cursor blink. make it with a shader
    subpixel rendering
 add shortcuts
    shift+enter to go back
-   shiftSelect ctrl+z if inserts new text
+   --shiftSelect ctrl+z if inserts new text
 render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
     or the both

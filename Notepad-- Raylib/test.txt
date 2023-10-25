@@ -11,6 +11,8 @@ make a type specimen book. It has not, but also the leap into electronic typeset
 It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like
 Aldus PageMaker including versions of Lorem Ipsum.
 
+hello i am profiling the memory. how much does my undohistory eats/absorbs. only ~1 mb for 512 undo items. i think thats good enough. but it depends on what you store in ctrl+z buffer. if you copy pasted a whole file 512 times. then it is gonna be 512 * theFileSize of space in memory. which is no good but noone will ever never do that, right? Clueless
+
 i write something here okay. you get it my man. thats great.
 
 Why do we use it?

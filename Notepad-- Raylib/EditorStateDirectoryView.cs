@@ -51,6 +51,7 @@ namespace Notepad___Raylib {
             Directory.SetCurrentDirectory(Program.directoryPath);
          } else if (previousState is EditorStatePaused) {
             theFileUserWasEditing = Program.filePath;
+            Program.undoHistory.Clear();
          }
 
          directories.Add("..");
