@@ -1,5 +1,4 @@
 bug: i dont resize the rendertextures in editorview state. thats why bloom shader fucks up
-bug: when you click with mouse it creates shiftSelection and it doesnt get destroyed and that causes problems. if shift selection start and end position is same then set it null. i could do that every frame or only when clicked with mouse
 shaders
    character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
    different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
@@ -13,6 +12,9 @@ render bloom shader at quarter resolution
     or the both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
+detect whether window is visible, if it is not then stop rendering 
+try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
+concept of window
 when escape is pressed deselect shiftSelection if there is one, dont switch to paused state immediaetly
 abstract out controlF rendering. same code in playing state and directory view state
 implement redo, un-undo

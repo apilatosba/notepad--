@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -630,7 +630,9 @@ namespace Notepad___Raylib {
             if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) {
                timeSinceLastMouseInput.Restart();
 
-               shiftSelection = mouseSelection;
+               if (mouseSelection.StartPosition != mouseSelection.EndPosition)
+                  shiftSelection = mouseSelection;
+
                mouseSelection = null;
             }
          }

@@ -1,4 +1,4 @@
-﻿//#define VISUAL_STUDIO
+﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System.Diagnostics;
 using System.IO;
