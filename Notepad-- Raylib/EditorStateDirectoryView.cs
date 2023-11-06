@@ -91,8 +91,8 @@ namespace Notepad___Raylib {
          windowCoverTexture ??= Raylib.LoadTextureFromImage((Image)windowCoverImage);
          highlightedLineRenderTexture ??= Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
 
-         directoryColor = Program.config.textColor - new ColorInt(40, 20, 0, 0);
-         fileColor = Program.config.textColor + new ColorInt(-10, 20, -10, 0);
+         directoryColor = Program.config.textColor - new ColorInt(40, 20, 20, 0);
+         fileColor = Program.config.textColor + new ColorInt(-10, 30, -10, 0);
 
          directoryColor.Clamp0To255();
          fileColor.Clamp0To255();

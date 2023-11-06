@@ -1,4 +1,3 @@
-bug: i dont resize the rendertextures in editorview state. thats why bloom shader fucks up
 shaders
    character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
    different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.
@@ -12,8 +11,14 @@ render bloom shader at quarter resolution
     or the both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
+horizontal scroll. trackpad is enough.
+in EditorStateDirectoryView if a normal key is pressed it should act as if it is typed to controlF buffer and pressed enter immediately
+controlF should show a/b where a is the index of current match and b is number of matches
+in EditorStatePaused at line 38 use GetExecutableDirectory instead of "notepad--" so that it works even if you double click
+add selection color to config
 detect whether window is visible, if it is not then stop rendering 
 try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
+bug: possible bug. when you ctrl+v paste if there is a selection, it is not being set to null. selection is deleted but it still exist. problem
 concept of window
 when escape is pressed deselect shiftSelection if there is one, dont switch to paused state immediaetly
 abstract out controlF rendering. same code in playing state and directory view state

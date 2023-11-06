@@ -62,6 +62,7 @@ namespace Notepad___Raylib {
       public static bool isQuitButtonPressed = false;
       public static bool isDraggingWindow = false;
       public static UndoHistory<List<UndoItem>> undoHistory = new UndoHistory<List<UndoItem>>(512);
+      public static readonly Stopwatch windowResizeTimer = new Stopwatch(); // This gets triggered even when window de-minimized which is what i am using it for.
       /// <summary>
       /// Vertical form of <see cref="Config.leftPadding"/>
       /// </summary>
@@ -244,6 +245,8 @@ namespace Notepad___Raylib {
             offset = new Vector2(0, 0),
          };
 
+         windowResizeTimer.Start();
+
          while (!Raylib.WindowShouldClose() && !isQuitButtonPressed) {
             Raylib.BeginDrawing();
 
@@ -300,6 +303,22 @@ namespace Notepad___Raylib {
                   } else {
                      Raylib.MaximizeWindow();
                   }
+               }
+            }
+
+            {
+               if (Raylib.IsWindowResized()) {
+                  windowResizeTimer.Restart();
+
+                  Raylib.UnloadImage(Program.windowCoverImage);
+                  Raylib.UnloadTexture(Program.windowCoverTexture);
+                  Raylib.UnloadRenderTexture(Program.textMask);
+
+                  Program.windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
+                  Program.windowCoverTexture = Raylib.LoadTextureFromImage(Program.windowCoverImage);
+
+                  Program.textMask = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+                  Raylib.SetTextureWrap(Program.textMask.texture, TextureWrap.TEXTURE_WRAP_CLAMP);
                }
             }
 

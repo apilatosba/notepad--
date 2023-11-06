@@ -25,7 +25,6 @@ namespace Notepad___Raylib {
       float flashShaderTransparency = 0.0f;
       readonly Stopwatch flashShaderTimer = new Stopwatch();
       readonly Stopwatch timeSinceLastMouseInput = new Stopwatch();
-      readonly Stopwatch windowResizeTimer = new Stopwatch(); // This gets triggered even when window de-minimized which is what i am using it for.
       readonly Stopwatch controlFHighlightMatchTimer = new Stopwatch();
       readonly Stopwatch controlVPasteHighlightTimer = new Stopwatch();
       readonly Stopwatch normalKeyPressesWithModifiersLastInputTimer = new Stopwatch();
@@ -630,8 +629,9 @@ namespace Notepad___Raylib {
             if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)) {
                timeSinceLastMouseInput.Restart();
 
-               if (mouseSelection.StartPosition != mouseSelection.EndPosition)
-                  shiftSelection = mouseSelection;
+               if (mouseSelection != null)
+                  if (mouseSelection.StartPosition != mouseSelection.EndPosition)
+                     shiftSelection = mouseSelection;
 
                mouseSelection = null;
             }
@@ -644,20 +644,6 @@ namespace Notepad___Raylib {
          if (shiftSelection != null) shiftSelection.EndPosition = cursor.position;
 
          Program.MakeSureCameraNotBelowZeroInBothAxes(ref camera);
-
-         if (Raylib.IsWindowResized()) {
-            windowResizeTimer.Restart();
-
-            Raylib.UnloadImage(Program.windowCoverImage);
-            Raylib.UnloadTexture(Program.windowCoverTexture);
-            Raylib.UnloadRenderTexture(Program.textMask);
-
-            Program.windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), new Color(255, 255, 255, 255));
-            Program.windowCoverTexture = Raylib.LoadTextureFromImage(Program.windowCoverImage);
-
-            Program.textMask = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
-            Raylib.SetTextureWrap(Program.textMask.texture, TextureWrap.TEXTURE_WRAP_CLAMP);
-         }
       }
 
       public unsafe void Render() {
@@ -871,7 +857,7 @@ namespace Notepad___Raylib {
 
          if (Program.TimeSinceLastKeyboardInput < 5000 ||
                timeSinceLastMouseInput.ElapsedMilliseconds < 5000 ||
-               windowResizeTimer.ElapsedMilliseconds < 3000 ||
+               Program.windowResizeTimer.ElapsedMilliseconds < 3000 ||
                normalKeyPressesWithModifiersLastInputTimer.ElapsedMilliseconds < 5000) {
             Render();
          }
@@ -894,7 +880,6 @@ namespace Notepad___Raylib {
          camera.target = lastKnownCameraTarget ?? new Vector2(0, 0);
 
          Program.YMargin = 0;
-         windowResizeTimer.Start();
          controlFHighlightMatchTimer.Start();
          controlVPasteHighlightTimer.Start();
          normalKeyPressesWithModifiersLastInputTimer.Start();
