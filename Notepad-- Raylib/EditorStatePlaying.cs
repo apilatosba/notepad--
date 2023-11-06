@@ -317,9 +317,14 @@ namespace Notepad___Raylib {
                               }
                               break;
                            case KeyboardKey.KEY_ESCAPE:
-                              lastKnownCursorPosition = cursor.position;
-                              lastKnownCameraTarget = camera.target;
-                              IEditorState.SetStateTo(new EditorStatePaused());
+                              if(shiftSelection == null) {
+                                 lastKnownCursorPosition = cursor.position;
+                                 lastKnownCameraTarget = camera.target;
+                                 IEditorState.SetStateTo(new EditorStatePaused());
+                              } else {
+                                 shiftSelection = null;
+                              }
+
                               break;
                            case KeyboardKey.KEY_BACKSPACE:
                               if (shiftSelection != null) {

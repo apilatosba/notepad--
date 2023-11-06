@@ -20,7 +20,6 @@ detect whether window is visible, if it is not then stop rendering
 try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
 bug: possible bug. when you ctrl+v paste if there is a selection, it is not being set to null. selection is deleted but it still exist. problem
 concept of window
-when escape is pressed deselect shiftSelection if there is one, dont switch to paused state immediaetly
 abstract out controlF rendering. same code in playing state and directory view state
 implement redo, un-undo
 show images when hovered over on directory view state
