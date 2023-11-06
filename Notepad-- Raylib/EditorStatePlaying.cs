@@ -185,6 +185,7 @@ namespace Notepad___Raylib {
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
                            mouseSelection?.Delete(Program.lines, cursor);
                            shiftSelection?.Delete(Program.lines, cursor);
+                           shiftSelection = null;
 
                            Selection selection = new Selection() {
                               StartPosition = cursor.position

@@ -1,5 +1,6 @@
 ﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -59,7 +60,13 @@ namespace Notepad___Raylib {
 
          Rectangle minimizeWindowRect = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y + window.height / 13, 2 * window.width / 7, 2 * window.height / 13);
 
-         if(RayGui.GuiButton(minimizeWindowRect, "Minimize Window")) {
+         if (RayGui.GuiButton(minimizeWindowRect, "Minimize Window")) {
+            //Activator.CreateInstance(previousState.GetType());
+
+            //Type previousStateType = previousState.GetType();
+            //IEditorState.SetStateTo(previousState.GetType().GetConstructor(System.Type.EmptyTypes).Invoke(null) as IEditorState);
+
+            //IEditorState.SetStateTo(previousState);
             Raylib.MinimizeWindow();
          }
 
