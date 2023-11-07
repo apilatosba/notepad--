@@ -166,7 +166,7 @@ namespace Notepad___Raylib {
                            keyPressMatches.Clear();
 
                            for (int i = 0; i < lines.Count; i++) {
-                              int[] indices = lines[i].Find(new Regex($"^{c}", RegexOptions.IgnoreCase));
+                              int[] indices = lines[i].Find(new Regex($"^{Regex.Escape(c.ToString())}", RegexOptions.IgnoreCase));
 
                               if (indices.Length > 0) {
                                  keyPressMatches.Add(i);
