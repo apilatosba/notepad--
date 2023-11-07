@@ -86,6 +86,8 @@ namespace Notepad___Raylib {
                   {
                      if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_Z)) {
+                           shiftSelection = null;
+
                            List<UndoItem> undoItems;
 
                            try {
