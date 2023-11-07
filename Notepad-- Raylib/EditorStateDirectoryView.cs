@@ -29,12 +29,16 @@ namespace Notepad___Raylib {
       readonly Stopwatch lastKeyboardInputTimer = new Stopwatch();
       readonly Stopwatch windowResizeTimer = new Stopwatch();
       readonly Stopwatch controlFHighlightMatchTimer = new Stopwatch();
+      readonly Stopwatch keyPressHighlightMatchTimer = new Stopwatch();
       InternalState internalState = InternalState.Normal;
       List<ControlFMatchLine> controlFMatches = new List<ControlFMatchLine>();
       ControlFMatch currentControlFMatch;
       string controlFBuffer = "";
       string submittedControlFBuffer = "";
       Rectangle controlFHighlightMatchRect;
+      Rectangle keyPressHighlightMatchRect;
+      char lastPressedChar = '\0';
+      List<int> keyPressMatches = new List<int>();
 
       public void EnterState(IEditorState previousState) {
          Program.YMargin = Line.Height;
@@ -119,6 +123,79 @@ namespace Notepad___Raylib {
                      if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
                         internalState = InternalState.ControlF;
                      }
+                  }
+
+                  if (pressedKeys != null) {
+#if VISUAL_STUDIO
+                     Program.PrintPressedKeys(pressedKeys);
+#endif
+                     foreach(char c in pressedKeys) {
+                        if(c == lastPressedChar) {
+                           int currentMatchIndex = keyPressMatches.IndexOf(cursor.position.y);
+
+                           if(currentMatchIndex == -1) {
+                              // reset back to the first match if there is a match
+                              // actually and luckily i dont need to do anything here. because the math below will do the job (-1 + 1 is zero which corresponds to first element)
+                           }
+
+                           try {
+                              cursor.position.y = keyPressMatches[currentMatchIndex + 1];
+
+                              keyPressHighlightMatchTimer.Restart();
+
+                              keyPressHighlightMatchRect = new Rectangle(0,
+                                                                         cursor.position.y * Line.Height + Program.YMargin,
+                                                                         float.MaxValue,
+                                                                         Line.Height);
+                           }
+                           catch (ArgumentOutOfRangeException) {
+                              try {
+                                 cursor.position.y = keyPressMatches[0];
+
+                                 keyPressHighlightMatchTimer.Restart();
+
+                                 keyPressHighlightMatchRect = new Rectangle(0,
+                                                                            cursor.position.y * Line.Height + Program.YMargin,
+                                                                            float.MaxValue,
+                                                                            Line.Height);
+                              } catch (ArgumentOutOfRangeException) {
+                                 // user keep pressing the same key but there is no match
+                              }
+                           }
+                        } else {
+                           keyPressMatches.Clear();
+
+                           for (int i = 0; i < lines.Count; i++) {
+                              int[] indices = lines[i].Find(new Regex($"^{c}", RegexOptions.IgnoreCase));
+
+                              if (indices.Length > 0) {
+                                 keyPressMatches.Add(i);
+                              }
+                           }
+
+                           if(keyPressMatches.Count > 0) {
+                              cursor.position.y = keyPressMatches[0];
+
+                              keyPressHighlightMatchRect = new Rectangle(0,
+                                                                         cursor.position.y * Line.Height + Program.YMargin,
+                                                                         float.MaxValue,
+                                                                         Line.Height);
+
+                              keyPressHighlightMatchTimer.Restart();
+                           } else {
+                              // there is no match.
+                              // todo shader effect. screen shake?
+                           }
+                        }
+
+                        lastPressedChar = c;
+                     }
+
+                     cursor.MakeSureCursorIsVisibleToCamera(lines,
+                                                            ref camera,
+                                                            Program.config.fontSize,
+                                                            Program.config.leftPadding,
+                                                            Program.font);
                   }
 
                   if (specialKey != KeyboardKey.KEY_NULL) {
@@ -240,6 +317,7 @@ namespace Notepad___Raylib {
                               controlFBuffer = controlFBuffer.Remove(controlFBuffer.Length - 1);
                            }
                            break;
+                        case KeyboardKey.KEY_TAB:
                         case KeyboardKey.KEY_KP_ENTER:
                         case KeyboardKey.KEY_ENTER:
                            if (controlFBuffer == "") break;
@@ -349,23 +427,33 @@ namespace Notepad___Raylib {
             {
                Program.HighlightLineCursorIsAt(cursor);
 
-               if (internalState == InternalState.ControlF) {
-                  for (int i = 0; i < controlFMatches.Count; i++) {
-                     int[] matches = controlFMatches[i].matchIndices;
-
-                     for (int j = 0; j < matches.Length; j++) {
-                        int match = matches[j];
-                        int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font, lines[controlFMatches[i].lineNumber].Value.Substring(0, match), Program.config.fontSize, 0).X;
-                        int rectangleLength = (int)Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0).X;
-
-                        Raylib.DrawRectangleLines(rectangleStartX, Line.Height * controlFMatches[i].lineNumber + Program.YMargin, rectangleLength, Line.Height, new Color(255, 0, 0, 150));
+               switch (internalState) {
+                  case InternalState.Normal:
+                     if(keyPressHighlightMatchTimer.ElapsedMilliseconds < 1500) {
+                        int alpha = (int)(MathF.Exp(-1 * 6 * (keyPressHighlightMatchTimer.ElapsedMilliseconds / 1000.0f)) * 255);
+                        Raylib.DrawRectangleRec(keyPressHighlightMatchRect, new Color(255, 255, 255, alpha));
                      }
-                  }
 
-                  if (controlFHighlightMatchTimer.ElapsedMilliseconds < 1500) {
-                     int alpha = (int)(MathF.Exp(-1 * 6 * (controlFHighlightMatchTimer.ElapsedMilliseconds / 1000.0f)) * 255);
-                     Raylib.DrawRectangleRec(controlFHighlightMatchRect, new Color(255, 255, 255, alpha));
-                  }
+                     break;
+                  case InternalState.ControlF:
+                     for (int i = 0; i < controlFMatches.Count; i++) {
+                        int[] matches = controlFMatches[i].matchIndices;
+
+                        for (int j = 0; j < matches.Length; j++) {
+                           int match = matches[j];
+                           int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font, lines[controlFMatches[i].lineNumber].Value.Substring(0, match), Program.config.fontSize, 0).X;
+                           int rectangleLength = (int)Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0).X;
+
+                           Raylib.DrawRectangleLines(rectangleStartX, Line.Height * controlFMatches[i].lineNumber + Program.YMargin, rectangleLength, Line.Height, new Color(255, 0, 0, 150));
+                        }
+                     }
+
+                     if (controlFHighlightMatchTimer.ElapsedMilliseconds < 1500) {
+                        int alpha = (int)(MathF.Exp(-1 * 6 * (controlFHighlightMatchTimer.ElapsedMilliseconds / 1000.0f)) * 255);
+                        Raylib.DrawRectangleRec(controlFHighlightMatchRect, new Color(255, 255, 255, alpha));
+                     }
+
+                     break;
                }
 
                Program.RenderLines(lines.GetRange(0, directories.Count), Program.font, (Color)directoryColor, Program.YMargin, camera);

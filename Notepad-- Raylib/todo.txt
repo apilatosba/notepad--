@@ -12,7 +12,6 @@ render bloom shader at quarter resolution
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
 horizontal scroll. trackpad is enough.
-in EditorStateDirectoryView if a normal key is pressed it should act as if it is typed to controlF buffer and pressed enter immediately
 controlF should show a/b where a is the index of current match and b is number of matches
 in EditorStatePaused at line 38 use GetExecutableDirectory instead of "notepad--" so that it works even if you double click
 add selection color to config

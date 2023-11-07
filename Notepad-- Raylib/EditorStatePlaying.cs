@@ -531,6 +531,7 @@ namespace Notepad___Raylib {
                                  controlFBuffer = controlFBuffer.Remove(controlFBuffer.Length - 1);
                               }
                               break;
+                           case KeyboardKey.KEY_TAB:
                            case KeyboardKey.KEY_KP_ENTER:
                            case KeyboardKey.KEY_ENTER:
                               if (controlFBuffer == "") break;
