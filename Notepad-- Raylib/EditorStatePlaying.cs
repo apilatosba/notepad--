@@ -250,9 +250,29 @@ namespace Notepad___Raylib {
                         //}
 
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
-                           internalState = InternalState.ControlF;
                            mouseSelection = null;
+
+                           if (shiftSelection != null &&
+                                 (shiftSelection?.StartPosition.y == shiftSelection?.EndPosition.y)) {
+                              
+                              controlFBuffer = shiftSelection.GetText(Program.lines);
+                              Int2 cursorPosition = cursor.position;
+                              Vector2 cameraPosition = camera.target;
+                              shiftSelection.GetRightAndLeft(out Int2 selectionLeft, out _);
+
+                              for(; ; ) {
+                                 if (cursor.position == selectionLeft) break;
+
+                                 SimulateEnterInControlF();
+                              }
+
+                              cursor.position = cursorPosition;
+                              camera.target = cameraPosition;
+                           }
+
                            shiftSelection = null;
+
+                           internalState = InternalState.ControlF;
                            break;
                         }
                      }
@@ -321,7 +341,7 @@ namespace Notepad___Raylib {
                               }
                               break;
                            case KeyboardKey.KEY_ESCAPE:
-                              if(shiftSelection == null) {
+                              if (shiftSelection == null) {
                                  lastKnownCursorPosition = cursor.position;
                                  lastKnownCameraTarget = camera.target;
                                  IEditorState.SetStateTo(new EditorStatePaused());
@@ -535,55 +555,7 @@ namespace Notepad___Raylib {
                            case KeyboardKey.KEY_TAB:
                            case KeyboardKey.KEY_KP_ENTER:
                            case KeyboardKey.KEY_ENTER:
-                              if (controlFBuffer == "") break;
-
-                              if (submittedControlFBuffer == controlFBuffer) {
-                                 IncreaseControlFMatchByOne();
-                              } else {
-                                 controlFMatches.Clear();
-                                 totalControlFMatches = 0;
-                                 submittedControlFBuffer = controlFBuffer;
-
-                                 for (int i = 0; i < Program.lines.Count; i++) {
-                                    int[] indices = Program.lines[i].Find(new Regex(controlFBuffer));
-
-                                    if (indices.Length > 0) {
-                                       controlFMatches.Add(new ControlFMatchLine(i, indices));
-                                       totalControlFMatches += indices.Length;
-                                    }
-                                 }
-
-                                 if (controlFMatches.Count > 0)
-                                    currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0, 0);
-                                 else
-                                    currentControlFMatch = null;
-                              }
-
-                              if (currentControlFMatch != null) {
-                                 cursor.position = new Int2(currentControlFMatch.line.matchIndices[currentControlFMatch.index], currentControlFMatch.line.lineNumber);
-
-                                 Vector2 highlightedTextLength = Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0);
-                                 int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font,
-                                                                                                              Program.lines[currentControlFMatch.line.lineNumber].Value.Substring(0, currentControlFMatch.line.matchIndices[currentControlFMatch.index]),
-                                                                                                              Program.config.fontSize,
-                                                                                                              0).X;
-
-                                 controlFHighlightMatchRect = new Rectangle(rectangleStartX,
-                                                                            cursor.position.y * Line.Height + Program.YMargin,
-                                                                            highlightedTextLength.X,
-                                                                            highlightedTextLength.Y);
-
-                                 controlFHighlightMatchTimer.Restart();
-                              }
-
-                              CameraMoveDirection cameraMoveDirection = cursor.MakeSureCursorIsVisibleToCamera(Program.lines,
-                                                                                                               ref camera,
-                                                                                                               Program.config.fontSize,
-                                                                                                               Program.config.leftPadding,
-                                                                                                               Program.font);
-
-                              Program.MoveCameraIfNecessary(ref camera, cameraMoveDirection);
-
+                              SimulateEnterInControlF();
                               break;
                         }
                      }
@@ -848,7 +820,7 @@ namespace Notepad___Raylib {
                Raylib.DrawRectangleRounded(rectangle, 0.5f, 8, new Color(50, 50, 50, 230));
                Raylib.DrawRectangleRounded(regexLabelRect, 0.5f, 8, new Color(50, 50, 50, 230));
 
-               if(totalControlFMatches > 0)
+               if (totalControlFMatches > 0)
                   Raylib.DrawRectangleRounded(currentMatchIndicatorTextRect, 0.5f, 8, new Color(50, 50, 50, 230));
 
                Raylib.DrawTextEx(Program.font,
@@ -865,7 +837,7 @@ namespace Notepad___Raylib {
                                  0,
                                  Program.config.textColor);
 
-               if(totalControlFMatches > 0) {
+               if (totalControlFMatches > 0) {
                   Raylib.DrawTextEx(Program.font,
                                     currentMatchIndicatorText,
                                     textPosition + currentMatchIndicatorTextOffset,
@@ -933,6 +905,59 @@ namespace Notepad___Raylib {
                currentControlFMatch = new ControlFMatch(nextLine, 0, 0, 0);
             }
          }
+      }
+
+      void SimulateEnterInControlF() {
+
+         if (controlFBuffer == "") return;
+
+         if (submittedControlFBuffer == controlFBuffer) {
+            IncreaseControlFMatchByOne();
+         } else {
+            controlFMatches.Clear();
+            totalControlFMatches = 0;
+            submittedControlFBuffer = controlFBuffer;
+
+            for (int i = 0; i < Program.lines.Count; i++) {
+               int[] indices = Program.lines[i].Find(new Regex(controlFBuffer));
+
+               if (indices.Length > 0) {
+                  controlFMatches.Add(new ControlFMatchLine(i, indices));
+                  totalControlFMatches += indices.Length;
+               }
+            }
+
+            if (controlFMatches.Count > 0)
+               currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0, 0);
+            else
+               currentControlFMatch = null;
+         }
+
+         if (currentControlFMatch != null) {
+            cursor.position = new Int2(currentControlFMatch.line.matchIndices[currentControlFMatch.index], currentControlFMatch.line.lineNumber);
+
+            Vector2 highlightedTextLength = Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0);
+            int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font,
+                                                                                         Program.lines[currentControlFMatch.line.lineNumber].Value.Substring(0, currentControlFMatch.line.matchIndices[currentControlFMatch.index]),
+                                                                                         Program.config.fontSize,
+                                                                                         0).X;
+
+            controlFHighlightMatchRect = new Rectangle(rectangleStartX,
+                                                       cursor.position.y * Line.Height + Program.YMargin,
+                                                       highlightedTextLength.X,
+                                                       highlightedTextLength.Y);
+
+            controlFHighlightMatchTimer.Restart();
+         }
+
+         CameraMoveDirection cameraMoveDirection = cursor.MakeSureCursorIsVisibleToCamera(Program.lines,
+                                                                                          ref camera,
+                                                                                          Program.config.fontSize,
+                                                                                          Program.config.leftPadding,
+                                                                                          Program.font);
+
+         Program.MoveCameraIfNecessary(ref camera, cameraMoveDirection);
+
       }
    }
 }
