@@ -145,33 +145,41 @@ namespace Notepad___Raylib {
          }
       }
 
-      public void MakeSureCursorIsVisibleToCamera(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
+      public CameraMoveDirection MakeSureCursorIsVisibleToCamera(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font) {
          Int2 cursorWorldSpacePosition = GetWorldSpacePosition(lines, fontSize, leftPadding, font);
 
-         MakeSureCursorIsVisibleVertical(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
-         MakeSureCursorIsVisibleHorizontal(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
+         bool verticalMove = MakeSureCursorIsVisibleVertical(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
+         bool horizontalMove = MakeSureCursorIsVisibleHorizontal(lines, ref camera, fontSize, leftPadding, font, cursorWorldSpacePosition);
+
+         return (verticalMove ? CameraMoveDirection.Down : 0) | (horizontalMove ? CameraMoveDirection.Right : 0);
       }
 
-      void MakeSureCursorIsVisibleHorizontal(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
+      /// <returns>true if the camera was moved to right</returns>
+      bool MakeSureCursorIsVisibleHorizontal(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
          int leftEdgeWorldSpacePositionX = (int)Raylib.GetScreenToWorld2D(Vector2.Zero, camera).X;
          int rightEdgeWorldSpacePositionX = (int)Raylib.GetScreenToWorld2D(new Vector2(Raylib.GetScreenWidth(), 0), camera).X;
 
          int a = cursorWorldSpacePosition.x - rightEdgeWorldSpacePositionX; // Explanation: ./CursorScreenExplanation.png
          int b = cursorWorldSpacePosition.x - leftEdgeWorldSpacePositionX; // Explanation: ./CursorScreenExplanation.png
 
-         if (Math.Abs(a) + Math.Abs(b) <= Raylib.GetScreenWidth()) return;
+         if (Math.Abs(a) + Math.Abs(b) <= Raylib.GetScreenWidth()) return false;
 
          // Offset is applied so we can see the cursor otherwise it would be at the edge of the screen and not visible.
          int offset = (int)Raylib.MeasureTextEx(font, "A", fontSize, 0).X - 1;
 
          if (Math.Abs(a) < Math.Abs(b)) {
             camera.target.X += a + offset;
+            return true;
          } else if (Math.Abs(b) < Math.Abs(a)) {
             camera.target.X += b - offset;
+            return false;
          }
+
+         return false;
       }
 
-      void MakeSureCursorIsVisibleVertical(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
+      /// <returns>true if camera was moved to down</returns>
+      bool MakeSureCursorIsVisibleVertical(in List<Line> lines, ref Camera2D camera, int fontSize, int leftPadding, Font font, Int2 cursorWorldSpacePosition) {
          int topEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(Vector2.Zero, camera).Y + Program.YMargin;
          int bottomEdgeWorldSpacePositionY = (int)Raylib.GetScreenToWorld2D(new Vector2(0, Raylib.GetScreenHeight()), camera).Y;
          bottomEdgeWorldSpacePositionY -= Line.Height;
@@ -179,13 +187,17 @@ namespace Notepad___Raylib {
          int a = cursorWorldSpacePosition.y - topEdgeWorldSpacePositionY; // Explanation: ./CursorScreenExplanation.png
          int b = cursorWorldSpacePosition.y - bottomEdgeWorldSpacePositionY; // Explanation: ./CursorScreenExplanation.png
 
-         if (Math.Abs(a) + Math.Abs(b) <= Raylib.GetScreenHeight() - Program.YMargin) return;
+         if (Math.Abs(a) + Math.Abs(b) <= Raylib.GetScreenHeight() - Program.YMargin) return false;
 
          if (Math.Abs(a) < Math.Abs(b)) {
             camera.target.Y += a;
+            return false;
          } else if (Math.Abs(b) < Math.Abs(a)) {
             camera.target.Y += b;
+            return true;
          }
+
+         return false;
       }
 
       /// <summary>

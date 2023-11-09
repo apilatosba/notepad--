@@ -192,11 +192,13 @@ namespace Notepad___Raylib {
                         lastPressedChar = c;
                      }
 
-                     cursor.MakeSureCursorIsVisibleToCamera(lines,
-                                                            ref camera,
-                                                            Program.config.fontSize,
-                                                            Program.config.leftPadding,
-                                                            Program.font);
+                     CameraMoveDirection cameraMoveDirection = cursor.MakeSureCursorIsVisibleToCamera(lines,
+                                                                                                      ref camera,
+                                                                                                      Program.config.fontSize,
+                                                                                                      Program.config.leftPadding,
+                                                                                                      Program.font);
+
+                     Program.MoveCameraIfNecessary(ref camera, cameraMoveDirection);
                   }
 
                   if (specialKey != KeyboardKey.KEY_NULL) {
@@ -362,11 +364,14 @@ namespace Notepad___Raylib {
                               controlFHighlightMatchTimer.Restart();
                            }
 
-                           cursor.MakeSureCursorIsVisibleToCamera(lines,
-                                                                  ref camera,
-                                                                  Program.config.fontSize,
-                                                                  Program.config.leftPadding,
-                                                                  Program.font);
+                           CameraMoveDirection cameraMoveDirection = cursor.MakeSureCursorIsVisibleToCamera(lines,
+                                                                                                            ref camera,
+                                                                                                            Program.config.fontSize,
+                                                                                                            Program.config.leftPadding,
+                                                                                                            Program.font);
+
+                           Program.MoveCameraIfNecessary(ref camera, cameraMoveDirection);
+
                            break;
                      }
                   }

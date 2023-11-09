@@ -750,6 +750,25 @@ namespace Notepad___Raylib {
          return rectangle;
       }
 
+      public static void MoveCameraDownABit(ref Camera2D camera) {
+         camera.target.Y += Line.Height * 3;
+      }
+
+      public static void MoveCameraRightABit(ref Camera2D camera) {
+         float lengthOfThirteenChars = Raylib.MeasureTextEx(font, new string('A', 13), config.fontSize, 0).X;
+         camera.target.X += lengthOfThirteenChars;
+      }
+
+      public static void MoveCameraIfNecessary(ref Camera2D camera, CameraMoveDirection cameraMoveDirection) {
+         if ((cameraMoveDirection & CameraMoveDirection.Down) != 0) {
+            MoveCameraDownABit(ref camera);
+         }
+
+         if ((cameraMoveDirection & CameraMoveDirection.Right) != 0) {
+            MoveCameraRightABit(ref camera);
+         }
+      }
+
       public static string GetConfigPath() {
 #if VISUAL_STUDIO
          return Path.Combine(appDirectory, CONFIG_FILE_NAME);

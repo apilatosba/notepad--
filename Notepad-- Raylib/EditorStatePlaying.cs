@@ -576,11 +576,14 @@ namespace Notepad___Raylib {
                                  controlFHighlightMatchTimer.Restart();
                               }
 
-                              cursor.MakeSureCursorIsVisibleToCamera(Program.lines,
-                                                                     ref camera,
-                                                                     Program.config.fontSize,
-                                                                     Program.config.leftPadding,
-                                                                     Program.font);
+                              CameraMoveDirection cameraMoveDirection = cursor.MakeSureCursorIsVisibleToCamera(Program.lines,
+                                                                                                               ref camera,
+                                                                                                               Program.config.fontSize,
+                                                                                                               Program.config.leftPadding,
+                                                                                                               Program.font);
+
+                              Program.MoveCameraIfNecessary(ref camera, cameraMoveDirection);
+
                               break;
                         }
                      }
