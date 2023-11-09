@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <fontSize>25</fontSize>
+  <fontSize>19</fontSize>
   <leftPadding>4</leftPadding>
   <spacingBetweenLines>0</spacingBetweenLines>
-  <tabSize>3</tabSize>
+  <tabSize>4</tabSize>
   <fontName>Inconsolata-Medium.ttf</fontName>
   <textColor>
-    <r>225</r>
-    <g>225</g>
-    <b>225</b>
+    <r>215</r>
+    <g>215</g>
+    <b>215</b>
     <a>255</a>
   </textColor>
   <backgroundColor>
@@ -23,6 +23,12 @@
     <b>227</b>
     <a>255</a>
   </cursorColor>
+  <selectionColor>
+    <r>61</r>
+    <g>129</g>
+    <b>207</b>
+    <a>102</a>
+  </selectionColor>
   <backgroundImage>482950.png</backgroundImage>
-  <backgroundLucidity>0.33</backgroundLucidity>
+  <backgroundLucidity>0.5</backgroundLucidity>
 </Config>

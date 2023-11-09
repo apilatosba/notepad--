@@ -13,7 +13,8 @@ namespace Notepad___Raylib {
       /// In text space
       /// </summary>
       Int2 endPosition;
-      Color color = new Color(61, 129, 207, 102); // gpt says rgba(0, 120, 215, 102)
+      // Color is in config now
+      //Color color = new Color(61, 129, 207, 102); // gpt says rgba(0, 120, 215, 102)
 
       public Int2 EndPosition {
          get => endPosition;
@@ -66,7 +67,7 @@ namespace Notepad___Raylib {
             Int2 leftWorldSpacePosition = GetWorldSpacePosition(left, lines, fontSize, leftPadding, font);
             Int2 rightWorldSpacePosition = GetWorldSpacePosition(right, lines, fontSize, leftPadding, font);
 
-            Raylib.DrawRectangle(leftWorldSpacePosition.x, leftWorldSpacePosition.y, rightWorldSpacePosition.x - leftWorldSpacePosition.x, Line.Height, color);
+            Raylib.DrawRectangle(leftWorldSpacePosition.x, leftWorldSpacePosition.y, rightWorldSpacePosition.x - leftWorldSpacePosition.x, Line.Height, Program.config.selectionColor);
          }
       }
 

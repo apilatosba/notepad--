@@ -15,7 +15,6 @@ copy paste the selected text to controlF buffer if there is a selection when ent
 in controlF if match is right side to the window camera only shows up to cursor so user cant see the rest of the word. problem
 horizontal scroll. trackpad is enough.
 controlF should show a/b where a is the index of current match and b is number of matches
-add selection color to config
 detect whether window is visible, if it is not then stop rendering 
 try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
 concept of window
