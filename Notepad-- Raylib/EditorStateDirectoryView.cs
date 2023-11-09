@@ -289,6 +289,13 @@ namespace Notepad___Raylib {
                   break;
 
                case InternalState.ControlF:
+                  if (modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
+                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
+                        internalState = InternalState.Normal;
+                        break;
+                     }
+                  }
+
                   if (pressedKeys != null) {
 #if VISUAL_STUDIO
                      Program.PrintPressedKeys($"{pressedKeys} (ctrl+f)");

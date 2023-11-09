@@ -11,7 +11,6 @@ render bloom shader at quarter resolution
     or the both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
-if i press ctrl+f when in controlF state it should switch back
 try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
 horizontal scroll. trackpad is enough.
 detect whether window is visible, if it is not then stop rendering 
