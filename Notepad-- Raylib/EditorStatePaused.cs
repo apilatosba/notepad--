@@ -2,6 +2,7 @@
 using Raylib_CsLo;
 using System.Diagnostics;
 using System.IO;
+using System.Numerics;
 
 namespace Notepad___Raylib {
    internal class EditorStatePaused : IEditorState {
@@ -45,10 +46,10 @@ namespace Notepad___Raylib {
             });
          }
 
-         if(previousState is EditorStatePlaying) {
+         if (previousState is EditorStatePlaying) {
             Rectangle openDirectoryRect = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y - window.height / 13, 2 * window.width / 7, 2 * window.height / 13);
 
-            if(RayGui.GuiButton(openDirectoryRect, "Open Containing Folder")) {
+            if (RayGui.GuiButton(openDirectoryRect, "Open Containing Folder")) {
                EditorStatePlaying.lastKnownCursorPosition = null;
                EditorStatePlaying.lastKnownCameraTarget = null;
 
@@ -71,8 +72,24 @@ namespace Notepad___Raylib {
 
          Rectangle quit = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y + window.height / 4, 2 * window.width / 7, 2 * window.height / 13);
 
-         if(RayGui.GuiButton(quit, "Quit")) {
+         if (RayGui.GuiButton(quit, "Quit")) {
             Program.isQuitButtonPressed = true;
+         }
+
+         {
+            float rectWidth = window.width / 10;
+            Rectangle repoRect = new Rectangle(window.x + window.width / 15, window.y + window.height - window.width / 9, rectWidth, rectWidth);
+
+            if (RayGui.GuiButton(repoRect, (string)null)) {
+               Raylib.OpenURL("https://github.com/apilatosba/notepad--");
+            }
+
+            {
+               Int2 iconSize = new Int2(Program.repoIcon.width, Program.repoIcon.height);
+               float scale = rectWidth / iconSize.x;
+
+               Raylib.DrawTextureEx(Program.repoIcon, new Vector2(repoRect.x, repoRect.y), 0, scale, Raylib.WHITE);
+            }
          }
       }
 

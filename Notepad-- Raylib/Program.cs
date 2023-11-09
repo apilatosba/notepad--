@@ -54,6 +54,7 @@ namespace Notepad___Raylib {
       public static Texture windowCoverTexture; // Rectangle doesnt work with uv's. https://github.com/raysan5/raylib/issues/1730
       public static Texture background;
       public static Texture quarterResolutionTextMask;
+      public static Texture repoIcon;
       public static RenderTexture textMask;
       public static Vector2 backgroundPosition;
       public static float backgroundScale;
@@ -218,6 +219,15 @@ namespace Notepad___Raylib {
          rainbowShaderHighlightedLineMaskLoc = Raylib.GetShaderLocation(rainbowShader, "highlightedLineMask");
 
          background = Raylib.LoadTexture(Path.Combine(GetImagesDirectory(), config.backgroundImage));
+         repoIcon = Raylib.LoadTexture(Path.Combine(GetImagesDirectory(), "repo icon.png"));
+
+         {
+            fixed (Texture* ptr = &repoIcon) {
+               Raylib.GenTextureMipmaps(ptr);
+            }
+
+            Raylib.SetTextureFilter(repoIcon, TextureFilter.TEXTURE_FILTER_BILINEAR);
+         }
 
          {
             int w = background.width;
@@ -337,6 +347,7 @@ namespace Notepad___Raylib {
          Raylib.UnloadImage(windowCoverImage);
          Raylib.UnloadTexture(windowCoverTexture);
          Raylib.UnloadTexture(background);
+         Raylib.UnloadTexture(repoIcon);
          Raylib.UnloadRenderTexture(textMask);
          Raylib.UnloadShader(flashShader);
          Raylib.UnloadShader(bloomShader);
@@ -406,7 +417,7 @@ namespace Notepad___Raylib {
             linesToFile[i] = lines[i].Value;
          }
 
-         for(int i = 0; ;) {
+         for (int i = 0; ;) {
             try {
                File.WriteAllLines(path, linesToFile);
                break;
@@ -414,7 +425,7 @@ namespace Notepad___Raylib {
             catch (IOException) {
                i++;
 
-               if(i > 5) {
+               if (i > 5) {
                   Console.WriteLine("Failed to save file.");
                   return;
                }
@@ -550,7 +561,7 @@ namespace Notepad___Raylib {
             KeyboardKey.KEY_LEFT,
          };
 
-         foreach(var key in specialKeys) {
+         foreach (var key in specialKeys) {
             if (Raylib.IsKeyDown(key)) {
                pressedSpecialKeys.Add(key);
                isKeyPressed = true;
@@ -589,7 +600,7 @@ namespace Notepad___Raylib {
       public static string GetExecutableDirectory() {
          Assembly entryAssembly = Assembly.GetEntryAssembly();
          string executableDirectory = Path.GetDirectoryName(entryAssembly.Location);
-         
+
          return executableDirectory;
       }
 
