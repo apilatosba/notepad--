@@ -1,6 +1,5 @@
 ﻿#define VISUAL_STUDIO
 using Raylib_CsLo;
-using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -36,7 +35,7 @@ namespace Notepad___Raylib {
          Rectangle settings = new Rectangle(centerOfWindow.x - window.width / 7, centerOfWindow.y - window.height / 4, 2 * window.width / 7, 2 * window.height / 13);
          //Raylib.DrawRectangleRec(settings, Raylib.RED);
          if (RayGui.GuiButton(settings, "Edit Settings")) {
-            Process.Start(new ProcessStartInfo("notepad--", $"\"{Program.GetConfigPath()}\"") { // notepad-- only works on windows. on linux it is "dotnet notepad--.dll". problem
+            Process.Start(new ProcessStartInfo(Path.Combine(Program.GetExecutableDirectory(), "notepad--"), $"\"{Program.GetConfigPath()}\"") {
                UseShellExecute = true,
                CreateNoWindow = true,
 #if VISUAL_STUDIO

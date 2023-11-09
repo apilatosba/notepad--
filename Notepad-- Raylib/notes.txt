@@ -5,7 +5,7 @@ dont forget to comment out #define VISUAL_STUDIO before publishing. check Progra
 when building with visual studio, set output type to WinExe(windows application) to get rid of console opening when you launch new instance of notepad--.
 jpg is not supported.
 range of background lucidity is 0-1.
-on linux it works with "dotnet notepad--.dll file"
+it prints to console in linux but not in windows. windows sucks
 what i liked about the notepad-- project so far:
    Selection implementation is good.
    Undo implementation is good.
