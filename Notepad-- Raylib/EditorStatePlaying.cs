@@ -256,7 +256,7 @@ namespace Notepad___Raylib {
                                  (shiftSelection?.StartPosition.y == shiftSelection?.EndPosition.y)) {
                               
                               controlFBuffer = shiftSelection.GetText(Program.lines);
-                              Int2 cursorPosition = cursor.position;
+                              //Int2 cursorPosition = cursor.position;
                               Vector2 cameraPosition = camera.target;
                               shiftSelection.GetRightAndLeft(out Int2 selectionLeft, out _);
 
@@ -266,11 +266,11 @@ namespace Notepad___Raylib {
                                  SimulateEnterInControlF();
                               }
 
-                              cursor.position = cursorPosition;
+                              //cursor.position = cursorPosition;
                               camera.target = cameraPosition;
+                           } else {
+                              shiftSelection = null;
                            }
-
-                           shiftSelection = null;
 
                            internalState = InternalState.ControlF;
                            break;
@@ -908,7 +908,6 @@ namespace Notepad___Raylib {
       }
 
       void SimulateEnterInControlF() {
-
          if (controlFBuffer == "") return;
 
          if (submittedControlFBuffer == controlFBuffer) {
@@ -935,6 +934,8 @@ namespace Notepad___Raylib {
 
          if (currentControlFMatch != null) {
             cursor.position = new Int2(currentControlFMatch.line.matchIndices[currentControlFMatch.index], currentControlFMatch.line.lineNumber);
+            cursor.exXPosition = cursor.position.x;
+            shiftSelection = new Selection(cursor.position + new Int2(submittedControlFBuffer.Length, 0), cursor.position);
 
             Vector2 highlightedTextLength = Raylib.MeasureTextEx(Program.font, submittedControlFBuffer, Program.config.fontSize, 0);
             int rectangleStartX = Program.config.leftPadding + (int)Raylib.MeasureTextEx(Program.font,
@@ -957,7 +958,6 @@ namespace Notepad___Raylib {
                                                                                           Program.font);
 
          Program.MoveCameraIfNecessary(ref camera, cameraMoveDirection);
-
       }
    }
 }
