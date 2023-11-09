@@ -23,6 +23,11 @@ namespace Notepad___Raylib {
          this.y = y;
       }
 
+      public Int2(float x, float y) {
+         this.x = (int)x;
+         this.y = (int)y;
+      }
+
       public override string ToString() {
          return $"({x}, {y})";
       }

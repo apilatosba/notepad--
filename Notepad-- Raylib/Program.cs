@@ -740,6 +740,16 @@ namespace Notepad___Raylib {
          return GetMousePositionInScreenSpace() - mousePositionLastFrame;
       }
 
+      public static Rectangle GenerateSurroundingRectangle(string text, Vector2 textPosition, Font font, int fontSize, int horizontalSpace, int verticalSpace) {
+         Int2 textLength = (Int2)Raylib.MeasureTextEx(font, text, fontSize, 0);
+         Rectangle rectangle = new Rectangle(textPosition.X - horizontalSpace,
+                                             textPosition.Y - verticalSpace,
+                                             2 * horizontalSpace + textLength.x,
+                                             2 * verticalSpace + textLength.y);
+
+         return rectangle;
+      }
+
       public static string GetConfigPath() {
 #if VISUAL_STUDIO
          return Path.Combine(appDirectory, CONFIG_FILE_NAME);

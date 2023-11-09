@@ -37,6 +37,7 @@ namespace Notepad___Raylib {
       string submittedControlFBuffer = "";
       Rectangle controlFHighlightMatchRect;
       Rectangle keyPressHighlightMatchRect;
+      int totalControlFMatches;
       char lastPressedChar = '\0';
       List<int> keyPressMatches = new List<int>();
 
@@ -326,6 +327,7 @@ namespace Notepad___Raylib {
                               IncreaseControlFMatchByOne();
                            } else {
                               controlFMatches.Clear();
+                              totalControlFMatches = 0;
                               submittedControlFBuffer = controlFBuffer;
 
                               for (int i = 0; i < lines.Count; i++) {
@@ -333,11 +335,12 @@ namespace Notepad___Raylib {
 
                                  if (indices.Length > 0) {
                                     controlFMatches.Add(new ControlFMatchLine(i, indices));
+                                    totalControlFMatches += indices.Length;
                                  }
                               }
 
                               if (controlFMatches.Count > 0)
-                                 currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0);
+                                 currentControlFMatch = new ControlFMatch(controlFMatches[0], 0, 0, 0);
                               else
                                  currentControlFMatch = null;
                            }
@@ -522,30 +525,32 @@ namespace Notepad___Raylib {
                               Program.config.textColor);
 
             if (internalState == InternalState.ControlF) {
-               Vector2 textPosition = new Vector2(Raylib.GetScreenWidth() - 150, Program.YMargin + 50);
-               Int2 textLength = (Int2)Raylib.MeasureTextEx(Program.font, controlFBuffer, Program.config.fontSize, 0);
                int horizontalSpace = 5;
                int verticalSpace = 2;
+
+               Vector2 textPosition = new Vector2(Raylib.GetScreenWidth() - 150, Program.YMargin + 50);
+               Int2 textLength = (Int2)Raylib.MeasureTextEx(Program.font, controlFBuffer, Program.config.fontSize, 0);
+
                string regexLabel = "REGEX";
-               Vector2 regexLabelLength = Raylib.MeasureTextEx(Program.font, regexLabel, Program.config.fontSize, 0);
-               Vector2 regexLabelOffset = new Vector2(7, Line.Height);
+               Int2 regexLabelLength = (Int2)Raylib.MeasureTextEx(Program.font, regexLabel, Program.config.fontSize, 0);
+               Vector2 regexLabelOffset = new Vector2(5, Line.Height);
+
+               string currentMatchIndicatorText = $"{currentControlFMatch?.overallIndex + 1 ?? 0}/{totalControlFMatches}";
+               Vector2 currentMatchIndicatorTextOffset = regexLabelOffset + new Vector2(regexLabelLength.x + 2 * horizontalSpace + 1, 0); // Offset is relative to textPosition
 
                if (textPosition.X + textLength.x + 2 * horizontalSpace > Raylib.GetScreenWidth()) {
                   textPosition.X = Raylib.GetScreenWidth() - textLength.x - 2 * horizontalSpace;
                }
 
-               Rectangle rectangle = new Rectangle(textPosition.X - horizontalSpace,
-                                                   textPosition.Y - verticalSpace,
-                                                   2 * horizontalSpace + textLength.x,
-                                                   2 * verticalSpace + textLength.y);
-
-               Rectangle regexLabelRect = new Rectangle(rectangle.x + regexLabelOffset.X,
-                                                        rectangle.y + regexLabelOffset.Y,
-                                                        regexLabelLength.X + 2 * horizontalSpace,
-                                                        regexLabelLength.Y + 2 * verticalSpace);
+               Rectangle rectangle = Program.GenerateSurroundingRectangle(controlFBuffer, textPosition, Program.font, Program.config.fontSize, horizontalSpace, verticalSpace);
+               Rectangle regexLabelRect = Program.GenerateSurroundingRectangle(regexLabel, textPosition + regexLabelOffset, Program.font, Program.config.fontSize, horizontalSpace, verticalSpace);
+               Rectangle currentMatchIndicatorTextRect = Program.GenerateSurroundingRectangle(currentMatchIndicatorText, textPosition + currentMatchIndicatorTextOffset, Program.font, Program.config.fontSize, horizontalSpace, verticalSpace);
 
                Raylib.DrawRectangleRounded(rectangle, 0.5f, 8, new Color(50, 50, 50, 255));
                Raylib.DrawRectangleRounded(regexLabelRect, 0.5f, 8, new Color(50, 50, 50, 255));
+               
+               if (totalControlFMatches > 0)
+                  Raylib.DrawRectangleRounded(currentMatchIndicatorTextRect, 0.5f, 8, new Color(50, 50, 50, 230));
 
                Raylib.DrawTextEx(Program.font,
                                  controlFBuffer,
@@ -560,6 +565,15 @@ namespace Notepad___Raylib {
                                  Program.config.fontSize,
                                  0,
                                  Program.config.textColor);
+
+               if (totalControlFMatches > 0) {
+                  Raylib.DrawTextEx(Program.font,
+                                    currentMatchIndicatorText,
+                                    textPosition + currentMatchIndicatorTextOffset,
+                                    Program.config.fontSize,
+                                    0,
+                                    Program.config.textColor);
+               }
             }
          }
       }
@@ -671,15 +685,16 @@ namespace Notepad___Raylib {
 
          if (line.matchIndices.Length > currentControlFMatch.index + 1) {
             currentControlFMatch.index++;
+            currentControlFMatch.overallIndex++;
          } else {
             ControlFMatchLine nextLine;
             try {
                nextLine = controlFMatches[currentControlFMatch.indexOfLineInMatchBuffer + 1];
-               currentControlFMatch = new ControlFMatch(nextLine, 0, currentControlFMatch.indexOfLineInMatchBuffer + 1);
+               currentControlFMatch = new ControlFMatch(nextLine, 0, currentControlFMatch.indexOfLineInMatchBuffer + 1, currentControlFMatch.overallIndex + 1);
             }
             catch (ArgumentOutOfRangeException) {
                nextLine = controlFMatches[0];
-               currentControlFMatch = new ControlFMatch(nextLine, 0, 0);
+               currentControlFMatch = new ControlFMatch(nextLine, 0, 0, 0);
             }
          }
       }
