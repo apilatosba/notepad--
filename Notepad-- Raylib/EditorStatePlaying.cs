@@ -499,7 +499,14 @@ namespace Notepad___Raylib {
                               } else {
                                  if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                               }
-                              //camera.target.Y -= 10;
+
+                              if(modifiers.Contains(KeyboardKey.KEY_LEFT_ALT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_ALT)) {
+                                 Line lineAboveCopy = new Line(Program.lines[cursor.position.y - 1]);
+
+                                 Program.lines[cursor.position.y - 1] = Program.lines[cursor.position.y];
+                                 Program.lines[cursor.position.y] = lineAboveCopy;
+                              }
+
                               break;
                            case KeyboardKey.KEY_DOWN:
                               if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
@@ -507,9 +514,17 @@ namespace Notepad___Raylib {
                               } else {
                                  if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                               }
-                              //camera.target.Y += 10;
+
+                              if(modifiers.Contains(KeyboardKey.KEY_LEFT_ALT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_ALT)) {
+                                 Line lineBelowCopy = new Line(Program.lines[cursor.position.y + 1]);
+
+                                 Program.lines[cursor.position.y + 1] = Program.lines[cursor.position.y];
+                                 Program.lines[cursor.position.y] = lineBelowCopy;
+                              }
+
                               break;
                         }
+
                         cursor.HandleArrowKeysNavigation(Program.lines,
                                                          ref camera,
                                                          Program.config.fontSize,
