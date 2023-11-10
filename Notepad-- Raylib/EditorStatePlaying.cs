@@ -265,7 +265,7 @@ namespace Notepad___Raylib {
                               for(; ; ) {
                                  if (cursor.position == selectionLeft) break;
 
-                                 SimulateEnterInControlF();
+                                 SimulateEnterInControlF(null);
                               }
 
                               //cursor.position = cursorPosition;
@@ -596,7 +596,8 @@ namespace Notepad___Raylib {
                            case KeyboardKey.KEY_TAB:
                            case KeyboardKey.KEY_KP_ENTER:
                            case KeyboardKey.KEY_ENTER:
-                              SimulateEnterInControlF();
+                              SimulateEnterInControlF(modifiers);
+
                               break;
                         }
                      }
@@ -946,11 +947,40 @@ namespace Notepad___Raylib {
          }
       }
 
-      void SimulateEnterInControlF() {
+      void DecreaseControlFMatchByOne() {
+         if (currentControlFMatch == null) return;
+
+         ControlFMatchLine line = currentControlFMatch.line;
+
+         if (currentControlFMatch.index > 0) {
+            currentControlFMatch.index--;
+            currentControlFMatch.overallIndex--;
+         } else {
+            ControlFMatchLine previousLine;
+            try {
+               previousLine = controlFMatches[currentControlFMatch.indexOfLineInMatchBuffer - 1];
+               currentControlFMatch = new ControlFMatch(previousLine, previousLine.matchIndices.Length - 1, currentControlFMatch.indexOfLineInMatchBuffer - 1, currentControlFMatch.overallIndex - 1);
+            }
+            catch (ArgumentOutOfRangeException) {
+               previousLine = controlFMatches[controlFMatches.Count - 1];
+               currentControlFMatch = new ControlFMatch(previousLine, previousLine.matchIndices.Length - 1, controlFMatches.Count - 1, totalControlFMatches - 1);
+            }
+         }
+      }
+
+      void SimulateEnterInControlF(in List<KeyboardKey> modifiers) {
          if (controlFBuffer == "") return;
 
          if (submittedControlFBuffer == controlFBuffer) {
-            IncreaseControlFMatchByOne();
+            if(modifiers == null) {
+               IncreaseControlFMatchByOne();
+            } else {
+               if(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT)) {
+                  DecreaseControlFMatchByOne();
+               } else {
+                  IncreaseControlFMatchByOne();
+               }
+            }
          } else {
             controlFMatches.Clear();
             totalControlFMatches = 0;

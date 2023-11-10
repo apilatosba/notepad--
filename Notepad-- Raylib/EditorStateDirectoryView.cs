@@ -145,27 +145,12 @@ namespace Notepad___Raylib {
 #if VISUAL_STUDIO
                      Program.PrintPressedKeys(pressedKeys);
 #endif
-                     foreach(char c in pressedKeys) {
-                        if(c == lastPressedChar) {
+                     foreach (char c in pressedKeys) {
+                        if (c.ToString().ToLower()[0] == lastPressedChar.ToString().ToLower()[0]) {
                            int currentMatchIndex = keyPressMatches.IndexOf(cursor.position.y);
 
-                           if(currentMatchIndex == -1) {
-                              // reset back to the first match if there is a match
-                              // actually and luckily i dont need to do anything here. because the math below will do the job (-1 + 1 is zero which corresponds to first element)
-                           }
-
-                           try {
-                              cursor.position.y = keyPressMatches[currentMatchIndex + 1];
-
-                              keyPressHighlightMatchTimer.Restart();
-
-                              keyPressHighlightMatchRect = new Rectangle(0,
-                                                                         cursor.position.y * Line.Height + Program.YMargin,
-                                                                         float.MaxValue,
-                                                                         Line.Height);
-                           }
-                           catch (ArgumentOutOfRangeException) {
-                              try {
+                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT)) {
+                              if (currentMatchIndex == -1) {
                                  cursor.position.y = keyPressMatches[0];
 
                                  keyPressHighlightMatchTimer.Restart();
@@ -174,8 +159,63 @@ namespace Notepad___Raylib {
                                                                             cursor.position.y * Line.Height + Program.YMargin,
                                                                             float.MaxValue,
                                                                             Line.Height);
-                              } catch (ArgumentOutOfRangeException) {
-                                 // user keep pressing the same key but there is no match
+                              } else {
+                                 try {
+                                    cursor.position.y = keyPressMatches[currentMatchIndex - 1];
+
+                                    keyPressHighlightMatchTimer.Restart();
+
+                                    keyPressHighlightMatchRect = new Rectangle(0,
+                                                                               cursor.position.y * Line.Height + Program.YMargin,
+                                                                               float.MaxValue,
+                                                                               Line.Height);
+                                 }
+                                 catch (ArgumentOutOfRangeException) {
+                                    try {
+                                       cursor.position.y = keyPressMatches[keyPressMatches.Count - 1];
+
+                                       keyPressHighlightMatchTimer.Restart();
+
+                                       keyPressHighlightMatchRect = new Rectangle(0,
+                                                                                  cursor.position.y * Line.Height + Program.YMargin,
+                                                                                  float.MaxValue,
+                                                                                  Line.Height);
+                                    }
+                                    catch (ArgumentOutOfRangeException) {
+                                       // user keep pressing the same key but there is no match
+                                    }
+                                 }
+                              }
+                           } else {
+                              if (currentMatchIndex == -1) {
+                                 // reset back to the first match if there is a match
+                                 // actually and luckily i dont need to do anything here. because the math below will do the job (-1 + 1 is zero which corresponds to first element)
+                              }
+
+                              try {
+                                 cursor.position.y = keyPressMatches[currentMatchIndex + 1];
+
+                                 keyPressHighlightMatchTimer.Restart();
+
+                                 keyPressHighlightMatchRect = new Rectangle(0,
+                                                                            cursor.position.y * Line.Height + Program.YMargin,
+                                                                            float.MaxValue,
+                                                                            Line.Height);
+                              }
+                              catch (ArgumentOutOfRangeException) {
+                                 try {
+                                    cursor.position.y = keyPressMatches[0];
+
+                                    keyPressHighlightMatchTimer.Restart();
+
+                                    keyPressHighlightMatchRect = new Rectangle(0,
+                                                                               cursor.position.y * Line.Height + Program.YMargin,
+                                                                               float.MaxValue,
+                                                                               Line.Height);
+                                 }
+                                 catch (ArgumentOutOfRangeException) {
+                                    // user keep pressing the same key but there is no match
+                                 }
                               }
                            }
                         } else {
@@ -189,7 +229,7 @@ namespace Notepad___Raylib {
                               }
                            }
 
-                           if(keyPressMatches.Count > 0) {
+                           if (keyPressMatches.Count > 0) {
                               cursor.position.y = keyPressMatches[0];
 
                               keyPressHighlightMatchRect = new Rectangle(0,
@@ -349,7 +389,11 @@ namespace Notepad___Raylib {
                            if (controlFBuffer == "") break;
 
                            if (submittedControlFBuffer == controlFBuffer) {
-                              IncreaseControlFMatchByOne();
+                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT)) {
+                                 DecreaseControlFMatchByOne();
+                              } else {
+                                 IncreaseControlFMatchByOne();
+                              }
                            } else {
                               controlFMatches.Clear();
                               totalControlFMatches = 0;
@@ -405,7 +449,7 @@ namespace Notepad___Raylib {
          if (!Program.isDraggingWindow) {
             if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
                Vector2 mousePosition = Raylib.GetMousePosition();
-               Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera); 
+               Int2 mousePositionInWorldSpace = (Int2)Raylib.GetScreenToWorld2D(mousePosition, camera);
 
                cursor.position.y = cursor.CalculatePositionFromWorldSpaceCoordinates(lines,
                                                                                      Program.config.fontSize,
@@ -460,7 +504,7 @@ namespace Notepad___Raylib {
 
                switch (internalState) {
                   case InternalState.Normal:
-                     if(keyPressHighlightMatchTimer.ElapsedMilliseconds < 1500) {
+                     if (keyPressHighlightMatchTimer.ElapsedMilliseconds < 1500) {
                         int alpha = (int)(MathF.Exp(-1 * 6 * (keyPressHighlightMatchTimer.ElapsedMilliseconds / 1000.0f)) * 255);
                         Raylib.DrawRectangleRec(keyPressHighlightMatchRect, new Color(255, 255, 255, alpha));
                      }
@@ -544,7 +588,7 @@ namespace Notepad___Raylib {
 
             Raylib.DrawRectangleGradientH(0, Program.YMargin, Raylib.GetScreenWidth() / 2, 1, Raylib.BLANK, Program.config.textColor);
             Raylib.DrawRectangleGradientH(Raylib.GetScreenWidth() / 2, Program.YMargin, Raylib.GetScreenWidth() / 2, 1, Program.config.textColor, Raylib.BLANK);
-            
+
             Raylib.DrawTextEx(Program.font,
                               currentDirectory,
                               centeredPosition,
@@ -576,7 +620,7 @@ namespace Notepad___Raylib {
 
                Raylib.DrawRectangleRounded(rectangle, 0.5f, 8, new Color(50, 50, 50, 255));
                Raylib.DrawRectangleRounded(regexLabelRect, 0.5f, 8, new Color(50, 50, 50, 255));
-               
+
                if (totalControlFMatches > 0)
                   Raylib.DrawRectangleRounded(currentMatchIndicatorTextRect, 0.5f, 8, new Color(50, 50, 50, 230));
 
@@ -723,6 +767,27 @@ namespace Notepad___Raylib {
             catch (ArgumentOutOfRangeException) {
                nextLine = controlFMatches[0];
                currentControlFMatch = new ControlFMatch(nextLine, 0, 0, 0);
+            }
+         }
+      }
+
+      void DecreaseControlFMatchByOne() {
+         if (currentControlFMatch == null) return;
+
+         ControlFMatchLine line = currentControlFMatch.line;
+
+         if (currentControlFMatch.index > 0) {
+            currentControlFMatch.index--;
+            currentControlFMatch.overallIndex--;
+         } else {
+            ControlFMatchLine previousLine;
+            try {
+               previousLine = controlFMatches[currentControlFMatch.indexOfLineInMatchBuffer - 1];
+               currentControlFMatch = new ControlFMatch(previousLine, previousLine.matchIndices.Length - 1, currentControlFMatch.indexOfLineInMatchBuffer - 1, currentControlFMatch.overallIndex - 1);
+            }
+            catch (ArgumentOutOfRangeException) {
+               previousLine = controlFMatches[controlFMatches.Count - 1];
+               currentControlFMatch = new ControlFMatch(previousLine, previousLine.matchIndices.Length - 1, controlFMatches.Count - 1, totalControlFMatches - 1);
             }
          }
       }
