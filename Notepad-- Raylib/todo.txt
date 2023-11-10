@@ -13,7 +13,6 @@ sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
 add keybinding info box to directoryview on right. a big ass column anchored to bottom right. or. put the list on github which is easier to do
 try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
-horizontal scroll. trackpad is enough.
 detect whether window is visible, if it is not then stop rendering 
 concept of window
 abstract out controlF rendering. same code in playing state and directory view state

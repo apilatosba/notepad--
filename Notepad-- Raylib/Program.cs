@@ -74,6 +74,8 @@ namespace Notepad___Raylib {
       static Int2 mousePositionOffsetRelativeToWindow;
       static Int2 windowSizeWhenStartedDragging;
       public readonly static Int2 minimumWindowSize = new Int2(100, 50);
+      static Vector2 mouseWheelInputLastFrame;
+      public static Line longestLine;
 
 #if VISUAL_STUDIO
       static string customFontsDirectory;
@@ -187,6 +189,7 @@ namespace Notepad___Raylib {
             filePath = Path.GetFileName(filePath);
 
             lines = ReadLinesFromFile(filePath);
+            longestLine = FindLongestLine(lines);
             IEditorState.SetStateTo(new EditorStatePlaying());
          }
 
@@ -335,6 +338,7 @@ namespace Notepad___Raylib {
             editorState.Update();
 
             mousePositionLastFrame = GetMousePositionInScreenSpace();
+            mouseWheelInputLastFrame = Raylib.GetMouseWheelMoveV();
 
             Raylib.EndDrawing();
          }
@@ -654,8 +658,19 @@ namespace Notepad___Raylib {
 
          cursor.position.y += linesToInsert.Count - 1;
          cursor.position.x = lastInsertedLine.Value.Length - textAfterCursorFirstLine.Length;
+
+         {
+            for (int i = lines.IndexOf(line); i < linesToInsert.Count; i++) {
+               if (lines[i].Value.Length > longestLine.Value.Length) {
+                  longestLine = lines[i];
+               }
+            }
+         }
       }
 
+      /// <summary>
+      /// Vertical. This treats horizontal movements as vertical movements.
+      /// </summary>
       public static void HandleMouseWheelInput(float mouseWheelInput, Stopwatch timeSinceLastMouseInput, List<KeyboardKey> modifiers, ref Camera2D camera, IEditorState currentState) {
          if (mouseWheelInput != 0) {
             timeSinceLastMouseInput?.Restart();
@@ -683,6 +698,32 @@ namespace Notepad___Raylib {
                }
             } else {
                camera.target.Y -= mouseWheelInput * Line.Height;
+            }
+         }
+      }
+
+      public static void HandleMouseWheelInput(Vector2 mouseWheelInput, Stopwatch timeSinceLastInput, List<KeyboardKey> modifiers, ref Camera2D camera, IEditorState currentState) {
+         if (mouseWheelInput != Vector2.Zero) {
+            float verticalMouseWheelInput = mouseWheelInput.Y;
+            float horizontalMouseWheelInput = mouseWheelInput.X;
+
+            timeSinceLastInput?.Restart();
+
+            HandleMouseWheelInput(verticalMouseWheelInput, timeSinceLastInput, modifiers, ref camera, currentState);
+
+            {
+               float charWidth = Raylib.MeasureTextEx(font, "A", config.fontSize, 0).X;
+               camera.target.X -= horizontalMouseWheelInput * charWidth;
+            }
+
+            {
+               float distanceRightMostChar = Raylib.MeasureTextEx(font, longestLine.Value, config.fontSize, 0).X + config.leftPadding;
+               int maxAllowedCameraShift = Raylib.GetScreenWidth() / 3;
+               float maxAllowedCameraTargetX = distanceRightMostChar - Raylib.GetScreenWidth() + maxAllowedCameraShift;
+
+               if (camera.target.X > maxAllowedCameraTargetX) {
+                  camera.target.X = maxAllowedCameraTargetX;
+               }
             }
          }
       }
@@ -786,6 +827,16 @@ namespace Notepad___Raylib {
             UseShellExecute = true,
             Verb = "open"
          });
+      }
+
+      /// <summary>
+      /// Useless since i get zero vectors when i scroll the mouse wheel.
+      /// </summary>
+      /// <returns></returns>
+      public static bool IsJustStartedMouseWheelInput() {
+         Vector2 mouseWheelInput = Raylib.GetMouseWheelMoveV();
+
+         return mouseWheelInput != Vector2.Zero && mouseWheelInputLastFrame == Vector2.Zero;
       }
 
       public static string GetConfigPath() {

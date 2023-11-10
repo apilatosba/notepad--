@@ -21,7 +21,7 @@ namespace Notepad___Raylib {
       };
       internal static Int2? lastKnownCursorPosition = null;
       internal static Vector2? lastKnownCameraTarget = null;
-      float mouseWheelInput = 0;
+      Vector2 mouseWheelInput;
       float flashShaderTransparency = 0.0f;
       readonly Stopwatch flashShaderTimer = new Stopwatch();
       readonly Stopwatch timeSinceLastMouseInput = new Stopwatch();
@@ -150,6 +150,7 @@ namespace Notepad___Raylib {
                                  Console.WriteLine("Your config file was corrupt. Reverting it to previous settings now.");
                                  Program.config.Serialize(Program.GetConfigPath());
                                  Program.lines = Program.ReadLinesFromFile(Program.filePath);
+                                 Program.longestLine = Program.FindLongestLine(Program.lines);
                               }
                            }
 
@@ -298,6 +299,13 @@ namespace Notepad___Raylib {
                         Line currentLine = Program.lines[cursor.position.y];
 
                         Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
+
+                        if(currentLine != Program.longestLine) {
+                           if(currentLine.Value.Length > Program.longestLine.Value.Length) {
+                              Program.longestLine = currentLine;
+                           }
+                        }
+
                         cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                         cursor.exXPosition = cursor.position.x;
                      }
@@ -451,10 +459,20 @@ namespace Notepad___Raylib {
                                  cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                                  cursor.exXPosition = cursor.position.x;
 
+                                 foreach (Line line in linesInRange) {
+                                    if (line.Value.Length > Program.longestLine.Value.Length) {
+                                       Program.longestLine = line;
+                                    }
+                                 }
+
                                  break;
                               }
 
                               Program.InsertTextAtCursor(Program.lines, cursor, new string(' ', Program.config.tabSize));
+
+                              if (Program.lines[cursor.position.y].Value.Length > Program.longestLine.Value.Length) {
+                                 Program.longestLine = Program.lines[cursor.position.y];
+                              }
 
                               cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                               cursor.exXPosition = cursor.position.x;
@@ -591,9 +609,7 @@ namespace Notepad___Raylib {
             missedKeyPressesBetweenFrames += pressedKeys;
          } // End of keyboard input handling
 
-
-
-         mouseWheelInput = Raylib.GetMouseWheelMove();
+         mouseWheelInput = Raylib.GetMouseWheelMoveV();
 
          Program.HandleMouseWheelInput(mouseWheelInput, timeSinceLastMouseInput, modifiers, ref camera, this);
 

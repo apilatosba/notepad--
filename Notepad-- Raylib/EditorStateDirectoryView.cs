@@ -267,6 +267,7 @@ namespace Notepad___Raylib {
                            if (isFile) {
                               Program.filePath = pressedLineValue;
                               Program.lines = Program.ReadLinesFromFile(Program.filePath);
+                              Program.longestLine = Program.FindLongestLine(Program.lines);
                               IEditorState.SetStateTo(new EditorStatePlaying());
                            } else {
                               if (CheckIfHasPermissionToOpenDirectory(pressedLineValue)) {
