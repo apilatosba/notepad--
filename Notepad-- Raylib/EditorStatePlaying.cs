@@ -132,7 +132,8 @@ namespace Notepad___Raylib {
                         }
 
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
-                           int previousfontSize = Program.config.fontSize;
+                           int previousFontSize = Program.config.fontSize;
+                           string previousFontName = Program.config.fontName;
 
                            Program.WriteLinesToFile(Program.filePath, Program.lines);
 
@@ -140,7 +141,7 @@ namespace Notepad___Raylib {
                               try {
                                  Program.config.Deserialize(Program.GetConfigPath());
 
-                                 if (Program.config.fontSize != previousfontSize) {
+                                 if (Program.config.fontSize != previousFontSize || previousFontName != Program.config.fontName) {
                                     Raylib.UnloadFont(Program.font);
                                     Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
                                  }
