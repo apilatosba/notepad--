@@ -313,7 +313,7 @@ namespace Notepad___Raylib {
                         switch (specialKey) {
                            case KeyboardKey.KEY_HOME:
                               if (!(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT))) {
-                                 if (shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
+                                 shiftSelection = null;
                               }
 
                               if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
@@ -326,7 +326,7 @@ namespace Notepad___Raylib {
                               break;
                            case KeyboardKey.KEY_END: {
                                  if (!(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT))) {
-                                    if (shiftSelection?.StartPosition == shiftSelection?.EndPosition) shiftSelection = null;
+                                    shiftSelection = null;
                                  }
 
                                  if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {

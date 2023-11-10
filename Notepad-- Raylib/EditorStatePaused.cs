@@ -85,8 +85,7 @@ namespace Notepad___Raylib {
             }
 
             {
-               Int2 iconSize = new Int2(Program.repoIcon.width, Program.repoIcon.height);
-               float scale = rectWidth / iconSize.x;
+               float scale = rectWidth / Program.repoIcon.width;
 
                Raylib.DrawTextureEx(Program.repoIcon, new Vector2(repoRect.x, repoRect.y), 0, scale, Raylib.WHITE);
             }
