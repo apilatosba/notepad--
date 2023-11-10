@@ -124,6 +124,21 @@ namespace Notepad___Raylib {
                      if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
                         internalState = InternalState.ControlF;
                      }
+
+                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER)) {
+                        try {
+                           Program.OpenDirectoryInDefaultProgram(Program.directoryPath);
+                           Raylib.MinimizeWindow();
+
+                           break;
+                        }
+                        catch (Exception e) {
+                           // todo some effect. screen shake? an info popup box
+#if VISUAL_STUDIO
+                           Console.WriteLine($"ERROR: Couldn't open directory. Exception message: {e.Message}");
+#endif
+                        }
+                     }
                   }
 
                   if (pressedKeys != null) {

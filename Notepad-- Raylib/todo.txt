@@ -11,7 +11,7 @@ render bloom shader at quarter resolution
     or the both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
-add a key binding to open the current directory in default application. because i dont want to even update the notepad-- i dont want to add features like create folder/file delete folder/file. i want to finish it and cut it off here (directory view only)
+add keybinding info box to directoryview on right. a big ass column anchored to bottom right. or. put the list on github which is easier to do
 alt + up/down arrow keys to move line
 try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
 horizontal scroll. trackpad is enough.

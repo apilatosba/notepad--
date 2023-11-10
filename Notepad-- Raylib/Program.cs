@@ -780,6 +780,14 @@ namespace Notepad___Raylib {
          }
       }
 
+      public static void OpenDirectoryInDefaultProgram(string path) {
+         Process.Start(new ProcessStartInfo {
+            FileName = path,
+            UseShellExecute = true,
+            Verb = "open"
+         });
+      }
+
       public static string GetConfigPath() {
 #if VISUAL_STUDIO
          return Path.Combine(appDirectory, CONFIG_FILE_NAME);
