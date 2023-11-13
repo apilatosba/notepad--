@@ -127,7 +127,7 @@ namespace Notepad___Raylib {
 
                      if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER)) {
                         try {
-                           Program.OpenDirectoryInDefaultProgram(Program.directoryPath);
+                           Program.OpenDirectoryInDefaultProgram(Directory.GetCurrentDirectory());
                            Raylib.MinimizeWindow();
 
                            break;
