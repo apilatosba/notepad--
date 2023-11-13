@@ -10,7 +10,6 @@ render bloom shader at quarter resolution
     or do both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
-if fullscreen and i resize or reposition then restore the window
 full keyboard support (no mouse is required) (have a keyboard way to do the buttons in esc paused state)
 m3 to minimize
 ctrl++ ctrl+- to adjust font size

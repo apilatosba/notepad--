@@ -275,6 +275,8 @@ namespace Notepad___Raylib {
                      mousePositionOffsetRelativeToWindow = windowPositionWhenStartedDragging - mousePositionWhenStartedDragging;
 
                      isDraggingWindow = true;
+
+                     if (Raylib.IsWindowMaximized()) Raylib.RestoreWindow();
                   }
 
                   if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)) {
@@ -291,6 +293,8 @@ namespace Notepad___Raylib {
                      mousePositionOffsetRelativeToWindow = windowPositionWhenStartedDragging - mousePositionWhenStartedDragging;
 
                      isDraggingWindow = true;
+
+                     if (Raylib.IsWindowMaximized()) Raylib.RestoreWindow();
                   }
 
                   if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT)) {
