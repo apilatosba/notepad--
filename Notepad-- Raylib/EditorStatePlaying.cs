@@ -86,6 +86,26 @@ namespace Notepad___Raylib {
                   ///////////////////////////////////////////
                   {
                      if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_ADD)) {
+                           Program.config.fontSize++;
+
+                           Program.config.Serialize(Program.GetConfigPath());
+                           Raylib.UnloadFont(Program.font);
+                           Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+
+                           Program.YMargin = Line.Height;
+                        }
+
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_SUBTRACT)) {
+                           Program.config.fontSize--;
+
+                           Program.config.Serialize(Program.GetConfigPath());
+                           Raylib.UnloadFont(Program.font);
+                           Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
+
+                           Program.YMargin = Line.Height;
+                        }
+
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_Z)) {
                            shiftSelection = null;
 

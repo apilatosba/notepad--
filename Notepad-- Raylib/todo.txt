@@ -12,7 +12,6 @@ sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
 full keyboard support (no mouse is required) (have a keyboard way to do the buttons in esc paused state)
 m3 to minimize
-ctrl++ ctrl+- to adjust font size
 add keybinding info box to directoryview on right. a big ass column anchored to bottom right. or. put the list on github which is easier to do
 try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
 detect whether window is visible, if it is not then stop rendering 
