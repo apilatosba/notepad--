@@ -28,6 +28,35 @@ rest is usual.
 Get binaries from [release section](https://github.com/apilatosba/notepad--/releases).  
 Put the contents of the zip file in a folder that is in your PATH environment variable.  
 
+## Keybindings
+### Directory Navigation
+A-Z: Simple search  
+Home: Go to beginning (..)  
+End: Go to end  
+Enter: Open file/directory  
+
+### File Editing
+Ctrl+z: Undo  
+Ctrl+a: Select all  
+Ctrl+s: Save  
+Ctrl+c: Copy  
+Ctrl+x: Cut  
+Ctrl+v: Paste  
+Ctrl+l: Cut Line  
+Home: Go to the beginning of the line  
+Ctrl+Home: Go to the beginning of the file  
+End: Go to the end of the line  
+Ctrl+End: Go to the end of the file  
+
+### General
+Ctrl+f: Search  
+Ctrl++: Increase font size  
+Ctrl+-: Decrease font size  
+Ctrl+up arrow: Move camera up  
+Ctrl+down arrow: Move camera down  
+Esc: Pause  
+Mouse: Mouse (Great explanation. Thank you)  
+
 ## References
 Raylib: https://www.raylib.com/ - Great library, big thumbs up.  
 Bloom: https://learnopengl.com/Advanced-Lighting/Bloom  
