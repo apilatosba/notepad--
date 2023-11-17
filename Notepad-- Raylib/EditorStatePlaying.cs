@@ -86,6 +86,15 @@ namespace Notepad___Raylib {
                   ///////////////////////////////////////////
                   {
                      if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
+                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_Q)) {
+                           lastKnownCursorPosition = null;
+                           lastKnownCameraTarget = null;
+
+                           Program.directoryPath = Path.GetDirectoryName(Program.filePath);
+
+                           IEditorState.SetStateTo(new EditorStateDirectoryView());
+                        }
+
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_ADD)) {
                            Program.config.fontSize++;
 

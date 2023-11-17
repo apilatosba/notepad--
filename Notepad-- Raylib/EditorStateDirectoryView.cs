@@ -57,6 +57,9 @@ namespace Notepad___Raylib {
          } else if (previousState is EditorStatePaused) {
             theFileUserWasEditing = Program.filePath;
             Program.undoHistory.Clear();
+         } else if (previousState is EditorStatePlaying) {
+            theFileUserWasEditing = Program.filePath;
+            Program.undoHistory.Clear();
          }
 
          directories.Add("..");

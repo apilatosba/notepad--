@@ -47,6 +47,7 @@ Home: Go to the beginning of the line
 Ctrl+Home: Go to the beginning of the file  
 End: Go to the end of the line  
 Ctrl+End: Go to the end of the file  
+Ctrl+q: Open containing folder  
 
 ### General
 Ctrl+f: Search  
