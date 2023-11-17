@@ -323,6 +323,41 @@ namespace Notepad___Raylib {
                }
             }
 
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SUPER)) {
+               if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_4)) {
+                  Raylib.SetWindowPosition(0, 0);
+
+                  int monitorWidth = Raylib.GetMonitorWidth(Raylib.GetCurrentMonitor());
+                  int monitorHeight = Raylib.GetMonitorHeight(Raylib.GetCurrentMonitor());
+
+                  Raylib.SetWindowSize(monitorWidth / 2, monitorHeight /* -taskbarLength */);
+
+                  if(Raylib.IsWindowMaximized()) Raylib.RestoreWindow();
+               }
+
+               if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_6)) {
+                  int monitorWidth = Raylib.GetMonitorWidth(Raylib.GetCurrentMonitor());
+                  int monitorHeight = Raylib.GetMonitorHeight(Raylib.GetCurrentMonitor());
+
+                  Raylib.SetWindowPosition(monitorWidth / 2, 0);
+                  Raylib.SetWindowSize(monitorWidth / 2, monitorHeight /* -taskbarLength */);
+
+                  if(Raylib.IsWindowMaximized()) Raylib.RestoreWindow();
+               }
+
+               if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_2)) {
+                  Raylib.MinimizeWindow();
+               }
+
+               if(Raylib.IsKeyPressed(KeyboardKey.KEY_KP_8)) {
+                  if (Raylib.IsWindowMaximized()) {
+                     Raylib.RestoreWindow();
+                  } else {
+                     Raylib.MaximizeWindow();
+                  }
+               }
+            }
+
             {
                if (Raylib.IsWindowResized()) {
                   windowResizeTimer.Restart();
@@ -796,6 +831,9 @@ namespace Notepad___Raylib {
          return GetMousePositionInScreenSpace() - mousePositionLastFrame;
       }
 
+      /// <summary>
+      /// Assumes that text is one line.
+      /// </summary>
       public static Rectangle GenerateSurroundingRectangle(string text, Vector2 textPosition, Font font, int fontSize, int horizontalSpace, int verticalSpace) {
          Int2 textLength = (Int2)Raylib.MeasureTextEx(font, text, fontSize, 0);
          Rectangle rectangle = new Rectangle(textPosition.X - horizontalSpace,

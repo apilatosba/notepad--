@@ -39,8 +39,8 @@ Enter: Open file/directory
 Ctrl+z: Undo  
 Ctrl+a: Select all  
 Ctrl+s: Save  
-Ctrl+c: Copy  
-Ctrl+x: Cut  
+Ctrl+c: Copy selection  
+Ctrl+x: Cut selection  
 Ctrl+v: Paste  
 Ctrl+l: Cut Line  
 Home: Go to the beginning of the line  
@@ -56,6 +56,14 @@ Ctrl+up arrow: Move camera up
 Ctrl+down arrow: Move camera down  
 Esc: Pause  
 Mouse: Mouse (Great explanation. Thank you)  
+F11: Maximize/Restore  
+Super+Numpad4: Window to left  
+Super+Numpad6: Window to right  
+Super+Numpad2: Minimize  
+Super+Numpad8: f11  
+
+#### Note  
+These Super+Numpad nonsense is only for windows. If you are on linux then you can use the shortcuts of your DE.
 
 ## References
 Raylib: https://www.raylib.com/ - Great library, big thumbs up.  

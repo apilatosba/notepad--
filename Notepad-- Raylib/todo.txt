@@ -10,9 +10,9 @@ render bloom shader at quarter resolution
     or do both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
+controlF regex doesnt match cahracters if they are already in match but it should (bug?) see what i am talking about by searching "....." in controlF. it jumps 5 by 5 but it should proceed 1 by 1 
 full keyboard support (no mouse is required) (have a keyboard way to do the buttons in esc paused state)
 m3 to minimize
-add keybinding info box to directoryview on right. a big ass column anchored to bottom right. or. put the list on github which is easier to do
 try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
 detect whether window is visible, if it is not then stop rendering 
 concept of window
@@ -22,7 +22,7 @@ show images when hovered over on directory view state
 frontend to settings
 add scrollbars
 a better last known window size logic. right now if you close the window when it is maximized, it will open maximized but wont remember the restored size. so when you click f11 nothing happens
---when pressed minimize window button also set state to whatever the previus state was.
+when pressed minimize window button also set state to whatever the previus state was.
    when i de-minimize the window for couple of frames i see the rendering of EditorStatePaused which is not good. idk why that happens. i tried to render previous state before minimizing the window because when window is minimized main loop stops and since it is imgui i thought it would be related to it. but it wasnt so i left it as it was
 add a status bar at bottom shows the line and column number of cursor and shows the number of lines in the file and shows zoom level. maybe not as status bar but in the EditorStatePaused
 change cursor y repositioning algorithm. only works with monospace font rn.

@@ -40,7 +40,7 @@ namespace Notepad___Raylib {
       int totalControlFMatches;
       char lastPressedChar = '\0';
       List<int> keyPressMatches = new List<int>();
-
+      
       public void EnterState(IEditorState previousState) {
          Program.YMargin = Line.Height;
          lastKeyboardInputTimer.Start();
