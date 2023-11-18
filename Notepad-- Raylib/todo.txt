@@ -1,4 +1,3 @@
-bug: super+numpad shouldnt print the numbers. when i press super+numpad4 it does the positioning window thingy but it also prints 4
 shaders
    character shader. a flash effect when typed. start with pure white then quickly lerp to the original color
    different effects with shaders. for example text near cursor gets a radial/horizontal gradient color.

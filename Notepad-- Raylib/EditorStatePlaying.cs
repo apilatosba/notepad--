@@ -37,6 +37,13 @@ namespace Notepad___Raylib {
       Rectangle controlFHighlightMatchRect;
       Rectangle[] controlVPasteHighlightRects;
       int totalControlFMatches;
+      bool isBloomShaderActivetadThisFrame;
+      public bool isControlFTextsAndRectanglesNeedToBeRecalculated;
+      Int2 controlFBufferTextSize;
+      Int2 regexLabelSize;
+      Rectangle controlFBufferSurroundingRect;
+      Rectangle regexLabelSurroundingRect;
+      Rectangle currentMatchIndicatorTextRect;
 
       // this code causes problems. Searched the web and it is probably related to loading a different asssembly. In this case it is raylib.
       // if you have static variables of classes that belongs other assemblies it becomes problematic.
@@ -93,9 +100,7 @@ namespace Notepad___Raylib {
                            Program.directoryPath = Path.GetDirectoryName(Program.filePath);
 
                            IEditorState.SetStateTo(new EditorStateDirectoryView());
-                        }
-
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_ADD)) {
+                        } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_ADD)) {
                            Program.config.fontSize++;
 
                            Program.config.Serialize(Program.GetConfigPath());
@@ -103,9 +108,7 @@ namespace Notepad___Raylib {
                            Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
 
                            Program.YMargin = Line.Height;
-                        }
-
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_SUBTRACT)) {
+                        } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_KP_SUBTRACT)) {
                            Program.config.fontSize--;
 
                            Program.config.Serialize(Program.GetConfigPath());
@@ -113,9 +116,7 @@ namespace Notepad___Raylib {
                            Program.font = Program.LoadFontWithAllUnicodeCharacters(Program.GetFontFilePath(), Program.config.fontSize);
 
                            Program.YMargin = Line.Height;
-                        }
-
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_Z)) {
+                        } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_Z)) {
                            shiftSelection = null;
 
                            List<UndoItem> undoItems;
@@ -150,17 +151,13 @@ namespace Notepad___Raylib {
                                                                   Program.config.fontSize,
                                                                   Program.config.leftPadding,
                                                                   Program.font);
-                        }
-
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) {
+                        } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) {
                            cursor.position = new Int2(Program.lines[Program.lines.Count - 1].Value.Length, Program.lines.Count - 1);
                            shiftSelection = new Selection(new Int2(0, 0), cursor.position);
                            cursor.exXPosition = cursor.position.x;
 
                            cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
-                        }
-
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
+                        } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_S)) {
                            int previousFontSize = Program.config.fontSize;
                            string previousFontName = Program.config.fontName;
 
@@ -199,24 +196,19 @@ namespace Notepad___Raylib {
                            //Raylib.ImageResize(&image, Program.textMask.texture.width / 2, Program.textMask.texture.height / 2);
                            //Program.quarterResolutionTextMask = Raylib.LoadTextureFromImage(image);
 
-                           flashShaderTimer.Restart();
-                        }
+                           isBloomShaderActivetadThisFrame = true;
 
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_C)) {
+                           flashShaderTimer.Restart();
+                        } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_C)) {
                            mouseSelection?.Copy(Program.lines);
                            shiftSelection?.Copy(Program.lines);
-                        }
-
-                        // No mouseSelection. It causes lots of issues. So I chose the easy path and I don't allow user to ctrl+x while he is holding down mouse1. User needs to release mouse1 and then press ctrl+x.
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_X)) {
+                        } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_X)) { // No mouseSelection. It causes lots of issues. So I chose the easy path and I don't allow user to ctrl+x while he is holding down mouse1. User needs to release mouse1 and then press ctrl+x.
                            shiftSelection?.Cut(Program.lines, cursor);
                            shiftSelection = null;
 
                            cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                            cursor.exXPosition = cursor.position.x;
-                        }
-
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
+                        } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
                            mouseSelection?.Delete(Program.lines, cursor);
                            shiftSelection?.Delete(Program.lines, cursor);
                            shiftSelection = null;
@@ -240,9 +232,7 @@ namespace Notepad___Raylib {
 
                            cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                            cursor.exXPosition = cursor.position.x;
-                        }
-
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_L)) {
+                        } else if (Raylib.IsKeyPressed(KeyboardKey.KEY_L)) {
                            if (!cursor.IsCursorAtLastLine(Program.lines)) {
                               shiftSelection = null;
                               cursor.position.x = 0;
@@ -270,28 +260,24 @@ namespace Notepad___Raylib {
 
                            cursor.MakeSureCursorIsVisibleToCamera(Program.lines, ref camera, Program.config.fontSize, Program.config.leftPadding, Program.font);
                            cursor.exXPosition = cursor.position.x;
-                        }
-
-                        //if (Raylib.IsKeyPressed(KeyboardKey.KEY_M)) {
-                        //   unsafe {
-                        //      Image image = Raylib.LoadImageFromTexture(Program.textMask.texture);
-                        //      Raylib.ImageFlipVertical(&image);
-                        //      Raylib.ExportImage(image, "text mask.png");
-                        //   }
-                        //}
-
-                        if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
+                        } /* else if (Raylib.IsKeyPressed(KeyboardKey.KEY_M)) {
+                           unsafe {
+                              Image image = Raylib.LoadImageFromTexture(Program.textMask.texture);
+                              Raylib.ImageFlipVertical(&image);
+                              Raylib.ExportImage(image, "text mask.png");
+                           }
+                        } */ else if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
                            mouseSelection = null;
 
                            if (shiftSelection != null &&
                                  (shiftSelection?.StartPosition.y == shiftSelection?.EndPosition.y)) {
-                              
+
                               controlFBuffer = shiftSelection.GetText(Program.lines);
                               //Int2 cursorPosition = cursor.position;
                               Vector2 cameraPosition = camera.target;
                               shiftSelection.GetRightAndLeft(out Int2 selectionLeft, out _);
 
-                              for(; ; ) {
+                              for (; ; ) {
                                  if (cursor.position == selectionLeft) break;
 
                                  SimulateEnterInControlF(null);
@@ -302,6 +288,8 @@ namespace Notepad___Raylib {
                            } else {
                               shiftSelection = null;
                            }
+
+                           isControlFTextsAndRectanglesNeedToBeRecalculated = true;
 
                            internalState = InternalState.ControlF;
                            break;
@@ -329,8 +317,8 @@ namespace Notepad___Raylib {
 
                         Program.InsertTextAtCursor(Program.lines, cursor, pressedKeys);
 
-                        if(currentLine != Program.longestLine) {
-                           if(currentLine.Value.Length > Program.longestLine.Value.Length) {
+                        if (currentLine != Program.longestLine) {
+                           if (currentLine.Value.Length > Program.longestLine.Value.Length) {
                               Program.longestLine = currentLine;
                            }
                         }
@@ -547,7 +535,7 @@ namespace Notepad___Raylib {
                                  if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                               }
 
-                              if(modifiers.Contains(KeyboardKey.KEY_LEFT_ALT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_ALT)) {
+                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_ALT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_ALT)) {
                                  Line lineAboveCopy = new Line(Program.lines[cursor.position.y - 1]);
 
                                  Program.lines[cursor.position.y - 1] = Program.lines[cursor.position.y];
@@ -562,7 +550,7 @@ namespace Notepad___Raylib {
                                  if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
                               }
 
-                              if(modifiers.Contains(KeyboardKey.KEY_LEFT_ALT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_ALT)) {
+                              if (modifiers.Contains(KeyboardKey.KEY_LEFT_ALT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_ALT)) {
                                  Line lineBelowCopy = new Line(Program.lines[cursor.position.y + 1]);
 
                                  Program.lines[cursor.position.y + 1] = Program.lines[cursor.position.y];
@@ -584,7 +572,7 @@ namespace Notepad___Raylib {
 
                   break;
                case InternalState.ControlF: {
-                     if(modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
+                     if (modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL)) {
                         if (Raylib.IsKeyPressed(KeyboardKey.KEY_F)) {
                            internalState = InternalState.Normal;
                            break;
@@ -597,6 +585,7 @@ namespace Notepad___Raylib {
 #endif
 
                         controlFBuffer += pressedKeys;
+                        isControlFTextsAndRectanglesNeedToBeRecalculated = true;
                      }
 
                      if (specialKey != KeyboardKey.KEY_NULL) {
@@ -620,6 +609,7 @@ namespace Notepad___Raylib {
                            case KeyboardKey.KEY_BACKSPACE:
                               if (controlFBuffer.Length > 0) {
                                  controlFBuffer = controlFBuffer.Remove(controlFBuffer.Length - 1);
+                                 isControlFTextsAndRectanglesNeedToBeRecalculated = true;
                               }
                               break;
                            case KeyboardKey.KEY_TAB:
@@ -698,6 +688,10 @@ namespace Notepad___Raylib {
 
       public void PostHandleInput() {
          if (shiftSelection != null) shiftSelection.EndPosition = cursor.position;
+
+         if (Raylib.IsWindowResized()) {
+            isControlFTextsAndRectanglesNeedToBeRecalculated = true;
+         }
 
          Program.MakeSureCameraNotBelowZeroInBothAxes(ref camera);
       }
@@ -798,17 +792,17 @@ namespace Notepad___Raylib {
                strength = MathF.Exp(-1 * 2.5f * (flashShaderTimer.ElapsedMilliseconds / 1000.0f));
             }
 
-            Raylib.BeginTextureMode(Program.textMask);
-            {
-               Raylib.BeginMode2D(camera);
-               Raylib.ClearBackground(Raylib.BLANK);
-               Program.RenderLines(Program.lines, Program.font, Raylib.WHITE, Program.YMargin, camera);
-               shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
-               mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
-               cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines, Raylib.WHITE);
-               Raylib.EndMode2D();
-            }
-            Raylib.EndTextureMode();
+            //Raylib.BeginTextureMode(Program.textMask);
+            //{
+            //   Raylib.BeginMode2D(camera);
+            //   Raylib.ClearBackground(Raylib.BLANK);
+            //   Program.RenderLines(Program.lines, Program.font, Raylib.WHITE, Program.YMargin, camera);
+            //   shiftSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+            //   mouseSelection?.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Raylib.WHITE);
+            //   cursor.Render(Program.lines, Program.config.fontSize, Program.config.leftPadding, Program.font, Program.config.spacingBetweenLines, Raylib.WHITE);
+            //   Raylib.EndMode2D();
+            //}
+            //Raylib.EndTextureMode();
 
 
             //fixed (Texture* texture = &Program.textMask.texture) {
@@ -817,10 +811,15 @@ namespace Notepad___Raylib {
 
             Raylib.BeginShaderMode(Program.bloomShader);
             {
-               Vector2 resolution = new Vector2(Program.textMask.texture.width, Program.textMask.texture.height);
+               if (isBloomShaderActivetadThisFrame) {
+                  Vector2 resolution = new Vector2(Program.textMask.texture.width, Program.textMask.texture.height);
 
-               Raylib.SetShaderValueTexture(Program.bloomShader, Program.bloomShaderTextMaskLoc, Program.textMask.texture);
-               Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderResolutionLoc, &resolution, ShaderUniformDataType.SHADER_UNIFORM_VEC2);
+                  Raylib.SetShaderValueTexture(Program.bloomShader, Program.bloomShaderTextMaskLoc, Program.textMask.texture);
+                  Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderResolutionLoc, &resolution, ShaderUniformDataType.SHADER_UNIFORM_VEC2);
+               }
+
+               isBloomShaderActivetadThisFrame = false;
+
                Raylib.SetShaderValue(Program.bloomShader, Program.bloomShaderStrengthLoc, &strength, ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
 
                Raylib.DrawTextureRec(Program.windowCoverTexture,
@@ -869,25 +868,36 @@ namespace Notepad___Raylib {
                int verticalSpace = 2;
 
                Vector2 textPosition = new Vector2(Raylib.GetScreenWidth() - 150, Program.YMargin + 50);
-               Int2 textLength = (Int2)Raylib.MeasureTextEx(Program.font, controlFBuffer, Program.config.fontSize, 0);
 
                string regexLabel = "REGEX";
                Vector2 regexLabelOffset = new Vector2(5, Line.Height); // Offset is relative to textPosition
-               Int2 regexLabelLength = (Int2)Raylib.MeasureTextEx(Program.font, regexLabel, Program.config.fontSize, 0);
 
                string currentMatchIndicatorText = $"{currentControlFMatch?.overallIndex + 1 ?? 0}/{totalControlFMatches}";
-               Vector2 currentMatchIndicatorTextOffset = regexLabelOffset + new Vector2(regexLabelLength.x + 2 * horizontalSpace + 1, 0); // Offset is relative to textPosition
 
-               if (textPosition.X + textLength.x + 2 * horizontalSpace > Raylib.GetScreenWidth()) {
-                  textPosition.X = Raylib.GetScreenWidth() - textLength.x - 2 * horizontalSpace;
+               if (isControlFTextsAndRectanglesNeedToBeRecalculated) {
+                  controlFBufferTextSize = (Int2)Raylib.MeasureTextEx(Program.font, controlFBuffer, Program.config.fontSize, 0);
                }
 
-               Rectangle rectangle = Program.GenerateSurroundingRectangle(controlFBuffer, textPosition, Program.font, Program.config.fontSize, horizontalSpace, verticalSpace);
-               Rectangle regexLabelRect = Program.GenerateSurroundingRectangle(regexLabel, textPosition + regexLabelOffset, Program.font, Program.config.fontSize, horizontalSpace, verticalSpace);
-               Rectangle currentMatchIndicatorTextRect = Program.GenerateSurroundingRectangle(currentMatchIndicatorText, textPosition + currentMatchIndicatorTextOffset, Program.font, Program.config.fontSize, horizontalSpace, verticalSpace);
+               if (textPosition.X + controlFBufferTextSize.x + 2 * horizontalSpace > Raylib.GetScreenWidth()) {
+                  textPosition.X = Raylib.GetScreenWidth() - controlFBufferTextSize.x - 2 * horizontalSpace;
+               }
 
-               Raylib.DrawRectangleRounded(rectangle, 0.5f, 8, new Color(50, 50, 50, 230));
-               Raylib.DrawRectangleRounded(regexLabelRect, 0.5f, 8, new Color(50, 50, 50, 230));
+               if (isControlFTextsAndRectanglesNeedToBeRecalculated) {
+                  regexLabelSize = (Int2)Raylib.MeasureTextEx(Program.font, regexLabel, Program.config.fontSize, 0);
+               }
+
+               Vector2 currentMatchIndicatorTextOffset = regexLabelOffset + new Vector2(regexLabelSize.x + 2 * horizontalSpace + 1, 0); // Offset is relative to textPosition
+
+               if (isControlFTextsAndRectanglesNeedToBeRecalculated) {
+                  controlFBufferSurroundingRect = Program.GenerateSurroundingRectangle(controlFBuffer, textPosition, Program.font, Program.config.fontSize, horizontalSpace, verticalSpace);
+                  regexLabelSurroundingRect = Program.GenerateSurroundingRectangle(regexLabel, textPosition + regexLabelOffset, Program.font, Program.config.fontSize, horizontalSpace, verticalSpace);
+                  currentMatchIndicatorTextRect = Program.GenerateSurroundingRectangle(currentMatchIndicatorText, textPosition + currentMatchIndicatorTextOffset, Program.font, Program.config.fontSize, horizontalSpace, verticalSpace);
+               }
+
+               isControlFTextsAndRectanglesNeedToBeRecalculated = false;
+
+               Raylib.DrawRectangleRounded(controlFBufferSurroundingRect, 0.5f, 8, new Color(50, 50, 50, 230));
+               Raylib.DrawRectangleRounded(regexLabelSurroundingRect, 0.5f, 8, new Color(50, 50, 50, 230));
 
                if (totalControlFMatches > 0)
                   Raylib.DrawRectangleRounded(currentMatchIndicatorTextRect, 0.5f, 8, new Color(50, 50, 50, 230));
@@ -1001,10 +1011,10 @@ namespace Notepad___Raylib {
          if (controlFBuffer == "") return;
 
          if (submittedControlFBuffer == controlFBuffer) {
-            if(modifiers == null) {
+            if (modifiers == null) {
                IncreaseControlFMatchByOne();
             } else {
-               if(modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT)) {
+               if (modifiers.Contains(KeyboardKey.KEY_LEFT_SHIFT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_SHIFT)) {
                   DecreaseControlFMatchByOne();
                } else {
                   IncreaseControlFMatchByOne();

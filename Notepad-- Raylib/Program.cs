@@ -735,6 +735,14 @@ namespace Notepad___Raylib {
                   if (currentState is EditorStateDirectoryView)
                      YMargin = Line.Height;
                }
+
+               try {
+                  EditorStatePlaying statePlaying = (EditorStatePlaying)currentState;
+                  statePlaying.isControlFTextsAndRectanglesNeedToBeRecalculated = true;
+               }
+               catch {
+                  Debug.Assert(currentState is not EditorStatePlaying);
+               }
             } else {
                camera.target.Y -= mouseWheelInput * Line.Height;
             }
