@@ -317,7 +317,7 @@ namespace Notepad___Raylib {
                   // Handling key presses that don't have modifiers ie. normal key presses
                   ////////////////////////////////////////////////////////////////////////
                   {
-                     if (pressedKeys != null) {
+                     if (pressedKeys != null && !Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SUPER)) {
 #if VISUAL_STUDIO
                         Program.PrintPressedKeys(pressedKeys);
 #endif
