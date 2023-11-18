@@ -63,6 +63,7 @@ namespace Notepad___Raylib {
       public static bool isQuitButtonPressed = false;
       public static bool isDraggingWindow = false;
       public static UndoHistory<List<UndoItem>> undoHistory = new UndoHistory<List<UndoItem>>(512);
+      public static UndoHistory<List<UndoItem>> redoHistory = new UndoHistory<List<UndoItem>>(512);
       public static readonly Stopwatch windowResizeTimer = new Stopwatch(); // This gets triggered even when window de-minimized which is what i am using it for.
       /// <summary>
       /// Vertical form of <see cref="Config.leftPadding"/>
@@ -685,12 +686,13 @@ namespace Notepad___Raylib {
          line.InsertTextAt(cursor.position.x, linesToInsert[0].Value);
 
          for (int i = 1; i < linesToInsert.Count; i++) {
-            undoItems.Add(new UndoItem(null, cursor.position.y + 1, cursor.position, UndoAction.Remove));
-
             lines.Insert(cursor.position.y + i, linesToInsert[i]);
+
+            undoItems.Add(new UndoItem(new Line(linesToInsert[i]), cursor.position.y + 1, cursor.position, UndoAction.Remove));
          }
 
          undoHistory.Push(undoItems);
+         redoHistory.Clear();
 
          Line lastInsertedLine = lines[cursor.position.y + linesToInsert.Count - 1];
          lastInsertedLine.InsertTextAt(lastInsertedLine.Value.Length, textAfterCursorFirstLine);

@@ -158,6 +158,8 @@ namespace Notepad___Raylib {
       /// <param name="lines"></param>
       /// <param name="cursor"></param>
       public void Delete(List<Line> lines, Cursor cursor) {
+         Program.redoHistory.Clear();
+
          GetRightAndLeft(out Int2 left, out Int2 right);
          Line[] linesInRange = GetLinesInRange(lines).ToArray();
 

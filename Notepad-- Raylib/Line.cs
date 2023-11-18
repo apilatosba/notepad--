@@ -42,6 +42,8 @@ namespace Notepad___Raylib {
             new UndoItem(new Line(this), Program.lines.IndexOf(this), cursor.position, UndoAction.Replace)
          });
 
+         Program.redoHistory.Clear();
+
          value = value.Insert(index, c);
       }
 

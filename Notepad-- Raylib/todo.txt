@@ -4,7 +4,6 @@ shaders
    make cursor blink. make it with a shader
    subpixel rendering
 add shortcuts
-   --shiftSelect ctrl+z if inserts new text
 render bloom shader at quarter resolution
     or not. i have better optimization. use two pass blur filter. render it to same rendertexture several times and of course sample the same rendertexture progressively. use weight function. gaussian weight function is good they said.
     or do both
