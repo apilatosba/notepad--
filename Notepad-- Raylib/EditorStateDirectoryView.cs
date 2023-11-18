@@ -24,6 +24,7 @@ namespace Notepad___Raylib {
       Image? windowCoverImage; // IsImageReady() function doesnt exist in this nuget package so i manually set it to null 
       Texture? windowCoverTexture; // IsTextureReady() function doesnt exist in this nuget package so i manually set it to null
       RenderTexture? highlightedLineRenderTexture; // IsRenderTextureReady() function doesnt exist in this nuget package so i manually set it to null
+      bool isHighlightedLineRenderTextureChanged;
       ColorInt directoryColor;
       ColorInt fileColor;
       readonly Stopwatch lastKeyboardInputTimer = new Stopwatch();
@@ -40,7 +41,7 @@ namespace Notepad___Raylib {
       int totalControlFMatches;
       char lastPressedChar = '\0';
       List<int> keyPressMatches = new List<int>();
-      
+
       public void EnterState(IEditorState previousState) {
          Program.YMargin = Line.Height;
          lastKeyboardInputTimer.Start();
@@ -98,6 +99,7 @@ namespace Notepad___Raylib {
          windowCoverImage ??= Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
          windowCoverTexture ??= Raylib.LoadTextureFromImage((Image)windowCoverImage);
          highlightedLineRenderTexture ??= Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+         isHighlightedLineRenderTextureChanged = true; // Safe to assume that it is changed since it is called once but not every frame.
 
          directoryColor = Program.config.textColor - new ColorInt(40, 20, 20, 0);
          fileColor = Program.config.textColor + new ColorInt(-10, 30, -10, 0);
@@ -497,6 +499,7 @@ namespace Notepad___Raylib {
             windowCoverImage = Raylib.GenImageColor(Raylib.GetScreenWidth(), Raylib.GetScreenHeight(), Raylib.WHITE);
             windowCoverTexture = Raylib.LoadTextureFromImage((Image)windowCoverImage);
             highlightedLineRenderTexture = Raylib.LoadRenderTexture(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
+            isHighlightedLineRenderTextureChanged = true;
 
             windowResizeTimer.Restart();
          }
@@ -588,11 +591,14 @@ namespace Notepad___Raylib {
                                      (float)Raylib.GetTime(),
                                      ShaderUniformDataType.SHADER_UNIFORM_FLOAT);
 
-               Raylib.SetShaderValueTexture(Program.rainbowShader,
-                                            Program.rainbowShaderHighlightedLineMaskLoc,
-                                            ((RenderTexture)highlightedLineRenderTexture).texture);
+               if (isHighlightedLineRenderTextureChanged) {
+                  Raylib.SetShaderValueTexture(Program.rainbowShader,
+                                               Program.rainbowShaderHighlightedLineMaskLoc,
+                                               ((RenderTexture)highlightedLineRenderTexture).texture);
+               }
+               isHighlightedLineRenderTextureChanged = false;
 
-               // Dispatch
+               // Dispatch. Not quite.
                Raylib.DrawTextureRec((Texture)windowCoverTexture,
                                      new Rectangle(0, 0, ((Texture)windowCoverTexture).width, -((Texture)windowCoverTexture).height),
                                      new Vector2(0, 0),

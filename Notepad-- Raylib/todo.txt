@@ -12,7 +12,6 @@ sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
 [abort] controlF regex doesnt match cahracters if they are already in match but it should (bug?) see what i am talking about by searching "....." in controlF. it jumps 5 by 5 but it should proceed 1 by 1 
 [abort. used ctrl+q instead] m3 to minimize
---try to not send data to gpu every frame if data is not updated. see if that works and if it works, do it that way because acerola said it is not good to send data to gpu every frame, he said do it if you have to otherwise dont do it.
 detect whether window is visible, if it is not then stop rendering 
 [dont do this if you value yourself. move on to another project] concept of window
 [refactor] abstract out controlF rendering. same code in playing state and directory view state
