@@ -873,7 +873,7 @@ namespace Notepad___Raylib {
          }
       }
 
-      public static void OpenDirectoryInDefaultProgram(string path) {
+      public static void OpenDirectoryOrFileInDefaultProgram(string path) {
          Process.Start(new ProcessStartInfo {
             FileName = path,
             UseShellExecute = true,
@@ -889,6 +889,39 @@ namespace Notepad___Raylib {
          Vector2 mouseWheelInput = Raylib.GetMouseWheelMoveV();
 
          return mouseWheelInput != Vector2.Zero && mouseWheelInputLastFrame == Vector2.Zero;
+      }
+
+      public static bool IsTextFile(string filePath) {
+         try {
+            // Attempt to read the file using StreamReader with auto-detection of encoding
+            using (StreamReader reader = new StreamReader(filePath, detectEncodingFromByteOrderMarks: true)) {
+               while (!reader.EndOfStream) {
+                  // Read a line from the file
+                  string line = reader.ReadLine();
+
+                  // Perform some basic text validation (customize based on your requirements)
+                  if (ContainsNonTextCharacters(line)) {
+                     return false; // File contains non-text characters
+                  }
+               }
+            }
+
+            return true; // File appears to be a text file
+         }
+         catch (Exception ex) {
+            Console.WriteLine($"An error occurred while determining if the file is a text file: {ex.Message}");
+            return false;
+         }
+
+         bool ContainsNonTextCharacters(string text) {
+            // Check for non-text characters using ASCII encoding
+            foreach (char c in text) {
+               if (c < 32 && c != '\t' && c != '\r' && c != '\n') {
+                  return true; // Found a non-text character
+               }
+            }
+            return false;
+         }
       }
 
       public static string GetConfigPath() {

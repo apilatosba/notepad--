@@ -9,6 +9,7 @@ render bloom shader at quarter resolution
     or do both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
+if pressed file is not a text file open it up in the default application and minimize maybe not minimize (EditorDirectoryView state only)
 [abort] controlF regex doesnt match cahracters if they are already in match but it should (bug?) see what i am talking about by searching "....." in controlF. it jumps 5 by 5 but it should proceed 1 by 1 
 [abort. used ctrl+q instead] m3 to minimize
 detect whether window is visible, if it is not then stop rendering 

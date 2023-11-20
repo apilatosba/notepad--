@@ -152,9 +152,9 @@ namespace Notepad___Raylib {
                         internalState = InternalState.ControlF;
                      }
 
-                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER)) {
+                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER) || Raylib.IsKeyPressed(KeyboardKey.KEY_KP_ENTER)) {
                         try {
-                           Program.OpenDirectoryInDefaultProgram(Directory.GetCurrentDirectory());
+                           Program.OpenDirectoryOrFileInDefaultProgram(Directory.GetCurrentDirectory());
                            Raylib.MinimizeWindow();
 
                            break;
@@ -332,10 +332,14 @@ namespace Notepad___Raylib {
                            }
 
                            if (isFile) {
-                              Program.filePath = pressedLineValue;
-                              Program.lines = Program.ReadLinesFromFile(Program.filePath);
-                              Program.longestLine = Program.FindLongestLine(Program.lines);
-                              IEditorState.SetStateTo(new EditorStatePlaying());
+                              if (Program.IsTextFile(pressedLineValue)) {
+                                 Program.filePath = pressedLineValue;
+                                 Program.lines = Program.ReadLinesFromFile(Program.filePath);
+                                 Program.longestLine = Program.FindLongestLine(Program.lines);
+                                 IEditorState.SetStateTo(new EditorStatePlaying());
+                              } else {
+                                 Program.OpenDirectoryOrFileInDefaultProgram(pressedLineValue);
+                              }
                            } else {
                               if (CheckIfHasPermissionToOpenDirectory(pressedLineValue)) {
                                  Program.directoryPath = pressedLineValue;
