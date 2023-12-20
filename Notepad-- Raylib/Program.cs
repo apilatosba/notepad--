@@ -1,4 +1,4 @@
-﻿#define VISUAL_STUDIO
+﻿//#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -921,6 +921,16 @@ namespace Notepad___Raylib {
                }
             }
             return false;
+         }
+      }
+
+      static void DrawBorder(Color color, int thickness) {
+         Raylib.DrawRectangleLinesEx(new Rectangle(0, 0, Raylib.GetScreenWidth(), Raylib.GetScreenHeight()), thickness, color);
+      }
+
+      public static void DrawBorderIfNotMaximized(Color color, int thickness) {
+         if (!Raylib.IsWindowMaximized()) {
+            DrawBorder(color, thickness);
          }
       }
 

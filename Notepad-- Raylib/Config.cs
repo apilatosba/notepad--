@@ -14,6 +14,7 @@ namespace Notepad___Raylib {
       [XmlElement] public Color backgroundColor = new Color(31, 31, 31, 50);
       [XmlElement] public Color cursorColor = new Color(227, 227, 227, 255);
       [XmlElement] public Color selectionColor = new Color(61, 129, 207, 102);
+      [XmlElement] public Color borderColor = new Color(115, 77, 255, 222);
       [XmlElement] public string backgroundImage = "482950.png";
       [XmlElement] public float backgroundLucidity = 0.5f;
 
@@ -32,6 +33,7 @@ namespace Notepad___Raylib {
          backgroundColor = config.backgroundColor;
          cursorColor = config.cursorColor;
          selectionColor = config.selectionColor;
+         borderColor = config.borderColor;
          backgroundImage = config.backgroundImage;
          backgroundLucidity = config.backgroundLucidity;
       }

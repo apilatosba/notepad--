@@ -1,4 +1,4 @@
-﻿#define VISUAL_STUDIO
+﻿//#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System.Diagnostics;
 using System.IO;
@@ -90,6 +90,8 @@ namespace Notepad___Raylib {
                Raylib.DrawTextureEx(Program.repoIcon, new Vector2(repoRect.x, repoRect.y), 0, scale, Raylib.WHITE);
             }
          }
+
+         Program.DrawBorderIfNotMaximized(Program.config.borderColor, 1);
       }
 
       public void Update() {

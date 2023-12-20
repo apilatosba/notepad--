@@ -1,4 +1,4 @@
-﻿#define VISUAL_STUDIO
+﻿//#define VISUAL_STUDIO
 using Raylib_CsLo;
 using System;
 using System.Collections.Generic;
@@ -1013,6 +1013,8 @@ namespace Notepad___Raylib {
                                     Program.config.textColor);
                }
             }
+
+            Program.DrawBorderIfNotMaximized(Program.config.borderColor, 1);
          }
       }
 

@@ -9,13 +9,16 @@ render bloom shader at quarter resolution
     or do both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
-if pressed file is not a text file open it up in the default application and minimize maybe not minimize (EditorDirectoryView state only)
+ctrl + up and ctrl + down to jump blank lines. blank line is anything that matches /^\s*$/
+Program.RenderLines() i iterate through every line every frame. problem. what i should do is determine (do the math) what lines to render from these values: font size, camera position, y margin, screen height i think thats all. so create a function that takes these as arguments and returns you what lines to render (index range probably). so then you only iterate through these lines to render
+it uses ~15% of my gpu when idle. problem
 [abort] controlF regex doesnt match cahracters if they are already in match but it should (bug?) see what i am talking about by searching "....." in controlF. it jumps 5 by 5 but it should proceed 1 by 1 
 [abort. used ctrl+q instead] m3 to minimize
 detect whether window is visible, if it is not then stop rendering 
 [dont do this if you value yourself. move on to another project] concept of window
 [refactor] abstract out controlF rendering. same code in playing state and directory view state
 --implement redo, un-undo
+   bug: cursor positioning doesnt work. sometimes it goes out of text area and crashes the program
 show images when hovered over on directory view state
 frontend to settings
 add scrollbars
