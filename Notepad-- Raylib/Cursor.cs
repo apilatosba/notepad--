@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace Notepad___Raylib {
    internal class Cursor {
@@ -123,20 +124,28 @@ namespace Notepad___Raylib {
 
                break;
             case KeyboardKey.KEY_UP:
-               if (isControlKeyDown) return;
                if (IsCursorAtFirstLine()) return;
 
-               position.y--;
+               if (isControlKeyDown) {
+                  position.y = ComputeNextJumpLocation(lines, position.y, Direction.Up);
+               } else {
+                  position.y--;
+               }
+
                position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
 
                MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
 
                break;
             case KeyboardKey.KEY_DOWN:
-               if (isControlKeyDown) return;
                if (IsCursorAtLastLine(lines)) return;
 
-               position.y++;
+               if (isControlKeyDown) {
+                  position.y = ComputeNextJumpLocation(lines, position.y, Direction.Down);
+               } else {
+                  position.y++;
+               }
+
                position.x = Math.Min(exXPosition, lines[position.y].Value.Length); //Math.Min(position.x, lines[position.y].Value.Length);
 
                MakeSureCursorIsVisibleToCamera(lines, ref camera, fontSize, leftPadding, font);
@@ -298,6 +307,70 @@ namespace Notepad___Raylib {
             default:
                Debug.Assert(false);
                return -1;
+         }
+      }
+
+      int FindIndexOfNextBlankLine(List<Line> lines, int startIndex, Direction direction) {
+         Regex blankLineRegex = new Regex(@"^\s*$");
+
+         switch (direction) {
+            case Direction.Up: {
+               for (int i = startIndex - 1; i >= 0; i--) {
+                  if (blankLineRegex.IsMatch(lines[i].Value)) {
+                     return i;
+                  }
+               }
+
+               return -1;
+            }
+
+            case Direction.Down: {
+               for (int i = startIndex + 1; i < lines.Count; i++) {
+                  if (blankLineRegex.IsMatch(lines[i].Value)) {
+                     return i;
+                  }
+               }
+
+               return -1;
+            }
+
+            default: throw new Exception("Invalid direction");
+         }
+      }
+
+      int ComputeNextJumpLocation(List<Line> lines, int currentLocation, Direction direction) {
+         Regex blankLineRegex = new Regex(@"^\s*$");
+
+         switch (direction) {
+            case Direction.Up: {
+               bool isStartingLineBlank = blankLineRegex.IsMatch(lines[currentLocation - 1].Value);
+               bool isCurrentLineBlank;
+
+               for (int i = currentLocation - 2; i >= 0; i--) {
+                  isCurrentLineBlank = blankLineRegex.IsMatch(lines[i].Value);
+                  if (isCurrentLineBlank != isStartingLineBlank) {
+                     return isStartingLineBlank ? i + 1 : i;
+                  }
+               }
+
+               return 0;
+            }
+
+            case Direction.Down: {
+               bool isStartingLineBlank = blankLineRegex.IsMatch(lines[currentLocation + 1].Value);
+               bool isCurrentLineBlank;
+
+               for (int i = currentLocation + 2; i < lines.Count; i++) {
+                  isCurrentLineBlank = blankLineRegex.IsMatch(lines[i].Value);
+                  if (isCurrentLineBlank != isStartingLineBlank) {
+                     return isStartingLineBlank ? i - 1 : i;
+                  }
+               }
+
+               return lines.Count - 1;
+            }
+
+            default: throw new Exception("Invalid direction");
          }
       }
 
