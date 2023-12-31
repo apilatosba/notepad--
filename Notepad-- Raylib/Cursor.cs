@@ -96,7 +96,7 @@ namespace Notepad___Raylib {
                   position.y++;
                } else {
                   if (isControlKeyDown) {
-                     position.x += CalculateHowManyCharactersToJump(lines, Direction.Right);
+                     position.x = CalculateNextJumpLocationX(lines, Direction.Right);
                   } else {
                      position.x++;
                   }
@@ -113,7 +113,7 @@ namespace Notepad___Raylib {
                   position.x = lines[--position.y].Value.Length;
                } else {
                   if (isControlKeyDown) {
-                     position.x -= CalculateHowManyCharactersToJump(lines, Direction.Left);
+                     position.x = CalculateNextJumpLocationX(lines, Direction.Left);
                   } else {
                      position.x--;
                   }
@@ -270,6 +270,7 @@ namespace Notepad___Raylib {
          }
       }
 
+      [Obsolete("Use CalculateNextJumpLocationX() instead")]
       public int CalculateHowManyCharactersToJump(in List<Line> lines, Direction direction) {
          switch (direction) {
             case Direction.Right: {
@@ -332,6 +333,40 @@ namespace Notepad___Raylib {
                }
 
                return -1;
+            }
+
+            default: throw new Exception("Invalid direction");
+         }
+      }
+
+      public int CalculateNextJumpLocationX(in List<Line> lines, Direction direction) {
+         switch (direction) {
+            case Direction.Right: {
+               bool isStartingCharSpace = lines[position.y].Value[position.x + 1] == ' ';
+               bool isCurrentCharSpace;
+
+               for (int i = position.x + 2; i < lines[position.y].Value.Length; i++) {
+                  isCurrentCharSpace = lines[position.y].Value[i] == ' ';
+                  if (isCurrentCharSpace != isStartingCharSpace) {
+                     return isStartingCharSpace ? i : i;
+                  }
+               }
+
+               return lines[position.y].Value.Length;
+            }
+
+            case Direction.Left: {
+               bool isStartingCharSpace = lines[position.y].Value[position.x - 2] == ' ';
+               bool isCurrentCharSpace;
+
+               for (int i = position.x - 2; i >= 0; i--) {
+                  isCurrentCharSpace = lines[position.y].Value[i] == ' ';
+                  if (isCurrentCharSpace != isStartingCharSpace) {
+                     return isStartingCharSpace ? i + 1 : i + 1;
+                  }
+               }
+
+               return 0;
             }
 
             default: throw new Exception("Invalid direction");

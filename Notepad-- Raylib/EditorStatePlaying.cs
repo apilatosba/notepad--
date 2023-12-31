@@ -480,7 +480,7 @@ namespace Notepad___Raylib {
                               new Selection(cursor.position, new Int2(Program.lines[cursor.position.y - 1].Value.Length, cursor.position.y - 1)).Delete(Program.lines, cursor);
                            } else {
                               if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                 int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Left);
+                                 int howManyCharactersToJump = cursor.position.x - cursor.CalculateNextJumpLocationX(Program.lines, Direction.Left);
                                  Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump);
                               } else {
                                  Program.RemoveTextAtCursor(Program.lines, cursor, 1);
@@ -597,7 +597,7 @@ namespace Notepad___Raylib {
                               new Selection(cursor.position, new Int2(0, cursor.position.y + 1)).Delete(Program.lines, cursor);
                            } else {
                               if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                                 int howManyCharactersToJump = cursor.CalculateHowManyCharactersToJump(Program.lines, Direction.Right);
+                                 int howManyCharactersToJump = cursor.CalculateNextJumpLocationX(Program.lines, Direction.Right) - cursor.position.x;
                                  Program.RemoveTextAtCursor(Program.lines, cursor, howManyCharactersToJump, Direction.Right);
                               } else {
                                  Program.RemoveTextAtCursor(Program.lines, cursor, 1, Direction.Right);
