@@ -235,7 +235,7 @@ namespace Notepad___Raylib {
 
          pos.y = (worldSpaceCoordinates.y - Program.YMargin) / Line.Height;
 
-         if (pos.y > lines.Count - 1) pos.y = lines.Count - 1;
+         pos.y = Math.Clamp(pos.y, 0, lines.Count - 1);
 
          Line line = lines[pos.y];
          string text = line.Value;
