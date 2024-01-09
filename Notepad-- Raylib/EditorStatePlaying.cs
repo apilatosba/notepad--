@@ -614,11 +614,7 @@ namespace Notepad___Raylib {
                            //camera.target.X -= 10;
                            break;
                         case KeyboardKey.KEY_UP:
-                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                              //camera.target.Y -= Line.Height; // I do blank line jumping on Cursor.HandleArrowKeysNavigation instead
-                           } else {
-                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                           }
+                           if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
 
                            if (modifiers.Contains(KeyboardKey.KEY_LEFT_ALT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_ALT)) {
                               Line lineAboveCopy = new Line(Program.lines[cursor.position.y - 1]);
@@ -629,11 +625,7 @@ namespace Notepad___Raylib {
 
                            break;
                         case KeyboardKey.KEY_DOWN:
-                           if (modifiers.Contains(KeyboardKey.KEY_LEFT_CONTROL) || modifiers.Contains(KeyboardKey.KEY_RIGHT_CONTROL)) {
-                              //camera.target.Y += Line.Height; // I do blank line jumping on Cursor.HandleArrowKeysNavigation instead
-                           } else {
-                              if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
-                           }
+                           if (Raylib.IsKeyUp(KeyboardKey.KEY_LEFT_SHIFT) && Raylib.IsKeyUp(KeyboardKey.KEY_RIGHT_SHIFT)) shiftSelection = null;
 
                            if (modifiers.Contains(KeyboardKey.KEY_LEFT_ALT) || modifiers.Contains(KeyboardKey.KEY_RIGHT_ALT)) {
                               Line lineBelowCopy = new Line(Program.lines[cursor.position.y + 1]);

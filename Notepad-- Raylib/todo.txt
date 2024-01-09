@@ -9,6 +9,7 @@ render bloom shader at quarter resolution
     or do both
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
+bug: when selecting text with mouse program crashes if mouse goes above the y=0 level (if y is negative)
 ctrl+up/down does two things in directory view mode. scrolling and jumping. choose one
 ctrl + v should work on ctrl+f mode too
 Program.RenderLines() i iterate through every line every frame. problem. what i should do is determine (do the math) what lines to render from these values: font size, camera position, y margin, screen height i think thats all. so create a function that takes these as arguments and returns you what lines to render (index range probably). so then you only iterate through these lines to render
