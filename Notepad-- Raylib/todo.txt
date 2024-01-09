@@ -10,7 +10,6 @@ render bloom shader at quarter resolution
 sfx
    when in controlF pressing enter. it says fichuw fichuw or don don every time you press
 ctrl+up/down does two things in directory view mode. scrolling and jumping. choose one
-ctrl + v should work on ctrl+f mode too
 Program.RenderLines() i iterate through every line every frame. problem. what i should do is determine (do the math) what lines to render from these values: font size, camera position, y margin, screen height i think thats all. so create a function that takes these as arguments and returns you what lines to render (index range probably). so then you only iterate through these lines to render
 it uses ~15% of my gpu when idle. problem
 [abort] controlF regex doesnt match cahracters if they are already in match but it should (bug?) see what i am talking about by searching "....." in controlF. it jumps 5 by 5 but it should proceed 1 by 1 

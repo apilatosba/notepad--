@@ -654,6 +654,14 @@ namespace Notepad___Raylib {
                         internalState = InternalState.Normal;
                         break;
                      }
+
+                     if (Raylib.IsKeyPressed(KeyboardKey.KEY_V)) {
+                        string clipboardText = Raylib.GetClipboardText_();
+                        controlFBuffer += clipboardText;
+                        isControlFTextsAndRectanglesNeedToBeRecalculated = true;
+
+                        SimulateEnterInControlF(null);
+                     }
                   }
 
                   if (pressedKeys != null) {
