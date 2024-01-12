@@ -332,7 +332,7 @@ namespace Notepad___Raylib {
                            }
 
                            if (isFile) {
-                              if (Program.IsTextFile(pressedLineValue)) {
+                              if (Program.IsTextFile(pressedLineValue) || pressedLineValue.EndsWith(".zort")) {
                                  Program.filePath = pressedLineValue;
                                  Program.lines = Program.ReadLinesFromFile(Program.filePath);
                                  Program.longestLine = Program.FindLongestLine(Program.lines);
